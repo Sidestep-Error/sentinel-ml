@@ -8,12 +8,12 @@ passed to features or models.
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class IOCType(str, Enum):
+class IOCType(StrEnum):
     IP = "ip"
     DOMAIN = "domain"
     URL = "url"

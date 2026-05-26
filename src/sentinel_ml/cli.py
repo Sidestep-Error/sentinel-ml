@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Annotated
 
 import typer
 
@@ -39,8 +40,8 @@ def extract_iocs_cmd(path: Path) -> None:
 
 @train_app.command("threat-classifier")
 def train_threat_classifier(
-    dataset: Path = typer.Option(..., help="JSONL with ThreatReport objects"),
-    out: Path = typer.Option(Path("models_store/threat_classifier.joblib")),
+    dataset: Annotated[Path, typer.Option(help="JSONL with ThreatReport objects")],
+    out: Annotated[Path, typer.Option()] = Path("models_store/threat_classifier.joblib"),
 ) -> None:
     """Train the baseline TF-IDF + LR threat classifier."""
     reports = list(load_threat_reports_jsonl(dataset))
