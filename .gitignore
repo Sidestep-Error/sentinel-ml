@@ -1,0 +1,56 @@
+# --- Local / IDE ---
+.env
+.env.*
+!.env.example
+.claude/
+/CLAUDE.md
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# --- Virtual envs ---
+.venv/
+venv/
+env/
+
+# --- Datasets and model artifacts (do NOT commit large binaries) ---
+data/*
+!data/.gitkeep
+!data/README.md
+models_store/*
+!models_store/.gitkeep
+*.pkl
+*.joblib
+*.bin
+*.safetensors
+*.h5
+*.onnx
+mlruns/
+
+# --- Notebooks output (commit cleaned notebooks only) ---
+*.ipynb_checkpoints/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Secrets and credentials ---
+*service-account*.json
+*credentials*.json
+*.pem
+*.key
+!cosign.pub

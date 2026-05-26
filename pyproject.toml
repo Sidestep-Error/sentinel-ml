@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentinel-ml"
+version = "0.1.0"
+description = "ML-baserat sakerhetsmodul for Sentinel Upload API (ChasAcademy 2026)"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = { text = "Proprietary" }
+authors = [
+    { name = "Sidestep Error" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Private :: Do Not Upload",
+]
+
+# Pin major versions; let patch float for security fixes.
+dependencies = [
+    "scikit-learn>=1.5,<2.0",
+    "pandas>=2.2,<3.0",
+    "numpy>=1.26,<3.0",
+    "pydantic>=2.7,<3.0",
+    "pydantic-settings>=2.3,<3.0",
+    "fastapi>=0.115,<1.0",
+    "uvicorn[standard]>=0.30,<1.0",
+    "pymongo>=4.8,<5.0",
+    "joblib>=1.4,<2.0",
+    "typer>=0.12,<1.0",
+    "python-dotenv>=1.0,<2.0",
+]
+
+[project.optional-dependencies]
+nlp = [
+    "spacy>=3.7,<4.0",
+]
+llm = [
+    "httpx>=0.27,<1.0",
+]
+adversarial = [
+    "adversarial-robustness-toolbox>=1.18,<2.0",
+]
+tracking = [
+    "mlflow>=2.14,<3.0",
+]
+dev = [
+    "pytest>=8.0,<9.0",
+    "pytest-asyncio>=0.23,<1.0",
+    "pytest-cov>=5.0,<7.0",
+    "ruff>=0.5,<1.0",
+    "pip-audit>=2.7,<3.0",
+    "httpx>=0.27,<1.0",
+]
+
+[project.scripts]
+sentinel-ml = "sentinel_ml.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "C4", "SIM"]
+ignore = [
+    "E501",  # line length handled by formatter
+    "S101",  # assert used in tests
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+asyncio_mode = "auto"
+markers = [
+    "slow: long-running tests (deselect with '-m \"not slow\"')",
+    "integration: tests requiring external services (MongoDB, Ollama)",
+]
