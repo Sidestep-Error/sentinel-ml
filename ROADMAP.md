@@ -13,7 +13,7 @@
 - [x] Repo skapat och scaffold på plats
 - [ ] Alla teammedlemmar har klonat och kört `pip install -e ".[dev]"` framgångsrikt
 - [ ] CI-pipeline grön (ruff + pytest)
-- [ ] Kursledare har godkänt scope (`bygga vidare på Sentinel`)
+- [x] Kursledare har godkänt scope (`bygga vidare på Sentinel`)
 
 ### Fas 1 — Baseline (vecka 1, ~till 2026-06-01)
 
