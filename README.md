@@ -1,5 +1,14 @@
 # sentinel-ml
 
+[![CI](https://github.com/Sidestep-Error/sentinel-ml/actions/workflows/ci.yml/badge.svg)](https://github.com/Sidestep-Error/sentinel-ml/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.5%2B-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![License: Proprietary](https://img.shields.io/badge/license-proprietary-lightgrey)](#licens)
+[![ChasAcademy 2026](https://img.shields.io/badge/ChasAcademy-2026-blue)](https://chasacademy.se/)
+[![Status: scaffold](https://img.shields.io/badge/status-scaffold-orange)]()
+
 ML-baserat säkerhetsmodul som bygger vidare på
 [sentinel-upload-api](https://github.com/Sidestep-Error/sentinel-upload-api).
 Grupprojekt för kursen *Nätverks-, OT- & AI-säkerhet*

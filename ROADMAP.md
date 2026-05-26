@@ -25,6 +25,7 @@
 - [ ] **Spår B:** Random Forest baseline med `class_weight="balanced"`.
 - [ ] **Integration:** Lokal FastAPI-service (`/predict/threat`, `/predict/upload`) som returnerar dummy-svar.
 - [ ] **LLM:** Ollama installerat lokalt, `llama3.2:3b` nedladdad, en `client.generate()`-anrop funkar i tester.
+- [ ] **Status-badge:** uppdatera README.md `Status: scaffold` → `Status: alpha` när fas är klar.
 
 ### Fas 2 — Iteration + adversarial (vecka 2, ~2026-06-08)
 
@@ -39,6 +40,7 @@
   - [ ] **Prompt injection:** kuraterad lista av prompts som försöker styra LLM-output. Mät success rate.
 - [ ] **Rapport:** Påbörja teknisk rapport (`docs/technical-report.md`).
 - [ ] **UI-integration:** PR i `sentinel-upload-api` som visar ML-output i threat map-popup.
+- [ ] **Status-badge:** uppdatera README.md `Status: alpha` → `Status: beta` när fas är klar.
 
 ### Fas 3 — Demo + leverans (vecka 3, ~2026-06-15 → 2026-06-19)
 
@@ -50,6 +52,7 @@
 - [ ] Teknisk rapport ifylld (arkitektur, dataflöde, modellval, träningsprocess, säkerhetsanalys).
 - [ ] Presentationsmaterial — 10–15 min, alla pratar (intro, metod, demo, säkerhet, slutsats).
 - [ ] Slutgiltig commit + tag (`v1.0.0`).
+- [ ] **Status-badge:** uppdatera README.md `Status: beta` → `Status: released` vid inlämning.
 - [ ] Inlämning via Canvas/portalen senast **2026-06-19**.
 
 ---
