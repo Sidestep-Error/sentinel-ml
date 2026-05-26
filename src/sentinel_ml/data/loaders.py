@@ -7,6 +7,7 @@ Predictions go into a separate `ml_predictions` collection or onto disk.
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -16,6 +17,8 @@ from sentinel_ml.data.schemas import ThreatReport, UploadRecord
 
 if TYPE_CHECKING:
     from pymongo.collection import Collection
+
+logger = logging.getLogger(__name__)
 
 
 def _get_collection(name: str) -> Collection:
@@ -43,7 +46,8 @@ def load_uploads_from_mongo(limit: int | None = None) -> list[UploadRecord]:
     for doc in cursor:
         try:
             records.append(UploadRecord.model_validate(doc))
-        except Exception:  # noqa: BLE001 — skip malformed docs silently in training
+        except Exception:  # noqa: BLE001 - we explicitly want to skip any malformed doc
+            logger.debug("Skipping malformed upload document", exc_info=True)
             continue
     return records
 

@@ -35,7 +35,9 @@ def poison_labels(
     if not 0.0 <= ratio <= 1.0:
         raise ValueError("ratio must be in [0.0, 1.0]")
 
-    rng = random.Random(seed)
+    # Seeded PRNG required for reproducible adversarial experiments — not used for any
+    # security/cryptographic purpose, so ruff's S311 does not apply here.
+    rng = random.Random(seed)  # noqa: S311
     new_texts = list(texts)
     new_labels = list(labels)
 
