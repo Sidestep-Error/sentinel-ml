@@ -45,16 +45,28 @@ class ThreatReport(BaseModel):
 
 
 class UploadRecord(BaseModel):
-    """Minimal projection of sentinel-upload-api's `uploads` collection."""
+    """Projection of sentinel-upload-api's `uploads` collection.
+
+    Field shapes verified 2026-06-02 against upstream `app/models.py`
+    after PR #68. All fields default to sensible empties so documents
+    that predate a field (e.g. pre-PR-#68 records without `size_bytes`)
+    still validate.
+    """
 
     sha256: str
     filename: str
     content_type: str
-    size_bytes: int
-    scan_status: str  # "clean" | "malicious" | "error"
-    decision: str  # "accepted" | "review" | "rejected"
-    risk_score: int = Field(ge=0, le=100)
-    created_at: datetime
+    size_bytes: int | None = Field(default=None, ge=0)
+    scan_status: str = "clean"  # "clean" | "malicious" | "error"
+    decision: str = "accepted"  # "accepted" | "review" | "rejected"
+    risk_score: int = Field(default=0, ge=0, le=100)
+    created_at: datetime | None = None
+    # Upstream fields previously not modeled in sentinel-ml.
+    status: str = "accepted"  # "accepted" | "rejected"
+    risk_reasons: list[str] = Field(default_factory=list)
+    scan_engine: str = "unknown"
+    scan_detail: str = ""
+    deduplicated: bool = False
 
 
 class Prediction(BaseModel):
