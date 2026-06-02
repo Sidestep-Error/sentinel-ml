@@ -1,6 +1,16 @@
 """
-Automatiserat jämförelsetest: regelbaserad vs AI-detektering.
-Genererar syntetisk attackdata, kör båda metoderna och beräknar förbättringar.
+chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
+Grupp: Sidestep Error
+
+Modulens ansvar:
+Denna testmodul jämför två detektionsstrategier: regelbaserad logik och AI-baserad
+anomalidetektering. Modulen skapar syntetiska angreppsscenarier, kör båda metoderna,
+mäter exekveringstid och sammanställer resultat till terminal samt JSON-rapport.
+
+Pedagogiskt syfte:
+Att tydligt visa styrkor och svagheter i olika detektionsmodeller, exempelvis när
+långsamma eller mönsterbaserade attacker passerar fasta tröskelvärden men ändå kan
+fångas av en ML-baserad metod.
 """
 
 import json
@@ -20,7 +30,14 @@ from anomaly_detector import detect_anomalies, extract_features, statistical_bas
 # ---------------------------------------------------------------------------
 
 def generate_ssh_brute_force(n_attempts: int = 10) -> pd.DataFrame:
-    """10 snabba SSH-misslyckanden från samma IP (nattetid)."""
+    """Skapa scenario med snabb SSH brute force under kort tidsintervall.
+
+    Args:
+        n_attempts: Antal misslyckade inloggningsförsök som genereras.
+
+    Returns:
+        DataFrame med attackhändelser plus bakgrundsbrus.
+    """
     base = datetime(2026, 4, 30, 3, 0, 0)
     records = [
         {
@@ -51,7 +68,14 @@ def generate_ssh_brute_force(n_attempts: int = 10) -> pd.DataFrame:
 
 
 def generate_port_scan(n_ports: int = 1000) -> pd.DataFrame:
-    """Skanning av 1000 portar från en IP under ca 100 sekunder."""
+    """Skapa scenario för intensiv portskanning från en enskild källa.
+
+    Args:
+        n_ports: Antal destinationportar som skannas.
+
+    Returns:
+        DataFrame med skanningshändelser och normal trafikhistorik.
+    """
     base = datetime(2026, 4, 30, 14, 0, 0)
     records = [
         {
@@ -81,7 +105,11 @@ def generate_port_scan(n_ports: int = 1000) -> pd.DataFrame:
 
 
 def generate_file_change() -> pd.DataFrame:
-    """Enstaka kritisk filändring (integrity checksum) mitt i natten."""
+    """Skapa scenario med kritisk filintegritetsavvikelse.
+
+    Returns:
+        DataFrame med en högkritisk filändringshändelse och historiskt brus.
+    """
     base = datetime(2026, 4, 30, 2, 30, 0)
     records = [
         {
@@ -110,10 +138,16 @@ def generate_file_change() -> pd.DataFrame:
 
 
 def generate_slow_brute_force(n_attempts: int = 36) -> pd.DataFrame:
-    """
-    1 SSH-misslyckande var 10:e minut under 6 timmar = ~6/timme.
-    Håller sig under den regelbaserade tröskeln (10/timme) men
-    skapar ett ihållande mönster som AI kan fånga upp.
+    """Skapa scenario för lågintensiv, ihållande brute force.
+
+    Attacken är avsiktligt utformad för att ofta passera fasta tröskelregler men
+    samtidigt skapa ett långvarigt avvikande beteendemönster.
+
+    Args:
+        n_attempts: Antal misslyckade försök i hela scenariot.
+
+    Returns:
+        DataFrame med lågintensiva attackhändelser och bakgrundstrafik.
     """
     base = datetime(2026, 4, 30, 18, 0, 0)
     records: list[dict[str, object]] = [
@@ -147,9 +181,17 @@ def generate_slow_brute_force(n_attempts: int = 36) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def rule_based_detection(df: pd.DataFrame, scenario: str) -> tuple[bool, float]:
-    """
-    Regelbaserad detektering – simulerar Wazuh-regler med fasta tröskelvärden.
-    Returnerar (detekterad, körtid_sekunder).
+    """Simulera regelbaserad detektering med statiska tröskelvärden.
+
+    Funktionen representerar ett förenklat SIEM/Wazuh-upplägg där varje scenario
+    har explicit logik med fasta gränser.
+
+    Args:
+        df: Händelsedata för aktuellt scenario.
+        scenario: Scenarionyckel som styr regeluppsättning.
+
+    Returns:
+        Tuple med detektionsutfall och körtid i sekunder.
     """
     start = time.perf_counter()
     detected = False
@@ -182,9 +224,16 @@ def rule_based_detection(df: pd.DataFrame, scenario: str) -> tuple[bool, float]:
 
 
 def ai_detection(df: pd.DataFrame) -> tuple[bool, float]:
-    """
-    AI-baserad detektering med Isolation Forest + statistisk baslinje.
-    Returnerar (detekterad, körtid_sekunder).
+    """Kör AI-baserad detekteringskedja på scenario-data.
+
+    Metoden extraherar features, tillämpar Isolation Forest och kompletterar med
+    statistisk baslinje för att avgöra om scenariot innehåller anomalier.
+
+    Args:
+        df: Händelsedata för scenario.
+
+    Returns:
+        Tuple med detektionsutfall och körtid i sekunder.
     """
     start = time.perf_counter()
 
@@ -212,6 +261,14 @@ SCENARIOS = [
 
 
 def run_tests() -> dict:
+    """Exekvera samtliga scenarier och sammanställ jämförelseresultat.
+
+    Funktionen kör generator, regelbaserad detektering och AI-detektering för
+    varje scenario. Resultatet returneras i ett serialiserbart dictionary-format.
+
+    Returns:
+        Struktur med metadata och mätvärden per scenario.
+    """
     results = {
         "test_scenario": "SSH brute force + portskanning + filändring + långsam brute force",
         "measurement_date": datetime.now().isoformat(),
@@ -262,6 +319,15 @@ def run_tests() -> dict:
 
 
 def print_summary(results: dict) -> None:
+    """Skriv en läsbar slutsammanfattning till terminalen.
+
+    Sammanfattningen visar detektionsgrad per metod, medelförbättring i tid
+    när båda metoderna detekterar, samt vilka scenarier som endast fångats av
+    den ena metoden.
+
+    Args:
+        results: Resultatstruktur från `run_tests`.
+    """
     tests = results["tests"]
     print("\n" + "=" * 62)
     print("  SAMMANFATTNING")
@@ -298,6 +364,7 @@ def print_summary(results: dict) -> None:
 
 
 def main() -> None:
+    """Kör hela jämförelsetestet och spara resultat till JSON-fil."""
     results = run_tests()
     print_summary(results)
 

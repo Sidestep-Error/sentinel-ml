@@ -30,12 +30,14 @@ from sentinel_ml.config import get_settings
 from sentinel_ml.data.schemas import IOC, Prediction, UploadRecord
 from sentinel_ml.features.ioc_extract import extract_iocs
 from sentinel_ml.features.upload_meta import build_feature_matrix
+from sentinel_ml.log_anomaly import tfidf_detector
 from sentinel_ml.models import threat_classifier, upload_classifier
 
 logger = logging.getLogger(__name__)
 
 THREAT_ARTIFACT_NAME = "threat_classifier.joblib"
 UPLOAD_ARTIFACT_NAME = "upload_classifier.joblib"
+LOG_ANOMALY_ARTIFACT_NAME = tfidf_detector.LOG_ANOMALY_ARTIFACT
 FALLBACK_VERSION = "none"
 
 
@@ -59,6 +61,21 @@ class ThreatResponse(BaseModel):
 
 class UploadResponse(BaseModel):
     prediction: Prediction
+    model_version: str
+
+
+class LogAnomalyRequest(BaseModel):
+    logs: list[str]
+
+
+class LogLinePrediction(BaseModel):
+    line: str
+    is_anomaly: bool
+    score: float
+
+
+class LogAnomalyResponse(BaseModel):
+    predictions: list[LogLinePrediction]
     model_version: str
 
 
@@ -89,6 +106,9 @@ async def lifespan(app: FastAPI):
     )
     app.state.upload_model = _try_load(
         models_dir / UPLOAD_ARTIFACT_NAME, upload_classifier.load
+    )
+    app.state.log_anomaly_model = _try_load(
+        models_dir / LOG_ANOMALY_ARTIFACT_NAME, tfidf_detector.load
     )
     yield
 
@@ -144,6 +164,30 @@ def create_app() -> FastAPI:
         features, _ = build_feature_matrix([record])
         prediction = _predict_with(loaded, features)
         return UploadResponse(prediction=prediction, model_version=loaded.version)
+
+    @app.post("/predict/log-anomaly", response_model=LogAnomalyResponse)
+    def predict_log_anomaly(req: LogAnomalyRequest, request: Request) -> LogAnomalyResponse:
+        loaded = _get_loaded(request, "log_anomaly_model")
+        if loaded is None or not req.logs:
+            return LogAnomalyResponse(
+                predictions=[
+                    LogLinePrediction(line=line, is_anomaly=False, score=0.0)
+                    for line in req.logs
+                ],
+                model_version=FALLBACK_VERSION,
+            )
+        results = tfidf_detector.predict(loaded.artifact, req.logs)
+        return LogAnomalyResponse(
+            predictions=[
+                LogLinePrediction(
+                    line=r["line"],
+                    is_anomaly=r["is_anomaly"],
+                    score=r["score"],
+                )
+                for r in results
+            ],
+            model_version=loaded.version,
+        )
 
     return app
 

@@ -78,6 +78,9 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["S", "B"]
+# generate_data and attack use random for synthetic/demo purposes, not cryptography.
+"src/sentinel_ml/log_anomaly/generate_data.py" = ["S311"]
+"src/sentinel_ml/log_anomaly/attack.py" = ["S311"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

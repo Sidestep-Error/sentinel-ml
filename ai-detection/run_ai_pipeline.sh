@@ -1,4 +1,14 @@
 #!/bin/bash
+# chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
+# Grupp: Sidestep Error
+#
+# Modulens ansvar:
+# Detta shellscript orkestrerar hela AI-detektionskedjan från export av råa Wazuh-larm
+# till analys, larmgenerering och automatiserad incidentrespons.
+#
+# Designidé:
+# Skriptet kör stegvis och avbryter direkt vid fel för att undvika halvfärdiga körningar.
+# Det loggar samtliga steg till pipeline.log för spårbarhet och felsökning.
 # Kör hela AI-detektionspipeline: export → anomalidetektering → larm → respons
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -6,6 +16,8 @@ PYTHON="$SCRIPT_DIR/../.venv/bin/python3"
 LOG="$SCRIPT_DIR/pipeline.log"
 ALERTS_FILE="$SCRIPT_DIR/pipeline_alerts.json"
 
+# Funktion: log
+# Skriver tidsstämplade statusrader till både terminal och loggfil.
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
 
 log "=== Pipeline startar ==="

@@ -1,4 +1,15 @@
 {
+    "_meta": {
+        "header": "chas academy kurs 5 - Nätverks-, OT & AI-säkerhet",
+        "group": "Sidestep Error",
+        "description_sv": "Rå export av Wazuh-alerts som används som indata till AI-baserad anomalidetektering.",
+        "notes_sv": [
+            "Filen behåller originalstrukturen från Wazuh/Elasticsearch.",
+            "Analyskod läser främst fältet hits.hits._source.",
+            "Metadatafältet _meta är tillagt för dokumentation och påverkar inte inläsning i denna pipeline."
+        ],
+        "last_documented": "2026-06-02"
+    },
     "took": 37,
     "timed_out": false,
     "_shards": {

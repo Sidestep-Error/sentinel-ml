@@ -1,5 +1,19 @@
-#!/usr/bin/env python3
-"""Larmhanterare som integrerar med anomalidetektorn."""
+"""
+chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
+Grupp: Sidestep Error
+
+Modulens ansvar:
+Denna modul tar resultat från AI-baserad anomalidetektering och översätter dem
+till operativa larm med tydlig allvarlighetsgrad. Larmen struktureras i JSON-format
+och sparas så att de kan konsumeras av andra säkerhetskomponenter, till exempel
+SOAR-flöden, SIEM-verktyg eller scripts för incidenthantering.
+
+Översikt av arbetsflödet:
+1. Läs in anomaliresultat från CSV.
+2. Klassificera varje avvikelse till en allvarlighetsnivå.
+3. Bygg ett konsekvent larmobjekt med metadata.
+4. Spara alla larm till en JSON-fil för vidare behandling.
+"""
 
 import json
 import logging
@@ -28,7 +42,22 @@ ALERT_THRESHOLDS = {
 
 
 def classify_alert(zscore: float, isolation_score: float) -> str | None:
-    """Klassificera en anomali baserat på tröskelvärden."""
+    """Bestäm larmnivå utifrån statistisk och modellbaserad avvikelse.
+
+    Funktionen jämför två signaler från detektionssteget:
+    - `zscore`: hur långt observationen ligger från normalnivån.
+    - `isolation_score`: modellens anomaliscore från Isolation Forest.
+
+    Trösklarna utvärderas från högsta till lägsta allvarlighetsgrad så att den
+    mest kritiska nivån vinner om flera villkor uppfylls samtidigt.
+
+    Args:
+        zscore: Z-score för aktuell tidsperiod.
+        isolation_score: Decision score från Isolation Forest.
+
+    Returns:
+        Larmnivå (`critical`, `high`, `medium`) eller `None` om inget larm ska skapas.
+    """
     sorted_levels = sorted(
         ALERT_THRESHOLDS.items(),
         key=lambda x: x[1]['zscore'],
@@ -41,7 +70,20 @@ def classify_alert(zscore: float, isolation_score: float) -> str | None:
 
 
 def create_alert(timestamp: Any, severity: str, details: dict[str, Any]) -> dict[str, Any]:
-    """Skapa ett strukturerat larmobjekt."""
+    """Skapa ett standardiserat larmobjekt för incidentkedjan.
+
+    Funktionen paketerar tidsstämpel, allvarlighetsgrad och detaljdata i ett
+    konsekvent schema. Detta gör att nedströmskomponenter kan läsa och agera på
+    larm utan att behöva känna till intern representation från detektorn.
+
+    Args:
+        timestamp: Tid för händelsen eller tidsfönstret där avvikelsen uppstod.
+        severity: Klassificerad larmnivå.
+        details: Nyckelvärden som beskriver avvikelsen, exempelvis event_count.
+
+    Returns:
+        Ett dictionary med larmdata och skapandetid (`detected_at`).
+    """
     return {
         'timestamp': str(timestamp),
         'severity': severity,
@@ -51,14 +93,34 @@ def create_alert(timestamp: Any, severity: str, details: dict[str, Any]) -> dict
 
 
 def write_alerts_to_file(alerts: list[dict[str, Any]], filepath: str = 'active_alerts.json') -> None:
-    """Skriv larm till JSON-fil (kan integreras med Wazuh)."""
+    """Persista larm till JSON så att andra system kan konsumera dem.
+
+    Funktionen serialiserar hela larmmängden till fil med indentering för god
+    läsbarhet. Filformatet används som överlämning mellan detektering och
+    incidentrespons.
+
+    Args:
+        alerts: Lista med strukturerade larmobjekt.
+        filepath: Målfil för JSON-utdata.
+    """
     with open(filepath, 'w') as f:
         json.dump(alerts, f, indent=2, default=str)
     logger.info(f"Skrev {len(alerts)} larm till {filepath}")
 
 
 def process_anomaly_results(csv_path: str = str(Path(__file__).parent / 'anomaly_detection_results.csv')) -> list[dict[str, Any]]:
-    """Läs anomaliresultat och generera larm."""
+    """Orkestrera konvertering från modellresultat till operativa larm.
+
+    Funktionen läser CSV-utdata från anomalidetektorn, itererar över varje
+    tidsfönster och skapar larm för de rader som passerar definierade trösklar.
+    Resultatet skrivs till disk och returneras för direkt användning.
+
+    Args:
+        csv_path: Sökväg till CSV-filen med extraherade features och anomaliscore.
+
+    Returns:
+        Lista med genererade larm.
+    """
     df = pd.read_csv(csv_path, index_col=0, parse_dates=True)
 
     alerts: list[dict[str, Any]] = []

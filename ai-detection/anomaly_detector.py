@@ -1,6 +1,19 @@
 """
-AI-stödd anomalidetektering för Wazuh-loggar.
-Analyserar loggar för att identifiera avvikande beteenden som kan indikera säkerhetsincidenter.
+chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
+Grupp: Sidestep Error
+
+Modulens ansvar:
+Denna modul implementerar en AI-stödd pipeline för anomalidetektering i loggdata.
+Fokus ligger på att transformera råa Wazuh-alerts till tidsfönsterbaserade features,
+kombinera modellbaserad detektion (Isolation Forest) med statistisk baslinje och
+slutligen generera en rapport som är användbar i säkerhetsanalys.
+
+Pipeline i korthet:
+1. Ladda och normalisera JSON-alerts.
+2. Extrahera aggregerade features per tidsfönster.
+3. Kör anomalidetektering med Isolation Forest.
+4. Kör kompletterande z-score-baslinje.
+5. Spara resultat och skriv textbaserad sammanfattning.
 """
 
 from __future__ import annotations
@@ -17,7 +30,18 @@ warnings.filterwarnings("ignore")
 
 
 def load_alerts(file_path: str | Path) -> pd.DataFrame:
-    """Ladda Wazuh-alerts från en JSON-fil och konvertera till en DataFrame."""
+    """Läs in Wazuh-alerts från JSON och omvandla till analyserbar tabell.
+
+    Funktionen plockar ut relevanta fält ur Wazuh-strukturen (`hits.hits._source`)
+    och normaliserar datatyper för tid, nivå och port så att efterföljande steg
+    får stabil indata.
+
+    Args:
+        file_path: Sökväg till JSON-fil med Wazuh-alerts.
+
+    Returns:
+        DataFrame med en rad per alert. Returnerar tom DataFrame om ingen data finns.
+    """
     with open(file_path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -47,7 +71,19 @@ def load_alerts(file_path: str | Path) -> pd.DataFrame:
 
 
 def extract_features(df: pd.DataFrame, window: str = "1h") -> pd.DataFrame:
-    """Extrahera relevanta funktioner för anomalidetektering."""
+    """Skapa tidsfönsterbaserade features för modellering och baslinjeanalys.
+
+    Funktionen resamplar logghändelser till ett valt tidsfönster och beräknar
+    bland annat händelsevolym, variationsmått och aktivitetsmönster. Den bygger
+    också derivat som rullande medelvärde/standardavvikelse samt z-score.
+
+    Args:
+        df: Normaliserad loggdata med tidsstämpelkolumn.
+        window: Resamplingsfönster, exempelvis `1h`.
+
+    Returns:
+        Feature-DataFrame indexerad på tidsfönster.
+    """
     if df.empty:
         return pd.DataFrame()
 
@@ -77,7 +113,19 @@ def extract_features(df: pd.DataFrame, window: str = "1h") -> pd.DataFrame:
 
 
 def detect_anomalies(features: pd.DataFrame, contamination: float = 0.1) -> pd.DataFrame:
-    """Kör Isolation Forest för att detektera anomalier i funktionerna."""
+    """Identifiera avvikande tidsfönster med Isolation Forest.
+
+    Funktionen skalar featurematrisen för att minska påverkan av olika enheter
+    och tränar sedan en osuperviserad modell som markerar avvikande observationer.
+    Den kompletterar DataFrame med prediktion, score och boolesk anomaliindikator.
+
+    Args:
+        features: Extraherade features per tidsfönster.
+        contamination: Antagen andel anomalier i datasetet.
+
+    Returns:
+        Samma DataFrame med tillagda kolumner: `anomaly`, `anomaly_score`, `is_anomaly`.
+    """
     if features.empty:
         return features
 
@@ -113,7 +161,19 @@ def detect_anomalies(features: pd.DataFrame, contamination: float = 0.1) -> pd.D
 
 
 def statistical_baseline(features: pd.DataFrame, threshold_sigma: float = 2.0) -> pd.DataFrame:
-    """Enklare statistisk baslinje för att flagga avvikande beteenden."""
+    """Flagga avvikelser med enkel statistisk tröskel på z-score.
+
+    Detta steg fungerar som en transparent referensmetod som kan jämföras mot
+    AI-modellens beslut. Ett tidsfönster markeras när absolut z-score överstiger
+    angiven sigma-tröskel.
+
+    Args:
+        features: Feature-DataFrame som innehåller `event_count_zscore`.
+        threshold_sigma: Gränsvärde för avvikelse i standardavvikelser.
+
+    Returns:
+        DataFrame med tillagd kolumn `stat_anomaly`.
+    """
     if features.empty:
         features["stat_anomaly"] = []
         return features
@@ -123,7 +183,18 @@ def statistical_baseline(features: pd.DataFrame, threshold_sigma: float = 2.0) -
 
 
 def generate_report(features: pd.DataFrame) -> str:
-    """Generera en textbaserad rapport över detekterade anomalier."""
+    """Bygg en textbaserad rapport för snabb tolkning av detektionsresultat.
+
+    Rapporten innehåller period, antal analyserade fönster, antal anomalier från
+    både Isolation Forest och statistisk baslinje samt detaljrader för markerade
+    tidsfönster.
+
+    Args:
+        features: DataFrame med resultat från detektionsstegen.
+
+    Returns:
+        Formaterad rapporttext.
+    """
     if features.empty:
         return "Ingen data kunde analyseras."
 
@@ -156,6 +227,11 @@ def generate_report(features: pd.DataFrame) -> str:
 
 
 def main() -> None:
+    """Kör hela detektionspipen från filinläsning till rapport och export.
+
+    Funktionen fungerar som modulens CLI-ingång: den väljer indatafil, kör alla
+    analyssteg i ordning, skriver rapport till terminal och sparar artefakter på disk.
+    """
     import sys
 
     script_dir = Path(__file__).resolve().parent

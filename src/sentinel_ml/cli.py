@@ -17,6 +17,8 @@ import typer
 from sentinel_ml import __version__
 from sentinel_ml.data.loaders import load_threat_reports_jsonl
 from sentinel_ml.features.ioc_extract import extract_iocs
+from sentinel_ml.log_anomaly import tfidf_detector
+from sentinel_ml.log_anomaly import train as log_anomaly_train
 from sentinel_ml.models import threat_classifier
 
 app = typer.Typer(no_args_is_help=True, add_completion=False, help="Sentinel ML CLI")
@@ -56,6 +58,62 @@ def train_threat_classifier(
     pipeline = threat_classifier.train(texts, labels)
     threat_classifier.save(pipeline, out)
     typer.echo(f"Saved classifier to {out}")
+
+
+@train_app.command("log-anomaly")
+def train_log_anomaly(
+    dataset: Annotated[
+        Path | None,
+        typer.Option(help="CSV with 'line' and optional 'label' columns (auto-generated if absent)"),
+    ] = None,
+    out: Annotated[
+        Path | None,
+        typer.Option(help="Output path for joblib artifact"),
+    ] = None,
+    contamination: Annotated[float, typer.Option(help="Expected anomaly fraction")] = 0.2,
+) -> None:
+    """Train the TF-IDF + IsolationForest log anomaly detector."""
+    log_anomaly_train.run(csv_path=dataset, out_path=out, contamination=contamination)
+
+
+@app.command("detect-anomalies")
+def detect_anomalies_cmd(
+    dataset: Annotated[Path, typer.Argument(help="CSV with 'line' column to score")],
+    model: Annotated[
+        Path | None,
+        typer.Option(help="Path to trained joblib artifact"),
+    ] = None,
+) -> None:
+    """Score log lines in a CSV and print anomalies as JSON."""
+    from sentinel_ml.config import get_settings
+    from sentinel_ml.log_anomaly.generate_data import load_csv
+
+    settings = get_settings()
+    artifact = model or Path(settings.models_dir) / tfidf_detector.LOG_ANOMALY_ARTIFACT
+    if not artifact.exists():
+        typer.echo(f"Modell saknas: {artifact}. Kör: sentinel-ml train log-anomaly", err=True)
+        raise typer.Exit(code=1)
+
+    pipeline = tfidf_detector.load(artifact)
+    records = load_csv(dataset)
+    lines = [r["line"] for r in records]
+    results = tfidf_detector.predict(pipeline, lines)
+    anomalies = [r for r in results if r["is_anomaly"]]
+    typer.echo(json.dumps(anomalies, indent=2, ensure_ascii=False))
+    typer.echo(f"\nDetekterade {len(anomalies)} av {len(results)} loggrader som anomalier", err=True)
+
+
+@app.command("attack-demo")
+def attack_demo_cmd(
+    model: Annotated[
+        Path | None,
+        typer.Option(help="Path to trained joblib artifact"),
+    ] = None,
+) -> None:
+    """Run the mimicry attack demo against the TF-IDF log anomaly detector."""
+    from sentinel_ml.log_anomaly.attack import demo
+
+    demo(model_path=model)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,16 @@
-#!/usr/bin/env python3
 """
-Automatiserad incidentrespons-playbook.
-Hanterar: blockering, isolering, larmning och loggning.
+chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
+Grupp: Sidestep Error
+
+Modulens ansvar:
+Denna modul implementerar en automatiserad respons-playbook för säkerhetsincidenter.
+Den tar emot larm från detektionsledet och utför fördefinierade åtgärder beroende
+på allvarlighetsgrad, exempelvis IP-blockering, agentisolering, larmdistribution
+och incidentloggning.
+
+Praktiskt syfte:
+Målet är att minska tiden mellan upptäckt och åtgärd, samt skapa en spårbar
+incidenthistorik som stöd för efteranalys och rapportering.
 """
 
 import ipaddress
@@ -27,7 +36,18 @@ logger = logging.getLogger(__name__)
 
 
 def _validate_ip(ip: str) -> bool:
-    """Returnerar True om ip är en giltig unicast-adress (ej loopback/multicast)."""
+    """Validera att en IP-adress är användbar för blockering.
+
+    Funktionen säkerställer att indata är en syntaktiskt giltig IP-adress och
+    exkluderar adressklasser som normalt inte ska blockeras i denna kontext,
+    till exempel loopback och multicast.
+
+    Args:
+        ip: IP-adress i textformat.
+
+    Returns:
+        `True` om adressen är giltig och lämplig för nätverksåtgärd, annars `False`.
+    """
     try:
         addr = ipaddress.ip_address(ip)
         return not addr.is_loopback and not addr.is_multicast
@@ -36,12 +56,34 @@ def _validate_ip(ip: str) -> bool:
 
 
 class IncidentResponder:
+    """Inkapslar incidentresponslogik för larmdriven åtgärdshantering.
+
+    Klassen håller intern status över utförda incidentåtgärder och redan blockerade
+    IP-adresser. Den exponerar metoder för tekniska motåtgärder samt för loggning
+    och notifiering.
+    """
+
     def __init__(self) -> None:
+        """Initiera responderns runtime-tillstånd.
+
+        Skapar tom lista för incidenthändelser och en mängd för blockerade IP-adresser
+        så att upprepade blockeringar kan undvikas.
+        """
         self.incidents: list[dict[str, Any]] = []
         self.blocked_ips: set[str] = set()
 
     def block_ip(self, ip: str, reason: str, duration: int = 3600) -> None:
-        """Blockera en IP-adress via iptables."""
+        """Blockera käll-IP på hostnivå med iptables-regler.
+
+        Funktionen validerar först adressen, kontrollerar om den redan blockerats
+        och försöker därefter införa DROP-regler i relevanta kedjor. Utfallet loggas
+        och registreras som incidenthändelse.
+
+        Args:
+            ip: Källadress som ska blockeras.
+            reason: Motivering som loggas tillsammans med åtgärden.
+            duration: Avsedd varaktighet i sekunder (informativ metadata).
+        """
         if not _validate_ip(ip):
             logger.error(f"Ogiltig IP-adress, blockering avbruten: {ip!r}")
             return
@@ -68,12 +110,29 @@ class IncidentResponder:
             logger.error(f"Kunde inte blockera {ip}: {e}")
 
     def isolate_agent(self, agent_id: str, reason: str) -> None:
-        """Isolera en Wazuh-agent via API (stub — utöka med Wazuh REST API-anrop)."""
+        """Markera isoleringsåtgärd för en agent.
+
+        Metoden är en kontrollerad stub som idag loggar och journalför isoleringsbeslut.
+        Den är avsedd att utökas med faktiska API-anrop mot Wazuh eller motsvarande
+        endpoint för host-isolering.
+
+        Args:
+            agent_id: Identifierare för agent/system som ska isoleras.
+            reason: Varför isolering initieras.
+        """
         logger.warning(f"ISOLERING: Agent {agent_id} — {reason}")
         self.log_incident('isolate_agent', {'agent_id': agent_id, 'reason': reason})
 
     def send_alert(self, severity: str, message: str) -> None:
-        """Skicka larm (logga till fil, kan utökas med e-post/webhook)."""
+        """Publicera incidentlarm till lokal kanal och persistent loggfil.
+
+        Funktionen skapar ett larmobjekt, skriver det till applikationslogg och
+        appenderar samma information till en JSON-fil för spårbar notifieringshistorik.
+
+        Args:
+            severity: Allvarlighetsgrad för larmet.
+            message: Läsbar larmtext till operatör eller integrationspunkt.
+        """
         alert = {
             'severity': severity,
             'message': message,
@@ -92,7 +151,15 @@ class IncidentResponder:
         alerts_file.write_text(json.dumps(existing, indent=2, ensure_ascii=False))
 
     def log_incident(self, action: str, details: dict[str, Any]) -> None:
-        """Logga incident för dokumentation."""
+        """Journalför en utförd åtgärd i incidentloggen.
+
+        Varje åtgärd serialiseras med tidsstämpel och detaljer, lagras i minnet
+        under körning och skrivs sedan till JSON för beständig dokumentation.
+
+        Args:
+            action: Namn på åtgärden, exempelvis `block_ip`.
+            details: Kontextdata för åtgärden.
+        """
         incident = {
             'action': action,
             'details': details,
@@ -104,7 +171,16 @@ class IncidentResponder:
             json.dump(self.incidents, f, indent=2, default=str, ensure_ascii=False)
 
     def process_alert(self, alert: dict) -> None:
-        """Hantera ett inkommande larm enligt playbook."""
+        """Tolka ett inkommande larm och verkställ playbook-regler.
+
+        Metoden mappar larmets allvarlighetsgrad till en sekvens av responsåtgärder:
+        - `critical`: blockering (om IP finns), isolering och omedelbart larm.
+        - `high`: blockering (om IP finns) och larm.
+        - `medium`: larm och loggning utan aktiv blockering.
+
+        Args:
+            alert: Larmobjekt med minst `severity`, `timestamp` och `details`.
+        """
         severity = alert.get('severity', 'medium')
         details = alert.get('details', {})
         timestamp = alert.get('timestamp', 'okänd tid')
