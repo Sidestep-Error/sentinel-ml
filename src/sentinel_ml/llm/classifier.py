@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import unicodedata
 from typing import TypeVar
 
@@ -12,6 +13,7 @@ from sentinel_ml.llm.ollama_client import OllamaClient
 from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM, CVE_RELEVANCE_SYSTEM
 from sentinel_ml.llm.schemas import CVERelevanceResult, ThreatClassificationResult
 
+logger = logging.getLogger(__name__)
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
 
@@ -93,6 +95,20 @@ def classify_threat_report(
         temperature=temperature,
     )
     return parse_json_response(response.text, ThreatClassificationResult)
+
+
+def try_classify_threat_report(
+    text: str,
+    *,
+    client: OllamaClient | None = None,
+    temperature: float = 0.0,
+) -> ThreatClassificationResult | None:
+    """Best-effort wrapper intended for service-layer fallback wiring."""
+    try:
+        return classify_threat_report(text, client=client, temperature=temperature)
+    except Exception:
+        logger.debug("LLM threat classification failed", exc_info=True)
+        return None
 
 
 def classify_cve_relevance(

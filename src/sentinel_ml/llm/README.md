@@ -70,7 +70,10 @@ Viktiga funktioner:
 - `sanitize_llm_input(text)`
 - `parse_json_response(raw_text, schema)`
 - `classify_threat_report(text, ...)`
+- `try_classify_threat_report(text, ...)`
 - `classify_cve_relevance(cve_text, stack_summary, ...)`
+
+`try_classify_threat_report()` är förberedd för Roll 1:s API-wiring. Den returnerar ett validerat resultat när LLM-flödet fungerar och `None` när LLM-anropet eller JSON-valideringen faller. På så sätt kan `service/api.py` få ett enkelt fallback-kontrakt utan att Roll 3 tar över API-lagret.
 
 ## Hur flödet fungerar
 
@@ -381,7 +384,7 @@ sudo systemctl start ollama
 
 Rimlig ordning härifrån:
 
-1. koppla in `classify_threat_report()` bakom säkert fallback-beteende i `service/api.py`
+1. lämna över `try_classify_threat_report()` till Roll 1 för inkoppling bakom säkert fallback-beteende i `service/api.py`
 2. lås gemensamt eval-format med Roll 2
 3. bygg deterministisk CVE/SBOM-matchning
 4. använd `classify_cve_relevance()` som komplement där exakt matchning inte räcker

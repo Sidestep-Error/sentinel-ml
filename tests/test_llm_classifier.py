@@ -11,6 +11,7 @@ from sentinel_ml.llm.classifier import (
     classify_threat_report,
     parse_json_response,
     sanitize_llm_input,
+    try_classify_threat_report,
 )
 from sentinel_ml.llm.ollama_client import LLMResponse
 from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM, CVE_RELEVANCE_SYSTEM
@@ -101,6 +102,25 @@ def test_classify_threat_report_uses_threat_prompt_and_returns_typed_result():
     assert isinstance(result, ThreatClassificationResult)
     assert client.calls[0]["system"] == CLASSIFY_THREAT_REPORT_SYSTEM
     assert "<threat_report>" in client.calls[0]["prompt"]
+
+
+def test_try_classify_threat_report_returns_result_when_llm_output_is_valid():
+    client = StubClient(
+        '{"category":"phishing","confidence":0.87,"rationale":"Credential theft language present."}'
+    )
+
+    result = try_classify_threat_report("Payroll phishing email seen in the wild.", client=client)
+
+    assert result is not None
+    assert result.category == "phishing"
+
+
+def test_try_classify_threat_report_returns_none_when_llm_output_is_invalid():
+    client = StubClient("not json")
+
+    result = try_classify_threat_report("Payroll phishing email seen in the wild.", client=client)
+
+    assert result is None
 
 
 def test_classify_cve_relevance_uses_cve_prompt_and_returns_typed_result():
