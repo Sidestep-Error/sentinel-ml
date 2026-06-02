@@ -6,25 +6,45 @@ Endpoints:
   POST /predict/upload     — predict malicious/clean for an upload metadata record
 
 The service is stateless — models are loaded once at startup. Trained
-artifacts live in `models_store/` (gitignored).
+artifacts live in ``models_store/`` (gitignored). If an artifact is missing
+or fails to load, the corresponding endpoint degrades to a fallback
+response (``label="unknown"``, ``model_version="none"``) so the service
+still answers during development.
 """
 
 from __future__ import annotations
 
+import hashlib
+import logging
+from collections.abc import Callable
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel
 
 from sentinel_ml import __version__
-from sentinel_ml.data.schemas import IOC, UploadRecord
+from sentinel_ml.config import get_settings
+from sentinel_ml.data.schemas import IOC, Prediction, UploadRecord
 from sentinel_ml.features.ioc_extract import extract_iocs
+from sentinel_ml.features.upload_meta import build_feature_matrix
+from sentinel_ml.models import threat_classifier, upload_classifier
 
-app = FastAPI(
-    title="Sentinel ML",
-    version=__version__,
-    description="ML-based security predictions for Sentinel Upload API.",
-)
+logger = logging.getLogger(__name__)
+
+THREAT_ARTIFACT_NAME = "threat_classifier.joblib"
+UPLOAD_ARTIFACT_NAME = "upload_classifier.joblib"
+FALLBACK_VERSION = "none"
+
+
+@dataclass(frozen=True)
+class LoadedModel:
+    """Trained estimator paired with an artifact-derived version string."""
+
+    artifact: Any
+    version: str
 
 
 class ThreatRequest(BaseModel):
@@ -32,42 +52,100 @@ class ThreatRequest(BaseModel):
 
 
 class ThreatResponse(BaseModel):
-    category: str
-    confidence: float
+    prediction: Prediction
     iocs: list[IOC]
     model_version: str
 
 
 class UploadResponse(BaseModel):
-    label: str
-    confidence: float
-    explanation: dict[str, Any] | None = None
+    prediction: Prediction
     model_version: str
 
 
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok", "version": __version__}
+def _artifact_version(path: Path) -> str:
+    """Short sha256 prefix of artifact bytes. Changes every retrain."""
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    return digest[:12]
 
 
-@app.post("/predict/threat", response_model=ThreatResponse)
-def predict_threat(req: ThreatRequest) -> ThreatResponse:
-    """Stub: IOC extraction is implemented; classifier wiring lands in Fas 1."""
-    iocs = extract_iocs(req.text)
-    return ThreatResponse(
-        category="unknown",
-        confidence=0.0,
-        iocs=iocs,
-        model_version=__version__,
+def _try_load(path: Path, loader: Callable[[Path], Any]) -> LoadedModel | None:
+    if not path.exists():
+        logger.info("Model artifact missing at %s — endpoint will use fallback", path)
+        return None
+    try:
+        artifact = loader(path)
+    except Exception:  # noqa: BLE001 — log and degrade rather than crash startup
+        logger.exception("Failed to load model artifact at %s", path)
+        return None
+    return LoadedModel(artifact=artifact, version=_artifact_version(path))
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    settings = get_settings()
+    models_dir = Path(settings.models_dir)
+    app.state.threat_model = _try_load(
+        models_dir / THREAT_ARTIFACT_NAME, threat_classifier.load
+    )
+    app.state.upload_model = _try_load(
+        models_dir / UPLOAD_ARTIFACT_NAME, upload_classifier.load
+    )
+    yield
+
+
+def _get_loaded(request: Request, attr: str) -> LoadedModel | None:
+    """Read a loaded model off app state, tolerating tests that skip lifespan."""
+    return getattr(request.app.state, attr, None)
+
+
+def _predict_with(loaded: LoadedModel, x: Any) -> Prediction:
+    probas = loaded.artifact.predict_proba(x)[0]
+    classes = loaded.artifact.classes_
+    idx = int(probas.argmax())
+    return Prediction(label=str(classes[idx]), confidence=float(probas[idx]))
+
+
+def create_app() -> FastAPI:
+    """Build a FastAPI app. Use this in tests to get a fresh lifespan."""
+    app = FastAPI(
+        title="Sentinel ML",
+        version=__version__,
+        description="ML-based security predictions for Sentinel Upload API.",
+        lifespan=lifespan,
     )
 
+    @app.get("/health")
+    def health() -> dict[str, str]:
+        return {"status": "ok", "version": __version__}
 
-@app.post("/predict/upload", response_model=UploadResponse)
-def predict_upload(record: UploadRecord) -> UploadResponse:
-    """Stub: returns a placeholder. Real prediction lands when Spar B is trained."""
-    return UploadResponse(
-        label="unknown",
-        confidence=0.0,
-        explanation=None,
-        model_version=__version__,
-    )
+    @app.post("/predict/threat", response_model=ThreatResponse)
+    def predict_threat(req: ThreatRequest, request: Request) -> ThreatResponse:
+        iocs = extract_iocs(req.text)
+        loaded = _get_loaded(request, "threat_model")
+        if loaded is None:
+            return ThreatResponse(
+                prediction=Prediction(label="unknown", confidence=0.0),
+                iocs=iocs,
+                model_version=FALLBACK_VERSION,
+            )
+        prediction = _predict_with(loaded, [req.text])
+        return ThreatResponse(
+            prediction=prediction, iocs=iocs, model_version=loaded.version
+        )
+
+    @app.post("/predict/upload", response_model=UploadResponse)
+    def predict_upload(record: UploadRecord, request: Request) -> UploadResponse:
+        loaded = _get_loaded(request, "upload_model")
+        if loaded is None:
+            return UploadResponse(
+                prediction=Prediction(label="unknown", confidence=0.0),
+                model_version=FALLBACK_VERSION,
+            )
+        features, _ = build_feature_matrix([record])
+        prediction = _predict_with(loaded, features)
+        return UploadResponse(prediction=prediction, model_version=loaded.version)
+
+    return app
+
+
+app = create_app()
