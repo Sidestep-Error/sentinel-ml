@@ -1,0 +1,14 @@
+[
+  {
+    "timestamp": "2026-04-30 09:00:00+00:00",
+    "severity": "critical",
+    "detected_at": "2026-04-30T15:10:16.667952",
+    "details": {
+      "event_count": 22,
+      "avg_severity": 6.64,
+      "unique_ips": 1,
+      "anomaly_score": -0.1244,
+      "zscore": 4.42
+    }
+  }
+]

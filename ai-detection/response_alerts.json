@@ -1,0 +1,282 @@
+[
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-04-30T15:04:43.681831"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-04-30T15:04:43.682167"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-04-30T15:04:43.682675"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-04-30T15:04:43.684055"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-04-30T15:10:20.668974"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-04-30T15:10:20.669352"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-04-30T15:10:20.669754"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-04-30T15:10:20.670068"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-04-30T17:00:03.816032"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-04-30T17:00:03.816497"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-04-30T17:00:03.816944"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-04-30T17:00:03.817293"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-04-30T18:00:03.482865"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-04-30T18:00:03.483281"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-04-30T18:00:03.483713"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-04-30T18:00:03.484047"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-04-30T19:00:03.148461"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-04-30T19:00:03.148903"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-04-30T19:00:03.149375"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-04-30T19:00:03.149698"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-05-01T01:00:03.469780"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-05-01T01:00:03.470248"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-05-01T01:00:03.470711"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-05-01T01:00:03.471068"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-05-01T06:00:02.549133"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-05-01T06:00:02.549643"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-05-01T06:00:02.550154"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-05-01T06:00:02.550525"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-05-01T07:00:03.193278"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-05-01T07:00:03.193781"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-05-01T07:00:03.194293"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-05-01T07:00:03.194661"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-05-01T08:00:02.728252"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-05-01T08:00:02.728773"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-05-01T08:00:02.729293"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-05-01T08:00:02.729690"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-05-01T18:00:02.530523"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-05-01T18:00:02.531070"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-05-01T18:00:02.531600"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-05-01T18:00:02.532022"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-05-01T19:00:03.166288"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-05-01T19:00:03.166850"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-05-01T19:00:03.167416"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-05-01T19:00:03.167850"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-05-01T21:00:03.200544"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-05-01T21:00:03.201347"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-05-01T21:00:03.202159"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-05-01T21:00:03.202800"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-05-01T22:00:02.968712"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-05-01T22:00:02.969350"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-05-01T22:00:02.969964"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-05-01T22:00:02.970449"
+  },
+  {
+    "severity": "medium",
+    "message": "Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}",
+    "timestamp": "2026-05-01T23:00:02.716192"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}",
+    "timestamp": "2026-05-01T23:00:02.716825"
+  },
+  {
+    "severity": "critical",
+    "message": "Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}",
+    "timestamp": "2026-05-01T23:00:02.717420"
+  },
+  {
+    "severity": "high",
+    "message": "Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}",
+    "timestamp": "2026-05-01T23:00:02.717871"
+  }
+]

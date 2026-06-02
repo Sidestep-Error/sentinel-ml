@@ -1,0 +1,168 @@
+2026-04-30 15:04:43,681 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-04-30 15:04:43,681 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-04-30 15:04:43,682 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-04-30 15:04:43,682 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-04-30 15:04:43,682 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-04-30 15:04:43,682 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-04-30 15:04:43,682 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-04-30 15:04:43,682 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-04-30 15:04:43,682 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-04-30 15:04:43,683 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-04-30 15:04:43,684 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-04-30 15:04:43,684 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-04-30 15:10:20,668 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-04-30 15:10:20,668 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-04-30 15:10:20,669 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-04-30 15:10:20,669 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-04-30 15:10:20,669 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-04-30 15:10:20,669 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-04-30 15:10:20,669 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-04-30 15:10:20,669 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-04-30 15:10:20,669 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-04-30 15:10:20,669 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-04-30 15:10:20,670 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-04-30 15:10:20,670 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-04-30 17:00:03,815 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-04-30 17:00:03,816 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-04-30 17:00:03,816 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-04-30 17:00:03,816 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-04-30 17:00:03,816 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-04-30 17:00:03,816 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-04-30 17:00:03,816 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-04-30 17:00:03,816 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-04-30 17:00:03,816 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-04-30 17:00:03,817 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-04-30 17:00:03,817 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-04-30 17:00:03,817 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-04-30 18:00:03,482 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-04-30 18:00:03,482 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-04-30 18:00:03,483 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-04-30 18:00:03,483 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-04-30 18:00:03,483 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-04-30 18:00:03,483 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-04-30 18:00:03,483 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-04-30 18:00:03,483 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-04-30 18:00:03,483 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-04-30 18:00:03,483 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-04-30 18:00:03,484 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-04-30 18:00:03,484 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-04-30 19:00:03,148 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-04-30 19:00:03,148 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-04-30 19:00:03,148 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-04-30 19:00:03,148 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-04-30 19:00:03,148 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-04-30 19:00:03,149 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-04-30 19:00:03,149 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-04-30 19:00:03,149 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-04-30 19:00:03,149 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-04-30 19:00:03,149 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-04-30 19:00:03,149 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-04-30 19:00:03,149 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-05-01 01:00:03,469 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-05-01 01:00:03,469 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-05-01 01:00:03,470 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-05-01 01:00:03,470 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-05-01 01:00:03,470 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-05-01 01:00:03,470 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-05-01 01:00:03,470 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-05-01 01:00:03,470 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-05-01 01:00:03,470 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-05-01 01:00:03,470 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-05-01 01:00:03,471 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-05-01 01:00:03,471 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-05-01 06:00:02,549 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-05-01 06:00:02,549 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-05-01 06:00:02,549 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-05-01 06:00:02,549 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-05-01 06:00:02,549 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-05-01 06:00:02,549 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-05-01 06:00:02,549 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-05-01 06:00:02,550 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-05-01 06:00:02,550 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-05-01 06:00:02,550 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-05-01 06:00:02,550 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-05-01 06:00:02,550 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-05-01 07:00:03,193 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-05-01 07:00:03,193 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-05-01 07:00:03,193 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-05-01 07:00:03,193 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-05-01 07:00:03,193 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-05-01 07:00:03,194 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-05-01 07:00:03,194 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-05-01 07:00:03,194 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-05-01 07:00:03,194 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-05-01 07:00:03,194 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-05-01 07:00:03,194 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-05-01 07:00:03,194 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-05-01 08:00:02,728 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-05-01 08:00:02,728 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-05-01 08:00:02,728 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-05-01 08:00:02,728 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-05-01 08:00:02,728 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-05-01 08:00:02,729 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-05-01 08:00:02,729 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-05-01 08:00:02,729 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-05-01 08:00:02,729 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-05-01 08:00:02,729 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-05-01 08:00:02,729 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-05-01 08:00:02,729 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-05-01 18:00:02,530 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-05-01 18:00:02,530 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-05-01 18:00:02,530 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-05-01 18:00:02,531 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-05-01 18:00:02,531 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-05-01 18:00:02,531 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-05-01 18:00:02,531 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-05-01 18:00:02,531 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-05-01 18:00:02,531 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-05-01 18:00:02,531 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-05-01 18:00:02,531 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-05-01 18:00:02,532 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-05-01 19:00:03,166 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-05-01 19:00:03,166 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-05-01 19:00:03,166 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-05-01 19:00:03,166 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-05-01 19:00:03,166 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-05-01 19:00:03,167 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-05-01 19:00:03,167 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-05-01 19:00:03,167 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-05-01 19:00:03,167 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-05-01 19:00:03,167 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-05-01 19:00:03,167 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-05-01 19:00:03,167 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-05-01 21:00:03,200 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-05-01 21:00:03,200 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-05-01 21:00:03,201 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-05-01 21:00:03,201 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-05-01 21:00:03,201 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-05-01 21:00:03,201 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-05-01 21:00:03,201 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-05-01 21:00:03,201 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-05-01 21:00:03,202 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-05-01 21:00:03,202 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-05-01 21:00:03,202 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-05-01 21:00:03,202 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-05-01 22:00:02,968 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-05-01 22:00:02,968 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-05-01 22:00:02,969 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-05-01 22:00:02,969 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-05-01 22:00:02,969 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-05-01 22:00:02,969 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-05-01 22:00:02,969 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-05-01 22:00:02,969 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-05-01 22:00:02,969 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-05-01 22:00:02,970 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-05-01 22:00:02,970 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-05-01 22:00:02,970 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}
+2026-05-01 23:00:02,716 [INFO] Behandlar larm: medium — {"event_count": 211, "avg_severity": 3.19, "unique_ips": 1, "anomaly_score": -0.008, "zscore": 2.14}
+2026-05-01 23:00:02,716 [WARNING] LARM [MEDIUM]: Medium incident vid 2026-04-15 09:00:00+00:00: {'event_count': 211, 'avg_severity': 3.19, 'unique_ips': 1, 'anomaly_score': -0.008, 'zscore': 2.14}
+2026-05-01 23:00:02,716 [INFO] Behandlar larm: high — {"event_count": 282, "avg_severity": 3.52, "unique_ips": 2, "anomaly_score": -0.1363, "zscore": 2.95}
+2026-05-01 23:00:02,716 [WARNING] Hög anomali vid 2026-04-15 10:00:00+00:00: ingen src_ip — 282 händelser
+2026-05-01 23:00:02,716 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 10:00:00+00:00: {'event_count': 282, 'avg_severity': 3.52, 'unique_ips': 2, 'anomaly_score': -0.1363, 'zscore': 2.95}
+2026-05-01 23:00:02,717 [INFO] Behandlar larm: critical — {"event_count": 960, "avg_severity": 3.74, "unique_ips": 3, "anomaly_score": -0.2183, "zscore": 10.64}
+2026-05-01 23:00:02,717 [WARNING] Kritisk anomali vid 2026-04-15 13:00:00+00:00: ingen src_ip — 960 händelser, z=10.64
+2026-05-01 23:00:02,717 [WARNING] ISOLERING: Agent agent@2026-04-15 13:00:00+00:00 — Kritisk anomali detekterad
+2026-05-01 23:00:02,717 [WARNING] LARM [CRITICAL]: Kritisk incident vid 2026-04-15 13:00:00+00:00: {'event_count': 960, 'avg_severity': 3.74, 'unique_ips': 3, 'anomaly_score': -0.2183, 'zscore': 10.64}
+2026-05-01 23:00:02,717 [INFO] Behandlar larm: high — {"event_count": 265, "avg_severity": 3.2, "unique_ips": 1, "anomaly_score": -0.0473, "zscore": 2.75}
+2026-05-01 23:00:02,717 [WARNING] Hög anomali vid 2026-04-15 14:00:00+00:00: ingen src_ip — 265 händelser
+2026-05-01 23:00:02,717 [WARNING] LARM [HIGH]: Hög incident vid 2026-04-15 14:00:00+00:00: {'event_count': 265, 'avg_severity': 3.2, 'unique_ips': 1, 'anomaly_score': -0.0473, 'zscore': 2.75}

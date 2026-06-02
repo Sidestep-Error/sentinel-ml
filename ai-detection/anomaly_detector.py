@@ -1,0 +1,193 @@
+"""
+AI-stödd anomalidetektering för Wazuh-loggar.
+Analyserar loggar för att identifiera avvikande beteenden som kan indikera säkerhetsincidenter.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+import warnings
+
+import pandas as pd
+from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import StandardScaler
+
+warnings.filterwarnings("ignore")
+
+
+def load_alerts(file_path: str | Path) -> pd.DataFrame:
+    """Ladda Wazuh-alerts från en JSON-fil och konvertera till en DataFrame."""
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    records = []
+    for hit in data.get("hits", {}).get("hits", []):
+        source = hit.get("_source", {})
+        records.append(
+            {
+                "timestamp": source.get("timestamp", ""),
+                "rule_id": source.get("rule", {}).get("id", 0),
+                "rule_level": source.get("rule", {}).get("level", 0),
+                "description": source.get("rule", {}).get("description", ""),
+                "src_ip": source.get("data", {}).get("srcip", "unknown"),
+                "dst_port": source.get("data", {}).get("dstport", 0),
+                "agent_name": source.get("agent", {}).get("name", "unknown"),
+            }
+        )
+
+    df = pd.DataFrame(records)
+    if df.empty:
+        return df
+
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+    df["rule_level"] = pd.to_numeric(df["rule_level"], errors="coerce").fillna(0)
+    df["dst_port"] = pd.to_numeric(df["dst_port"], errors="coerce").fillna(0)
+    return df.dropna(subset=["timestamp"])
+
+
+def extract_features(df: pd.DataFrame, window: str = "1h") -> pd.DataFrame:
+    """Extrahera relevanta funktioner för anomalidetektering."""
+    if df.empty:
+        return pd.DataFrame()
+
+    indexed_df = df.set_index("timestamp").sort_index()
+
+    features = indexed_df.resample(window).agg(
+        event_count=("rule_id", "count"),
+        unique_rules=("rule_id", "nunique"),
+        avg_severity=("rule_level", "mean"),
+        max_severity=("rule_level", "max"),
+        unique_ips=("src_ip", "nunique"),
+        unique_ports=("dst_port", "nunique"),
+    ).fillna(0)
+
+    features["hour"] = features.index.hour
+    features["is_night"] = features["hour"].apply(lambda hour: 1 if hour < 6 or hour > 22 else 0)
+    features["event_count_rolling_mean"] = features["event_count"].rolling(6, min_periods=1).mean()
+    features["event_count_rolling_std"] = (
+        features["event_count"].rolling(6, min_periods=1).std().fillna(0)
+    )
+
+    mean = features["event_count"].mean()
+    std = features["event_count"].std()
+    scale = std if pd.notna(std) and std > 0 else 1
+    features["event_count_zscore"] = (features["event_count"] - mean) / scale
+    return features
+
+
+def detect_anomalies(features: pd.DataFrame, contamination: float = 0.1) -> pd.DataFrame:
+    """Kör Isolation Forest för att detektera anomalier i funktionerna."""
+    if features.empty:
+        return features
+
+    feature_cols = [
+        "event_count",
+        "unique_rules",
+        "avg_severity",
+        "max_severity",
+        "unique_ips",
+        "unique_ports",
+        "is_night",
+        "event_count_zscore",
+    ]
+
+    if len(features) < 2:
+        features["anomaly"] = 1
+        features["anomaly_score"] = 0.0
+        features["is_anomaly"] = False
+        return features
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(features[feature_cols].values)
+
+    model = IsolationForest(
+        n_estimators=100,
+        contamination=contamination,
+        random_state=42,
+    )
+    features["anomaly"] = model.fit_predict(X_scaled)
+    features["anomaly_score"] = model.decision_function(X_scaled)
+    features["is_anomaly"] = features["anomaly"] == -1
+    return features
+
+
+def statistical_baseline(features: pd.DataFrame, threshold_sigma: float = 2.0) -> pd.DataFrame:
+    """Enklare statistisk baslinje för att flagga avvikande beteenden."""
+    if features.empty:
+        features["stat_anomaly"] = []
+        return features
+
+    features["stat_anomaly"] = features["event_count_zscore"].abs() > threshold_sigma
+    return features
+
+
+def generate_report(features: pd.DataFrame) -> str:
+    """Generera en textbaserad rapport över detekterade anomalier."""
+    if features.empty:
+        return "Ingen data kunde analyseras."
+
+    anomalies = features[features["is_anomaly"]]
+    stat_anomalies = features[features["stat_anomaly"]]
+
+    report = []
+    report.append("=" * 60)
+    report.append("Anomalidetekteringsrapport")
+    report.append("=" * 60)
+    report.append(f"\nAnalyserad period: {features.index.min()} - {features.index.max()}")
+    report.append(f"Antal tidsperioder analyserade: {len(features)}")
+    report.append("\n--- Isolation Forest ---")
+    report.append(f"Anomalier detekterade: {len(anomalies)}")
+    report.append("\n--- Statistisk baslinje (z-score) ---")
+    report.append(f"Statistiska anomalier: {len(stat_anomalies)}")
+
+    if len(anomalies) > 0:
+        report.append("\nDetaljer om detekterade anomalier:")
+        for idx, row in anomalies.iterrows():
+            report.append(
+                f"{idx}: {int(row['event_count'])} händelser, "
+                f"severity snitt {row['avg_severity']:.1f}, "
+                f"{int(row['unique_ips'])} unika IP:n, "
+                f"score {row['anomaly_score']:.3f}"
+            )
+
+    report.append("\n" + "=" * 60)
+    return "\n".join(report)
+
+
+def main() -> None:
+    import sys
+
+    script_dir = Path(__file__).resolve().parent
+    filepath = Path(sys.argv[1]) if len(sys.argv) > 1 else script_dir / "baseline_alerts.json"
+
+    if not filepath.exists():
+        fallback = script_dir / filepath
+        if fallback.exists():
+            filepath = fallback
+
+    print(f"Laddar data från: {filepath}...")
+
+    df = load_alerts(filepath)
+    print(f"Laddade: {len(df)} händelser")
+
+    features = extract_features(df, window="1h")
+    print(f"Extraherade funktioner för {len(features)} tidsperioder")
+
+    features = detect_anomalies(features)
+    features = statistical_baseline(features)
+
+    report = generate_report(features)
+    print(report)
+
+    results_path = script_dir / "anomaly_detection_results.csv"
+    report_path = script_dir / "anomaly_report.txt"
+    features.to_csv(results_path)
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write(report)
+
+    print(f"\nResultat sparade i {results_path.name} och {report_path.name}")
+
+
+if __name__ == "__main__":
+    main()

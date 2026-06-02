@@ -1,0 +1,3174 @@
+{
+    "took": 10,
+    "timed_out": false,
+    "_shards": {
+        "total": 51,
+        "successful": 51,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 49,
+            "relation": "eq"
+        },
+        "max_score": 1.0,
+        "hits": [
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "DCrx2p0BmGPi9FJy1PPK",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy\nudp 0.0.0.0:59076 0.0.0.0:* 19421/firefox",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 2,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy\nudp 0.0.0.0:59076 0.0.0.0:* 19421/firefox",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T20:32:44.470Z",
+                    "location": "netstat listening ports",
+                    "id": "1777494764.21180",
+                    "timestamp": "2026-04-29T20:32:44.470+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "Jyqf2p0BmGPi9FJyWu-3",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:50840 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:52957 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:50840 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:52957 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T19:02:38.399Z",
+                    "location": "netstat listening ports",
+                    "id": "1777489358.16996",
+                    "timestamp": "2026-04-29T19:02:38.399+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "1Cpo2p0BmGPi9FJyWOwj",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:37843 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:37843 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T18:02:34.344Z",
+                    "location": "netstat listening ports",
+                    "id": "1777485754.14476",
+                    "timestamp": "2026-04-29T18:02:34.344+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "PyqP2Z0BmGPi9FJyDeQP",
+                "_score": 1.0,
+                "_source": {
+                    "syscheck": {
+                        "uname_after": "root",
+                        "mtime_after": "2026-04-29T05:37:16",
+                        "inode_before": 4327388,
+                        "size_after": "313",
+                        "gid_after": "0",
+                        "mtime_before": "2026-04-28T05:37:26",
+                        "mode": "scheduled",
+                        "path": "/etc/apt/sources.list.d/google-chrome.sources",
+                        "sha1_after": "ae0ca5fa2367f03a06775deab18058e86ab20995",
+                        "changed_attributes": [
+                            "inode",
+                            "mtime"
+                        ],
+                        "gname_after": "root",
+                        "uid_after": "0",
+                        "perm_after": "rw-r--r--",
+                        "event": "modified",
+                        "md5_after": "9121c24e0a381471a6f238bc58fe2e45",
+                        "sha256_after": "614b6ba750320df4b10f5fc039eddc9b13361e9828cda7982b7458fb36b2d415",
+                        "inode_after": 4325380
+                    },
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "11.5"
+                        ],
+                        "hipaa": [
+                            "164.312.c.1",
+                            "164.312.c.2"
+                        ],
+                        "tsc": [
+                            "PI1.4",
+                            "PI1.5",
+                            "CC6.1",
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Integrity checksum changed.",
+                        "groups": [
+                            "ossec",
+                            "syscheck",
+                            "syscheck_entry_modified",
+                            "syscheck_file"
+                        ],
+                        "nist_800_53": [
+                            "SI.7"
+                        ],
+                        "gdpr": [
+                            "II_5.1.f"
+                        ],
+                        "firedtimes": 2,
+                        "mitre": {
+                            "technique": [
+                                "Stored Data Manipulation"
+                            ],
+                            "id": [
+                                "T1565.001"
+                            ],
+                            "tactic": [
+                                "Impact"
+                            ]
+                        },
+                        "id": "550",
+                        "gpg13": [
+                            "4.11"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "syscheck_integrity_changed"
+                    },
+                    "full_log": "File '/etc/apt/sources.list.d/google-chrome.sources' modified\nMode: scheduled\nChanged attributes: inode,mtime\nOld modification time was: '1777354646', now it is '1777441036'\nOld inode was: '4327388', now it is '4325380'\n",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T14:05:19.321Z",
+                    "location": "syscheck",
+                    "id": "1777471519.13160",
+                    "timestamp": "2026-04-29T14:05:19.321+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "41e73Z0BxaP7cVva8Z4W",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "name": "wazuh.manager",
+                        "id": "000"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "pci_dss": [
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Wazuh server started.",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "502",
+                        "nist_800_53": [
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: Manager started.",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:32:49.707Z",
+                    "location": "wazuh-monitord",
+                    "id": "1777541569.31718",
+                    "timestamp": "2026-04-30T09:32:49.707+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "Nyu63Z0BmGPi9FJyxxJB",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "libinput10",
+                        "arch": "amd64",
+                        "version": "1.25.0-1ubuntu3.3"
+                    },
+                    "rule": {
+                        "firedtimes": 14,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:36 status half-configured libinput10:amd64 1.25.0-1ubuntu3.3",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.705Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.28303",
+                    "timestamp": "2026-04-30T09:31:36.705+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "Oiu63Z0BmGPi9FJyxxJB",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "gir1.2-nm-1.0",
+                        "arch": "amd64",
+                        "version": "1.46.0-1ubuntu2.6"
+                    },
+                    "rule": {
+                        "firedtimes": 17,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:36 status half-configured gir1.2-nm-1.0:amd64 1.46.0-1ubuntu2.6",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.738Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.29814",
+                    "timestamp": "2026-04-30T09:31:36.738+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "PCu63Z0BmGPi9FJyxxJB",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "snapd",
+                        "arch": "amd64",
+                        "version": "2.73+ubuntu24.04.2"
+                    },
+                    "rule": {
+                        "firedtimes": 19,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:36 status half-configured snapd:amd64 2.73+ubuntu24.04.2",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.759Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.30886",
+                    "timestamp": "2026-04-30T09:31:36.759+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "wSu63Z0BmGPi9FJyvxFz",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "containerd.io",
+                        "arch": "amd64",
+                        "version": "2.2.2-1~ubuntu.24.04~noble"
+                    },
+                    "rule": {
+                        "firedtimes": 2,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:26 status half-configured containerd.io:amd64 2.2.2-1~ubuntu.24.04~noble",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:28.633Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541488.21995",
+                    "timestamp": "2026-04-30T09:31:28.633+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "wyu63Z0BmGPi9FJyvxFz",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "google-chrome-stable",
+                        "arch": "amd64",
+                        "version": "147.0.7727.55-1"
+                    },
+                    "rule": {
+                        "firedtimes": 4,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:28 status half-configured google-chrome-stable:amd64 147.0.7727.55-1",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:28.653Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541488.23047",
+                    "timestamp": "2026-04-30T09:31:28.653+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "xSu63Z0BmGPi9FJyvxFz",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "rsyslog",
+                        "arch": "amd64",
+                        "version": "8.2312.0-3ubuntu9.1"
+                    },
+                    "rule": {
+                        "firedtimes": 6,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:34 status half-configured rsyslog:amd64 8.2312.0-3ubuntu9.1",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:34.653Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541494.24123",
+                    "timestamp": "2026-04-30T09:31:34.653+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "2iu63Z0BmGPi9FJywxFe",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "mutter-common",
+                        "arch": "all",
+                        "version": "46.2-1ubuntu0.24.04.14"
+                    },
+                    "rule": {
+                        "firedtimes": 9,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:35 status half-configured mutter-common:all 46.2-1ubuntu0.24.04.14",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.649Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.25708",
+                    "timestamp": "2026-04-30T09:31:36.649+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "3Cu63Z0BmGPi9FJywxFe",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "libmutter-14-0",
+                        "arch": "amd64",
+                        "version": "46.2-1ubuntu0.24.04.14"
+                    },
+                    "rule": {
+                        "firedtimes": 11,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:35 status half-configured libmutter-14-0:amd64 46.2-1ubuntu0.24.04.14",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.674Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.26748",
+                    "timestamp": "2026-04-30T09:31:36.674+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "3Su63Z0BmGPi9FJywxFe",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "mutter-common-bin",
+                        "arch": "amd64",
+                        "version": "46.2-1ubuntu0.24.04.14"
+                    },
+                    "rule": {
+                        "firedtimes": 12,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:35 status half-configured mutter-common-bin:amd64 46.2-1ubuntu0.24.04.14",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.684Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.27269",
+                    "timestamp": "2026-04-30T09:31:36.684+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "sSum3Z0BmGPi9FJymw8G",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\nudp 0.0.0.0:34002 0.0.0.0:* 19421/firefox\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:37904 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\nudp 0.0.0.0:34002 0.0.0.0:* 19421/firefox\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:37904 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:09:35.240Z",
+                    "location": "netstat listening ports",
+                    "id": "1777540175.19349",
+                    "timestamp": "2026-04-30T09:09:35.240+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "Gis-3Z0BmGPi9FJyOwxH",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\nudp 0.0.0.0:33107 0.0.0.0:* 19421/firefox\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:50200 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\nudp 0.0.0.0:33107 0.0.0.0:* 19421/firefox\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:50200 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T07:15:27.596Z",
+                    "location": "netstat listening ports",
+                    "id": "1777533327.15165",
+                    "timestamp": "2026-04-30T07:15:27.596+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "8Ssw3Z0BmGPi9FJyzQqm",
+                "_score": 1.0,
+                "_source": {
+                    "predecoder": {
+                        "hostname": "Stoffe-Ubunto",
+                        "program_name": "kernel",
+                        "timestamp": "Apr 30 07:00:49"
+                    },
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "extra_data": "open",
+                        "status": "DENIED"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "description": "Apparmor DENIED",
+                        "groups": [
+                            "local",
+                            "syslog",
+                            "apparmor"
+                        ],
+                        "id": "52002"
+                    },
+                    "decoder": {
+                        "parent": "kernel",
+                        "name": "kernel"
+                    },
+                    "full_log": "Apr 30 07:00:49 Stoffe-Ubunto kernel: audit: type=1400 audit(1777532449.756:3751): apparmor=\"DENIED\" operation=\"open\" class=\"file\" profile=\"snap.firmware-updater.firmware-notifier\" name=\"/proc/sys/vm/max_map_count\" pid=1074251 comm=\"firmware-notifi\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T07:00:50.602Z",
+                    "location": "journald",
+                    "id": "1777532450.14715",
+                    "timestamp": "2026-04-30T07:00:50.602+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "givK3J0BmGPi9FJy3gbn",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "vulnerability": {
+                            "severity": "High",
+                            "package": {
+                                "condition": "Package default status",
+                                "name": "python3-wheel",
+                                "source": "wheel",
+                                "version": "0.42.0-2ubuntu0.1~esm1",
+                                "architecture": "all"
+                            },
+                            "assigner": "GitHub_M",
+                            "published": "2026-01-22T05:16:23Z",
+                            "classification": "-",
+                            "title": "CVE-2026-24049 affects python3-wheel",
+                            "type": "Packages",
+                            "rationale": "wheel is a command line tool for manipulating Python wheel files, asdefined in PEP 427. In versions 0.40.0 through 0.46.1, the unpack functionis vulnerable to file permission modification through mishandling of filepermissions after extraction. The logic blindly trusts the filename fromthe archive header for the chmod operation, even though the extractionprocess itself might have sanitized the path. Attackers can craft amalicious wheel file that, when unpacked, changes the permissions ofcritical system files (e.g., /etc/passwd, SSH keys, config files), allowingfor Privilege Escalation or arbitrary code execution by modifyingnow-writable scripts. This issue has been fixed in version 0.46.2.",
+                            "reference": "https://ubuntu.com/security/CVE-2026-24049, https://www.cve.org/CVERecord?id=CVE-2026-24049",
+                            "score": {
+                                "version": "3.1",
+                                "base": "7.100000"
+                            },
+                            "cve": "CVE-2026-24049",
+                            "enumeration": "CVE",
+                            "cvss": {
+                                "cvss3": {
+                                    "base_score": "7.100000",
+                                    "vector": {
+                                        "user_interaction": "REQUIRED",
+                                        "integrity_impact": "HIGH",
+                                        "scope": "UNCHANGED",
+                                        "availability": "HIGH",
+                                        "confidentiality_impact": "NONE",
+                                        "privileges_required": "NONE"
+                                    }
+                                }
+                            },
+                            "updated": "2026-02-18T14:56:48Z",
+                            "status": "Active"
+                        }
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 10,
+                        "pci_dss": [
+                            "11.2.1",
+                            "11.2.3"
+                        ],
+                        "tsc": [
+                            "CC7.1",
+                            "CC7.2"
+                        ],
+                        "description": "CVE-2026-24049 affects python3-wheel",
+                        "groups": [
+                            "vulnerability-detector"
+                        ],
+                        "id": "23505",
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "json"
+                    },
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T05:09:33.705Z",
+                    "location": "vulnerability-detector",
+                    "id": "1777525773.7035",
+                    "timestamp": "2026-04-30T05:09:33.705+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "gyvK3J0BmGPi9FJy3gbn",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "vulnerability": {
+                            "severity": "High",
+                            "package": {
+                                "name": "python3-wheel",
+                                "version": "0.42.0-2",
+                                "architecture": "all"
+                            },
+                            "published": "2026-01-22T05:16:23Z",
+                            "classification": "CVSS",
+                            "title": "CVE-2026-24049 affecting python3-wheel was solved",
+                            "type": "Packages",
+                            "reference": "https://github.com/pypa/wheel/security/advisories/GHSA-8rrh-rw8j-w5fx, https://github.com/pypa/wheel/commit/7a7d2de96b22a9adf9208afcc9547e1001569fef, https://github.com/pypa/wheel/releases/tag/0.46.2",
+                            "score": {
+                                "version": "3.1",
+                                "base": "7.100000"
+                            },
+                            "cve": "CVE-2026-24049",
+                            "enumeration": "CVE",
+                            "cvss": {
+                                "cvss3": {
+                                    "base_score": "7.100000"
+                                }
+                            },
+                            "updated": "2026-02-18T14:56:48Z",
+                            "status": "Solved"
+                        }
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "pci_dss": [
+                            "11.2.1",
+                            "11.2.3"
+                        ],
+                        "tsc": [
+                            "CC7.1",
+                            "CC7.2"
+                        ],
+                        "description": "The CVE-2026-24049 that affected python3-wheel was solved due to an update in the agent or feed.",
+                        "groups": [
+                            "vulnerability-detector"
+                        ],
+                        "id": "23502",
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "json"
+                    },
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T05:09:33.858Z",
+                    "location": "vulnerability-detector",
+                    "id": "1777525773.10684",
+                    "timestamp": "2026-04-30T05:09:33.858+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "9SuZ3J0BmGPi9FJylQRP",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "python3-wheel",
+                        "arch": "all",
+                        "version": "0.42.0-2"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 06:15:40 status half-configured python3-wheel:all 0.42.0-2",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T04:15:41.507Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777522541.5075",
+                    "timestamp": "2026-04-30T04:15:41.507+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "5CoP3J0BmGPi9FJyyv6k",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:39390 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:43430 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:39390 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:43430 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T01:45:05.440Z",
+                    "location": "netstat listening ports",
+                    "id": "1777513505.445",
+                    "timestamp": "2026-04-30T01:45:05.440+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "7ipC250BmGPi9FJyZvWN",
+                "_score": 1.0,
+                "_source": {
+                    "predecoder": {
+                        "hostname": "Stoffe-Ubunto",
+                        "program_name": "kernel",
+                        "timestamp": "Apr 29 22:00:49"
+                    },
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "extra_data": "open",
+                        "status": "DENIED"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "description": "Apparmor DENIED",
+                        "groups": [
+                            "local",
+                            "syslog",
+                            "apparmor"
+                        ],
+                        "id": "52002"
+                    },
+                    "decoder": {
+                        "parent": "kernel",
+                        "name": "kernel"
+                    },
+                    "full_log": "Apr 29 22:00:49 Stoffe-Ubunto kernel: audit: type=1400 audit(1777500049.877:3748): apparmor=\"DENIED\" operation=\"open\" class=\"file\" profile=\"snap.firmware-updater.firmware-notifier\" name=\"/proc/sys/vm/max_map_count\" pid=887172 comm=\"firmware-notifi\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T22:00:50.348Z",
+                    "location": "journald",
+                    "id": "1777500050.25406",
+                    "timestamp": "2026-04-29T22:00:50.348+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "Syr82p0BmGPi9FJy0fNn",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:42741 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:52752 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy\nudp 0.0.0.0:59749 0.0.0.0:* 19421/firefox",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 3,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:42741 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:52752 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy\nudp 0.0.0.0:59749 0.0.0.0:* 19421/firefox",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T20:44:45.263Z",
+                    "location": "netstat listening ports",
+                    "id": "1777495485.23251",
+                    "timestamp": "2026-04-29T20:44:45.263+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "Fiqd2p0BmGPi9FJyme96",
+                "_score": 1.0,
+                "_source": {
+                    "predecoder": {
+                        "hostname": "Stoffe-Ubunto",
+                        "program_name": "kernel",
+                        "timestamp": "Apr 29 19:00:49"
+                    },
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "extra_data": "open",
+                        "status": "DENIED"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "description": "Apparmor DENIED",
+                        "groups": [
+                            "local",
+                            "syslog",
+                            "apparmor"
+                        ],
+                        "id": "52002"
+                    },
+                    "decoder": {
+                        "parent": "kernel",
+                        "name": "kernel"
+                    },
+                    "full_log": "Apr 29 19:00:49 Stoffe-Ubunto kernel: audit: type=1400 audit(1777489249.878:3747): apparmor=\"DENIED\" operation=\"open\" class=\"file\" profile=\"snap.firmware-updater.firmware-notifier\" name=\"/proc/sys/vm/max_map_count\" pid=825762 comm=\"firmware-notifi\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T19:00:50.290Z",
+                    "location": "journald",
+                    "id": "1777489250.16547",
+                    "timestamp": "2026-04-29T19:00:50.290+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "PiqP2Z0BmGPi9FJyDeQP",
+                "_score": 1.0,
+                "_source": {
+                    "syscheck": {
+                        "uname_after": "root",
+                        "mtime_after": "2026-04-29T05:37:16",
+                        "inode_before": 4327537,
+                        "size_after": "58",
+                        "gid_after": "0",
+                        "mtime_before": "2026-04-28T05:37:26",
+                        "mode": "scheduled",
+                        "path": "/etc/default/google-chrome",
+                        "sha1_after": "a5ddb5adf30b39cca9d862d3f6cbb83b1eb2be43",
+                        "changed_attributes": [
+                            "inode",
+                            "mtime"
+                        ],
+                        "gname_after": "root",
+                        "uid_after": "0",
+                        "perm_after": "rw-r--r--",
+                        "event": "modified",
+                        "md5_after": "a7c8cba56663160b43265d054961b0dd",
+                        "sha256_after": "f9120c06aad5aa4add1b646456199fd34b4fa72c6eb8ba4d37d85a59d7cac478",
+                        "inode_after": 4327388
+                    },
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "11.5"
+                        ],
+                        "hipaa": [
+                            "164.312.c.1",
+                            "164.312.c.2"
+                        ],
+                        "tsc": [
+                            "PI1.4",
+                            "PI1.5",
+                            "CC6.1",
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Integrity checksum changed.",
+                        "groups": [
+                            "ossec",
+                            "syscheck",
+                            "syscheck_entry_modified",
+                            "syscheck_file"
+                        ],
+                        "nist_800_53": [
+                            "SI.7"
+                        ],
+                        "gdpr": [
+                            "II_5.1.f"
+                        ],
+                        "firedtimes": 1,
+                        "mitre": {
+                            "technique": [
+                                "Stored Data Manipulation"
+                            ],
+                            "id": [
+                                "T1565.001"
+                            ],
+                            "tactic": [
+                                "Impact"
+                            ]
+                        },
+                        "id": "550",
+                        "gpg13": [
+                            "4.11"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "syscheck_integrity_changed"
+                    },
+                    "full_log": "File '/etc/default/google-chrome' modified\nMode: scheduled\nChanged attributes: inode,mtime\nOld modification time was: '1777354646', now it is '1777441036'\nOld inode was: '4327537', now it is '4327388'\n",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T14:05:19.316Z",
+                    "location": "syscheck",
+                    "id": "1777471519.12313",
+                    "timestamp": "2026-04-29T14:05:19.316+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "Niu63Z0BmGPi9FJyxxJB",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "libinput-bin",
+                        "arch": "amd64",
+                        "version": "1.25.0-1ubuntu3.3"
+                    },
+                    "rule": {
+                        "firedtimes": 13,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:35 status half-configured libinput-bin:amd64 1.25.0-1ubuntu3.3",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.695Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.27796",
+                    "timestamp": "2026-04-30T09:31:36.695+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "Oyu63Z0BmGPi9FJyxxJB",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "network-manager-config-connectivity-ubuntu",
+                        "arch": "all",
+                        "version": "1.46.0-1ubuntu2.6"
+                    },
+                    "rule": {
+                        "firedtimes": 18,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:36 status half-configured network-manager-config-connectivity-ubuntu:all 1.46.0-1ubuntu2.6",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.748Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.30323",
+                    "timestamp": "2026-04-30T09:31:36.748+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "QCu63Z0BmGPi9FJyyxIp",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "extra_data": "Stoffe-Ubunto->any"
+                    },
+                    "rule": {
+                        "mail": false,
+                        "level": 3,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.6"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8"
+                        ],
+                        "description": "Wazuh agent stopped.",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14",
+                            "AU.5"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ],
+                        "firedtimes": 1,
+                        "mitre": {
+                            "technique": [
+                                "Disable or Modify Tools"
+                            ],
+                            "id": [
+                                "T1562.001"
+                            ],
+                            "tactic": [
+                                "Defense Evasion"
+                            ]
+                        },
+                        "id": "506",
+                        "gpg13": [
+                            "10.1"
+                        ]
+                    },
+                    "decoder": {
+                        "parent": "ossec",
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: Agent stopped: 'Stoffe-Ubunto->any'.",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:37.784Z",
+                    "location": "wazuh-remoted",
+                    "id": "1777541497.31381",
+                    "timestamp": "2026-04-30T09:31:37.784+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "2yu63Z0BmGPi9FJywxFe",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "gir1.2-mutter-14",
+                        "arch": "amd64",
+                        "version": "46.2-1ubuntu0.24.04.14"
+                    },
+                    "rule": {
+                        "firedtimes": 10,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:35 status half-configured gir1.2-mutter-14:amd64 46.2-1ubuntu0.24.04.14",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.661Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.26223",
+                    "timestamp": "2026-04-30T09:31:36.661+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "PCuW3Z0BmGPi9FJyIA8Y",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:34725 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:34725 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T08:51:34.048Z",
+                    "location": "netstat listening ports",
+                    "id": "1777539094.17278",
+                    "timestamp": "2026-04-30T08:51:34.048+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "3Spq250BmGPi9FJyr_d7",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:42202 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:42202 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T22:44:53.304Z",
+                    "location": "netstat listening ports",
+                    "id": "1777502693.25855",
+                    "timestamp": "2026-04-29T22:44:53.304+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "ryrm2p0BmGPi9FJy2PIt",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:46598 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:46598 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T20:20:43.644Z",
+                    "location": "netstat listening ports",
+                    "id": "1777494043.19109",
+                    "timestamp": "2026-04-29T20:20:43.644+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.29",
+                "_id": "7Cr42Z0BmGPi9FJyzOdn",
+                "_score": 1.0,
+                "_source": {
+                    "predecoder": {
+                        "hostname": "Stoffe-Ubunto",
+                        "program_name": "kernel",
+                        "timestamp": "Apr 29 16:00:49"
+                    },
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "extra_data": "open",
+                        "status": "DENIED"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "description": "Apparmor DENIED",
+                        "groups": [
+                            "local",
+                            "syslog",
+                            "apparmor"
+                        ],
+                        "id": "52002"
+                    },
+                    "decoder": {
+                        "parent": "kernel",
+                        "name": "kernel"
+                    },
+                    "full_log": "Apr 29 16:00:49 Stoffe-Ubunto kernel: audit: type=1400 audit(1777478449.764:3746): apparmor=\"DENIED\" operation=\"open\" class=\"file\" profile=\"snap.firmware-updater.firmware-notifier\" name=\"/proc/sys/vm/max_map_count\" pid=764295 comm=\"firmware-notifi\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-29T16:00:50.238Z",
+                    "location": "journald",
+                    "id": "1777478450.14027",
+                    "timestamp": "2026-04-29T16:00:50.238+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "bHR43p0BBVQmd4A-sjYz",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "name": "wazuh.manager",
+                        "id": "000"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "pci_dss": [
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Wazuh server started.",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "502",
+                        "nist_800_53": [
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: Manager started.",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T12:58:55.986Z",
+                    "location": "wazuh-monitord",
+                    "id": "1777553935.32208",
+                    "timestamp": "2026-04-30T12:58:55.986+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "zXTt3Z0BBVQmd4A-1jRg",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "name": "wazuh.manager",
+                        "id": "000"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "pci_dss": [
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Wazuh server started.",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "502",
+                        "nist_800_53": [
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: Manager started.",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T10:27:19.663Z",
+                    "location": "wazuh-monitord",
+                    "id": "1777544839.31963",
+                    "timestamp": "2026-04-30T10:27:19.663+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "OCu63Z0BmGPi9FJyxxJB",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "network-manager",
+                        "arch": "amd64",
+                        "version": "1.46.0-1ubuntu2.6"
+                    },
+                    "rule": {
+                        "firedtimes": 15,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:36 status half-configured network-manager:amd64 1.46.0-1ubuntu2.6",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.715Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.28806",
+                    "timestamp": "2026-04-30T09:31:36.715+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "OSu63Z0BmGPi9FJyxxJB",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "libnm0",
+                        "arch": "amd64",
+                        "version": "1.46.0-1ubuntu2.6"
+                    },
+                    "rule": {
+                        "firedtimes": 16,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:36 status half-configured libnm0:amd64 1.46.0-1ubuntu2.6",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.728Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.29319",
+                    "timestamp": "2026-04-30T09:31:36.728+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "wCu63Z0BmGPi9FJyvxFz",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "docker-ce-cli",
+                        "arch": "amd64",
+                        "version": "5:29.4.0-1~ubuntu.24.04~noble"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:26 status half-configured docker-ce-cli:amd64 5:29.4.0-1~ubuntu.24.04~noble",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:26.628Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541486.21462",
+                    "timestamp": "2026-04-30T09:31:26.628+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "wiu63Z0BmGPi9FJyvxFz",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "docker-ce",
+                        "arch": "amd64",
+                        "version": "5:29.4.0-1~ubuntu.24.04~noble"
+                    },
+                    "rule": {
+                        "firedtimes": 3,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:27 status half-configured docker-ce:amd64 5:29.4.0-1~ubuntu.24.04~noble",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:28.643Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541488.22522",
+                    "timestamp": "2026-04-30T09:31:28.643+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "xCu63Z0BmGPi9FJyvxFz",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "docker-ce-rootless-extras",
+                        "arch": "amd64",
+                        "version": "5:29.4.0-1~ubuntu.24.04~noble"
+                    },
+                    "rule": {
+                        "firedtimes": 5,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:34 status half-configured docker-ce-rootless-extras:amd64 5:29.4.0-1~ubuntu.24.04~noble",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:34.653Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541494.23566",
+                    "timestamp": "2026-04-30T09:31:34.653+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "xiu63Z0BmGPi9FJyvxFz",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "docker-compose-plugin",
+                        "arch": "amd64",
+                        "version": "5.1.2-1~ubuntu.24.04~noble"
+                    },
+                    "rule": {
+                        "firedtimes": 7,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:34 status half-configured docker-compose-plugin:amd64 5.1.2-1~ubuntu.24.04~noble",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:34.694Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541494.24624",
+                    "timestamp": "2026-04-30T09:31:34.694+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "2Su63Z0BmGPi9FJywxFe",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "docker-model-plugin",
+                        "arch": "amd64",
+                        "version": "1.1.35-1~ubuntu.24.04~noble"
+                    },
+                    "rule": {
+                        "firedtimes": 8,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 11:31:35 status half-configured docker-model-plugin:amd64 1.1.35-1~ubuntu.24.04~noble",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T09:31:36.639Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777541496.25167",
+                    "timestamp": "2026-04-30T09:31:36.639+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "zSsB3Z0BmGPi9FJypgjj",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\nudp 0.0.0.0:32796 0.0.0.0:* 19421/firefox\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:42428 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:43663 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:44185 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:50933 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy\nudp 0.0.0.0:56299 0.0.0.0:* 19421/firefox",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\nudp 0.0.0.0:32796 0.0.0.0:* 19421/firefox\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:42428 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:43663 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:44185 0.0.0.0:* 19421/firefox\nudp 0.0.0.0:50933 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy\nudp 0.0.0.0:56299 0.0.0.0:* 19421/firefox",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T06:09:23.157Z",
+                    "location": "netstat listening ports",
+                    "id": "1777529363.12434",
+                    "timestamp": "2026-04-30T06:09:23.157+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "JCub3J0BmGPi9FJyLwV7",
+                "_score": 1.0,
+                "_source": {
+                    "predecoder": {
+                        "hostname": "Stoffe-Ubunto",
+                        "program_name": "pkexec",
+                        "timestamp": "Apr 30 04:17:25"
+                    },
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "srcuser": "kristoffer",
+                        "uid": "1000",
+                        "dstuser": "root(uid=0)"
+                    },
+                    "rule": {
+                        "mail": false,
+                        "level": 3,
+                        "pci_dss": [
+                            "10.2.5"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "PAM: Login session opened.",
+                        "groups": [
+                            "pam",
+                            "syslog",
+                            "authentication_success"
+                        ],
+                        "nist_800_53": [
+                            "AU.14",
+                            "AC.7"
+                        ],
+                        "gdpr": [
+                            "IV_32.2"
+                        ],
+                        "firedtimes": 1,
+                        "mitre": {
+                            "technique": [
+                                "Valid Accounts"
+                            ],
+                            "id": [
+                                "T1078"
+                            ],
+                            "tactic": [
+                                "Defense Evasion",
+                                "Persistence",
+                                "Privilege Escalation",
+                                "Initial Access"
+                            ]
+                        },
+                        "id": "5501",
+                        "gpg13": [
+                            "7.8",
+                            "7.9"
+                        ]
+                    },
+                    "decoder": {
+                        "parent": "pam",
+                        "name": "pam"
+                    },
+                    "full_log": "Apr 30 04:17:25 Stoffe-Ubunto pkexec[1018518]: pam_unix(polkit-1:session): session opened for user root(uid=0) by kristoffer(uid=1000)",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T04:17:25.636Z",
+                    "location": "journald",
+                    "id": "1777522645.6575",
+                    "timestamp": "2026-04-30T04:17:25.636+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "9iuZ3J0BmGPi9FJylQRP",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status half-configured",
+                        "package": "python3-wheel",
+                        "arch": "all",
+                        "version": "0.42.0-2ubuntu0.1~esm1"
+                    },
+                    "rule": {
+                        "firedtimes": 2,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "Dpkg (Debian Package) half configured.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2904",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 06:15:40 status half-configured python3-wheel:all 0.42.0-2ubuntu0.1~esm1",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T04:15:41.548Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777522541.5561",
+                    "timestamp": "2026-04-30T04:15:41.548+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "9yuZ3J0BmGPi9FJylQRP",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "dpkg_status": "status installed",
+                        "package": "python3-wheel",
+                        "arch": "all",
+                        "version": "0.42.0-2ubuntu0.1~esm1"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.6.1",
+                            "10.2.7"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC7.2",
+                            "CC7.3",
+                            "CC6.8",
+                            "CC8.1"
+                        ],
+                        "description": "New dpkg (Debian Package) installed.",
+                        "groups": [
+                            "syslog",
+                            "dpkg",
+                            "config_changed"
+                        ],
+                        "id": "2902",
+                        "nist_800_53": [
+                            "AU.6",
+                            "AU.14"
+                        ],
+                        "gpg13": [
+                            "4.10"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "dpkg-decoder"
+                    },
+                    "full_log": "2026-04-30 06:15:41 status installed python3-wheel:all 0.42.0-2ubuntu0.1~esm1",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T04:15:41.548Z",
+                    "location": "/var/log/dpkg.log",
+                    "id": "1777522541.6075",
+                    "timestamp": "2026-04-30T04:15:41.548+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "0SuM3J0BmGPi9FJyAAOg",
+                "_score": 1.0,
+                "_source": {
+                    "predecoder": {
+                        "hostname": "Stoffe-Ubunto",
+                        "program_name": "kernel",
+                        "timestamp": "Apr 30 04:00:49"
+                    },
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "extra_data": "open",
+                        "status": "DENIED"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "description": "Apparmor DENIED",
+                        "groups": [
+                            "local",
+                            "syslog",
+                            "apparmor"
+                        ],
+                        "id": "52002"
+                    },
+                    "decoder": {
+                        "parent": "kernel",
+                        "name": "kernel"
+                    },
+                    "full_log": "Apr 30 04:00:49 Stoffe-Ubunto kernel: audit: type=1400 audit(1777521649.760:3750): apparmor=\"DENIED\" operation=\"open\" class=\"file\" profile=\"snap.firmware-updater.firmware-notifier\" name=\"/proc/sys/vm/max_map_count\" pid=1012584 comm=\"firmware-notifi\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T04:00:50.551Z",
+                    "location": "journald",
+                    "id": "1777521650.4626",
+                    "timestamp": "2026-04-30T04:00:50.551+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "XCtR3J0BmGPi9FJytgE7",
+                "_score": 1.0,
+                "_source": {
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "previous_output": "Previous output:\nossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:52299 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 7,
+                        "pci_dss": [
+                            "10.2.7",
+                            "10.6.1"
+                        ],
+                        "hipaa": [
+                            "164.312.b"
+                        ],
+                        "tsc": [
+                            "CC6.8",
+                            "CC7.2",
+                            "CC7.3"
+                        ],
+                        "description": "Listened ports status (netstat) changed (new port opened or closed).",
+                        "groups": [
+                            "ossec"
+                        ],
+                        "id": "533",
+                        "nist_800_53": [
+                            "AU.14",
+                            "AU.6"
+                        ],
+                        "gpg13": [
+                            "10.1"
+                        ],
+                        "gdpr": [
+                            "IV_35.7.d"
+                        ]
+                    },
+                    "decoder": {
+                        "name": "ossec"
+                    },
+                    "full_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "previous_log": "ossec: output: 'netstat listening ports':\ntcp 0.0.0.0:22 0.0.0.0:* 1/init\ntcp6 :::22 :::* 1/init\ntcp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\ntcp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.53:53 0.0.0.0:* 992/systemd-resolve\nudp 127.0.0.54:53 0.0.0.0:* 992/systemd-resolve\ntcp 0.0.0.0:443 0.0.0.0:* 211520/docker-proxy\ntcp6 :::443 :::* 211529/docker-proxy\nudp 0.0.0.0:514 0.0.0.0:* 211051/docker-proxy\nudp6 :::514 :::* 211057/docker-proxy\ntcp 0.0.0.0:1514 0.0.0.0:* 211079/docker-proxy\ntcp6 :::1514 :::* 211088/docker-proxy\ntcp 0.0.0.0:1515 0.0.0.0:* 211109/docker-proxy\ntcp6 :::1515 :::* 211122/docker-proxy\ntcp 0.0.0.0:9200 0.0.0.0:* 211022/docker-proxy\ntcp6 :::9200 :::* 211029/docker-proxy\ntcp 127.0.0.1:34074 0.0.0.0:* 365940/code\nudp 0.0.0.0:52299 0.0.0.0:* 19421/firefox\ntcp 0.0.0.0:55000 0.0.0.0:* 211138/docker-proxy\ntcp6 :::55000 :::* 211152/docker-proxy",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T02:57:10.253Z",
+                    "location": "netstat listening ports",
+                    "id": "1777517830.2556",
+                    "timestamp": "2026-04-30T02:57:10.253+0000"
+                }
+            },
+            {
+                "_index": "wazuh-alerts-4.x-2026.04.30",
+                "_id": "9irn250BmGPi9FJyNPxv",
+                "_score": 1.0,
+                "_source": {
+                    "predecoder": {
+                        "hostname": "Stoffe-Ubunto",
+                        "program_name": "kernel",
+                        "timestamp": "Apr 30 01:00:49"
+                    },
+                    "agent": {
+                        "ip": "192.168.2.9",
+                        "name": "Stoffe-Ubunto",
+                        "id": "004"
+                    },
+                    "manager": {
+                        "name": "wazuh.manager"
+                    },
+                    "data": {
+                        "extra_data": "open",
+                        "status": "DENIED"
+                    },
+                    "rule": {
+                        "firedtimes": 1,
+                        "mail": false,
+                        "level": 3,
+                        "description": "Apparmor DENIED",
+                        "groups": [
+                            "local",
+                            "syslog",
+                            "apparmor"
+                        ],
+                        "id": "52002"
+                    },
+                    "decoder": {
+                        "parent": "kernel",
+                        "name": "kernel"
+                    },
+                    "full_log": "Apr 30 01:00:49 Stoffe-Ubunto kernel: audit: type=1400 audit(1777510849.759:3749): apparmor=\"DENIED\" operation=\"open\" class=\"file\" profile=\"snap.firmware-updater.firmware-notifier\" name=\"/proc/sys/vm/max_map_count\" pid=949394 comm=\"firmware-notifi\" requested_mask=\"r\" denied_mask=\"r\" fsuid=1000 ouid=0",
+                    "input": {
+                        "type": "log"
+                    },
+                    "@timestamp": "2026-04-30T01:00:50.468Z",
+                    "location": "journald",
+                    "id": "1777510850.0",
+                    "timestamp": "2026-04-30T01:00:50.468+0000"
+                }
+            }
+        ]
+    }
+}
