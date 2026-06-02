@@ -33,9 +33,14 @@ exponerar en valfri FastAPI-service (`/predict`) som Sentinel kan ringa.
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
+Copy-Item .env.example .env   # initialisera lokal konfig (gitignored)
 ruff check src tests
 pytest -q
 ```
+
+`.env.example` listar alla miljövariabler [config.py](src/sentinel_ml/config.py)
+känner till. Justera värdena i `.env` för din lokala miljö — t.ex. Mongo-URI om
+du kör mot Atlas istället för lokal Docker.
 
 ## Köra modulen
 
