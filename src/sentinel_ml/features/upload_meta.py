@@ -53,7 +53,7 @@ def _row(record: UploadRecord) -> list[float]:
     digits = len(_DIGIT_RE.findall(record.filename))
 
     return [
-        math.log1p(record.size_bytes),
+        math.log1p(record.size_bytes or 0),
         float(name_len),
         float(len(_SPECIAL_CHAR_RE.findall(record.filename))),
         digits / name_len if name_len else 0.0,

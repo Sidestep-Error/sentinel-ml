@@ -18,8 +18,12 @@ class Settings(BaseSettings):
     )
 
     # --- MongoDB (sentinel-upload-api data source) ---
-    mongodb_uri: str = Field(default="mongodb://localhost:28017", alias="MONGODB_URI")
-    mongodb_db: str = Field(default="sentinel", alias="MONGODB_DB")
+    # Defaults match upstream sentinel-upload-api (see its app/db.py) so a
+    # local dev setup with both services running uses the same Mongo instance.
+    mongodb_uri: str = Field(
+        default="mongodb://localhost:27017/sentinel_upload", alias="MONGODB_URI"
+    )
+    mongodb_db: str = Field(default="sentinel_upload", alias="MONGODB_DB")
 
     # --- LLM (Ollama, local) ---
     ollama_host: str = Field(default="http://localhost:11434", alias="OLLAMA_HOST")
