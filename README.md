@@ -59,6 +59,41 @@ uvicorn sentinel_ml.service.api:app --reload --port 8100
 python scripts/demo_smoke.py
 ```
 
+## Köra med Docker
+
+För live-demo eller en självförsörjande dev-stack utan att behöva
+installera Python-deps lokalt:
+
+```powershell
+docker compose build
+docker compose up
+```
+
+Servicen lyssnar på `http://localhost:8100`. `/health`, `/predict/threat`
+och `/predict/upload` är tillgängliga. Verifiera med smoke-scriptet i
+en separat terminal:
+
+```powershell
+python scripts/demo_smoke.py
+```
+
+Lokal Mongo via compose-profile (för dev utan att starta upstream
+sentinel-upload-api):
+
+```powershell
+docker compose --profile with-mongo up
+```
+
+Mongo körs då på `localhost:27017` med databasen `sentinel_upload`,
+vilket matchar `MONGODB_URI`-defaulten i `.env.example`.
+
+### Modellfiler
+
+`models_store/` mountas read-only från host. Träna en modell på host
+(`python -m sentinel_ml.cli train ...`) och restarta containern — den
+plockar upp den nya artefakten vid lifespan-start. Tom `models_store/`
+triggar fallback-svar i endpoints (`label="unknown"`, `model_version="none"`).
+
 ## Struktur
 
 Se [docs/architecture.md](docs/architecture.md) för fullständig översikt
