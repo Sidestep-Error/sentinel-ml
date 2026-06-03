@@ -53,6 +53,10 @@ python -m sentinel_ml.cli extract-iocs path/to/report.txt
 
 # Starta FastAPI-service (för demo eller integration med sentinel-upload-api)
 uvicorn sentinel_ml.service.api:app --reload --port 8100
+
+# Smoke-testa servicen (i en separat terminal) — pingar /health,
+# /predict/threat och /predict/upload med exempel-input
+python scripts/demo_smoke.py
 ```
 
 ## Struktur
