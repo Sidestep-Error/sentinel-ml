@@ -99,6 +99,36 @@ Alla modeller utvärderades med 80/20 train/test-split, `random_state=42`, på `
 | TF-IDF + IsolationForest | TBD | TBD | TBD | TBD |
 | IsolationForest (strukturerade features) | TBD | TBD | TBD | TBD |
 
+### 5.3 Spår C — Malware-familje-klassificerare (MalwareBazaar metadata)
+
+Dataset: 1 000 syntetiska samples (100/familj), 10 malware-familjer.
+Features: filtyp, filstorlek (log), MIME-typ, imphash-förekomst.
+
+| Modell | Accuracy | F1-macro | Precision-macro | Recall-macro |
+|--------|----------|----------|-----------------|--------------|
+| Random Forest (metadata) | 0.425 | 0.422 | 0.423 | 0.425 |
+
+**Per familj:**
+
+| Familj | Precision | Recall | F1 | Typ |
+|--------|-----------|--------|----|-----|
+| GuLoader | 0.74 | 0.70 | 0.72 | Downloader (PS1/ZIP — unik filtyp) |
+| LockBit | 0.63 | 0.60 | 0.62 | Ransomware (stor EXE — unik storlek) |
+| AgentTesla | 0.57 | 0.65 | 0.60 | Stealer |
+| Qakbot | 0.57 | 0.65 | 0.60 | Banker/Loader |
+| Emotet | 0.44 | 0.35 | 0.39 | Banker |
+| NjRAT | 0.28 | 0.35 | 0.31 | RAT |
+| Formbook | 0.28 | 0.25 | 0.26 | Stealer |
+| AsyncRAT | 0.27 | 0.20 | 0.23 | RAT |
+| RedLine | 0.27 | 0.30 | 0.29 | Stealer |
+| Remcos | 0.20 | 0.20 | 0.20 | RAT |
+
+**Konklusion:** F1=0.42 är 4× bättre än slumpen (10 klasser = 10% baseline) men otillräckligt
+för produktion. RAT-familjerna (AsyncRAT, NjRAT, Remcos) är näst intill identiska i metadata
+och går inte att skilja åt utan beteendedata (API-anrop, systemanrop, nätverksmönster).
+GuLoader och LockBit sticker ut tack vare unik filtyp respektive storlek.
+Detta motiverar varför beteendebaserad analys krävs för hög precision i malware-klassificering.
+
 ## 6. Träningsprocess
 
 **Spår A:**

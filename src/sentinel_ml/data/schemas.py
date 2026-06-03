@@ -59,6 +59,20 @@ class UploadRecord(BaseModel):
     created_at: datetime | None = None
 
 
+class MalwareSample(BaseModel):
+    """Metadata record from MalwareBazaar — no binary required."""
+
+    sha256: str
+    file_name: str | None = None
+    file_size: int | None = None
+    file_type: str | None = None
+    file_type_mime: str | None = None
+    signature: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    imphash: str | None = None
+    first_seen: str | None = None
+
+
 class Prediction(BaseModel):
     """Generic prediction envelope returned by all estimators."""
 
