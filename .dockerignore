@@ -1,0 +1,36 @@
+# Local dev / build artifacts
+.git/
+.github/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+
+# Local data and trained artifacts -- mount via volume, don't bake into image
+data/
+notebooks/
+mlruns/
+models_store/
+
+# Local config
+.env
+*.local
+.vscode/
+.idea/
+
+# Not needed in runtime image
+tests/
+docs/
+scripts/
+memory/
+
+# Container files themselves
+Dockerfile
+docker-compose.yml
+docker-compose.yml-old
+.dockerignore

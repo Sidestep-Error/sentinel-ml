@@ -1,0 +1,44 @@
+# Lokal demo-stack för sentinel-ml.
+#
+# Default: bara FastAPI-servicen.
+#   docker compose up
+#
+# Med lokal Mongo för helt självförsörjande dev-miljö:
+#   docker compose --profile with-mongo up
+#
+# Models_store mountas read-only -- träna en modell på host, restarta containern.
+
+services:
+  sentinel-ml:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sentinel-ml:local
+    container_name: sentinel-ml
+    ports:
+      - "8100:8100"
+    environment:
+      # Defaults pekar på compose-internal mongo om profilen with-mongo aktiveras;
+      # annars kan host-Mongo nås via host.docker.internal eller en extern URI.
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/sentinel_upload}
+      MONGODB_DB: ${MONGODB_DB:-sentinel_upload}
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+      SENTINEL_ML_SEED: ${SENTINEL_ML_SEED:-42}
+      MODELS_DIR: /app/models_store
+    volumes:
+      - ./models_store:/app/models_store:ro
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    container_name: sentinel-ml-mongo
+    profiles: ["with-mongo"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
