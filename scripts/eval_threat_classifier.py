@@ -2,10 +2,11 @@
 from pathlib import Path
 
 import typer
+from sklearn.model_selection import train_test_split
+
 from sentinel_ml.data.loaders import load_threat_reports_jsonl
 from sentinel_ml.eval.metrics import evaluate_classifier
 from sentinel_ml.models import threat_classifier
-from sklearn.model_selection import train_test_split
 
 
 def main(dataset: Path = typer.Argument(Path("data/threat_reports_sample.jsonl"))) -> None:
