@@ -15,6 +15,7 @@ still answers during development.
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 from collections.abc import Callable
 from contextlib import asynccontextmanager
@@ -30,6 +31,8 @@ from sentinel_ml.config import get_settings
 from sentinel_ml.data.schemas import IOC, Prediction, UploadRecord
 from sentinel_ml.features.ioc_extract import extract_iocs
 from sentinel_ml.features.upload_meta import build_feature_matrix
+from sentinel_ml.llm.ollama_client import OllamaClient
+from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM
 from sentinel_ml.log_anomaly import tfidf_detector
 from sentinel_ml.models import threat_classifier, upload_classifier
 
@@ -53,10 +56,18 @@ class ThreatRequest(BaseModel):
     text: str
 
 
+class LLMAnalysis(BaseModel):
+    category: str
+    confidence: float
+    rationale: str
+    model: str
+
+
 class ThreatResponse(BaseModel):
     prediction: Prediction
     iocs: list[IOC]
     model_version: str
+    llm_analysis: LLMAnalysis | None = None
 
 
 class UploadResponse(BaseModel):
@@ -118,6 +129,23 @@ def _get_loaded(request: Request, attr: str) -> LoadedModel | None:
     return getattr(request.app.state, attr, None)
 
 
+def _call_ollama(text: str) -> LLMAnalysis | None:
+    """Call Ollama for LLM-based threat classification. Returns None on any failure."""
+    try:
+        client = OllamaClient(timeout=30.0)
+        response = client.generate(prompt=text, system=CLASSIFY_THREAT_REPORT_SYSTEM)
+        data = json.loads(response.text)
+        return LLMAnalysis(
+            category=str(data.get("category", "unknown")),
+            confidence=float(data.get("confidence", 0.0)),
+            rationale=str(data.get("rationale", "")),
+            model=response.model,
+        )
+    except Exception:
+        logger.debug("Ollama unavailable or returned unexpected format — skipping LLM analysis", exc_info=True)
+        return None
+
+
 def _predict_with(loaded: LoadedModel, x: Any) -> Prediction:
     probas = loaded.artifact.predict_proba(x)[0]
     classes = loaded.artifact.classes_
@@ -141,16 +169,18 @@ def create_app() -> FastAPI:
     @app.post("/predict/threat", response_model=ThreatResponse)
     def predict_threat(req: ThreatRequest, request: Request) -> ThreatResponse:
         iocs = extract_iocs(req.text)
+        llm = _call_ollama(req.text)
         loaded = _get_loaded(request, "threat_model")
         if loaded is None:
             return ThreatResponse(
                 prediction=Prediction(label="unknown", confidence=0.0),
                 iocs=iocs,
                 model_version=FALLBACK_VERSION,
+                llm_analysis=llm,
             )
         prediction = _predict_with(loaded, [req.text])
         return ThreatResponse(
-            prediction=prediction, iocs=iocs, model_version=loaded.version
+            prediction=prediction, iocs=iocs, model_version=loaded.version, llm_analysis=llm
         )
 
     @app.post("/predict/upload", response_model=UploadResponse)

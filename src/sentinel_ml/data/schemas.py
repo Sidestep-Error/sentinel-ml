@@ -47,14 +47,16 @@ class ThreatReport(BaseModel):
 class UploadRecord(BaseModel):
     """Minimal projection of sentinel-upload-api's `uploads` collection."""
 
-    sha256: str
+    model_config = {"populate_by_name": True}
+
     filename: str
     content_type: str
-    size_bytes: int
-    scan_status: str  # "clean" | "malicious" | "error"
-    decision: str  # "accepted" | "review" | "rejected"
-    risk_score: int = Field(ge=0, le=100)
-    created_at: datetime
+    sha256: str | None = None
+    size_bytes: int | None = None
+    scan_status: str | None = None  # "clean" | "malicious" | "error"
+    decision: str | None = Field(default=None, alias="status")  # "accepted" | "review" | "rejected"
+    risk_score: int | None = Field(default=None, ge=0, le=100)
+    created_at: datetime | None = None
 
 
 class Prediction(BaseModel):

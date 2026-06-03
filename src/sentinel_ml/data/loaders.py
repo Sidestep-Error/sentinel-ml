@@ -27,7 +27,8 @@ def _get_collection(name: str) -> Collection:
 
     settings = get_settings()
     client = MongoClient(settings.mongodb_uri, serverSelectionTimeoutMS=5000)
-    return client[settings.mongodb_db][name]
+    db_name = settings.mongodb_db_upload if name == "uploads" else settings.mongodb_db
+    return client[db_name][name]
 
 
 def load_uploads_from_mongo(limit: int | None = None) -> list[UploadRecord]:

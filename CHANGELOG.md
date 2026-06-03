@@ -9,6 +9,16 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased] — branch `stoffes_feature`
 
 ### Tillagt
+- **`scripts/generate_synthetic_threat_reports.py`** — genererar 250 syntetiska threat reports (50/kategori) i JSONL-format för baseline-träning (#28)
+- **`scripts/download_real_threat_reports.py`** — laddar ner och konverterar `mrmoor/cyber-threat-intelligence` (CC-BY-4.0, ~10k rader) till ThreatReport JSONL; keyword-baserad dokumentklassificering ger 1 582 lablade rapporter (#29)
+- **`scripts/eval_threat_classifier.py`** — kör train/test-split och rapporterar accuracy/precision/recall/F1 per klass (#31)
+- **`scripts/compare_ioc_extractors.py`** — jämförelseverktyg för regex- vs spaCy-extraktion (#33)
+- **`src/sentinel_ml/features/ioc_extract_spacy.py`** — spaCy-baserad IOC-extraktion (Fas 2): EntityRuler för strukturerade IOCs + pre-trained NER för malware-namn och threat actors som regex inte kan hitta (#33)
+- **`src/sentinel_ml/data/schemas.py`** — `UploadRecord` gjord flexibel med optionella fält för att matcha verklig Atlas-data; stöder `status`-alias för `decision`
+- **`src/sentinel_ml/config.py`** — ny inställning `MONGODB_DB_UPLOAD` (default `sentinel_upload`) för att hantera att uploads och threat events ligger i separata databaser
+- **`src/sentinel_ml/data/loaders.py`** — `_get_collection` väljer nu rätt databas per collection (`uploads` → `sentinel_upload`, övriga → `sentinel`)
+
+
 - **`src/sentinel_ml/log_anomaly/`** — nytt paket för logganomalier enligt [r87-e/ais-grupp-logganomali](https://github.com/r87-e/ais-grupp-logganomali)-konventioner:
   - `tfidf_detector.py` — TF-IDF + IsolationForest på råa loggtexter; ger jämförbar ML-metod mot strukturerad detektor (VG-krav: algoritmjämförelse)
   - `detector.py` — IsolationForest på strukturerade Wazuh-tidsfeatures (portad från `ai-detection/`, anpassad till projektstil)
