@@ -12,7 +12,6 @@ Use extract_iocs_spacy() as a drop-in complement to the regex extractor.
 
 from __future__ import annotations
 
-import re
 from functools import lru_cache
 
 import spacy
