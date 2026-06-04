@@ -45,32 +45,29 @@ class ThreatReport(BaseModel):
 
 
 class UploadRecord(BaseModel):
-    """Minimal projection of sentinel-upload-api's `uploads` collection."""
+    """Projection of sentinel-upload-api's `uploads` collection.
+
+    Field shapes verified 2026-06-02 against upstream `app/models.py`
+    after PR #68. All fields default to sensible empties so documents
+    that predate a field (e.g. pre-PR-#68 records without `size_bytes`)
+    still validate.
+    """
 
     model_config = {"populate_by_name": True}
 
     filename: str
     content_type: str
-    sha256: str | None = None
-    size_bytes: int | None = None
-    scan_status: str | None = None  # "clean" | "malicious" | "error"
-    decision: str | None = Field(default=None, alias="status")  # "accepted" | "review" | "rejected"
-    risk_score: int | None = Field(default=None, ge=0, le=100)
+    size_bytes: int | None = Field(default=None, ge=0)
+    scan_status: str = "clean"  # "clean" | "malicious" | "error"
+    decision: str = "accepted"  # "accepted" | "review" | "rejected"
+    risk_score: int = Field(default=0, ge=0, le=100)
     created_at: datetime | None = None
-
-
-class MalwareSample(BaseModel):
-    """Metadata record from MalwareBazaar — no binary required."""
-
-    sha256: str
-    file_name: str | None = None
-    file_size: int | None = None
-    file_type: str | None = None
-    file_type_mime: str | None = None
-    signature: str | None = None
-    tags: list[str] = Field(default_factory=list)
-    imphash: str | None = None
-    first_seen: str | None = None
+    # Upstream fields previously not modeled in sentinel-ml.
+    status: str = "accepted"  # "accepted" | "rejected"
+    risk_reasons: list[str] = Field(default_factory=list)
+    scan_engine: str = "unknown"
+    scan_detail: str = ""
+    deduplicated: bool = False
 
 
 class Prediction(BaseModel):
