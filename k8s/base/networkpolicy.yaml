@@ -1,0 +1,48 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sentinel-ml
+  namespace: sentinel
+  labels:
+    app.kubernetes.io/name: sentinel-ml
+    app.kubernetes.io/part-of: sentinel-platform
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: sentinel-ml
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Intern-only deploy: bara sentinel-upload-api får ringa servicen.
+    # Ingen Ingress-controller har access -> servicen är inte publik.
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: sentinel-upload-api
+      ports:
+        - protocol: TCP
+          port: 8100
+  egress:
+    # DNS-uppslagning via KubeDNS.
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # MongoDB Atlas eller annan Mongo (port 27017).
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 27017
+    # HTTPS för externa beroenden (Atlas TLS, ev. ML-feeds).
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443

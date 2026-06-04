@@ -33,9 +33,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH"
 
-# Non-root user matchar sentinel-upload-api-konvention (appuser:1000).
-RUN groupadd --system --gid 1000 appuser && \
-    useradd --system --uid 1000 --gid appuser --home /app --shell /usr/sbin/nologin appuser
+# Non-root user matchar sentinel-upload-api-konvention (UID 10001).
+# K8s pod-spec sätter runAsUser: 10001 — UID måste finnas i image:n så
+# att ägarskap på /app/models_store mappas till rätt process-identitet.
+RUN groupadd --system --gid 10001 appuser && \
+    useradd --system --uid 10001 --gid appuser --home /app --shell /usr/sbin/nologin appuser
 
 COPY --from=builder /opt/venv /opt/venv
 
