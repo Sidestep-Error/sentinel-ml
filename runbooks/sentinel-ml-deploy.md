@@ -101,6 +101,22 @@ trigga ny deploy.
 | `forbidden: cannot patch deployments` i CI | SA-token rotated eller saknas | Regenera `KUBECONFIG_HETZNER_B64`-secret enligt sentinel-upload-api runbook |
 | OPA-policyn blockerar apply | Manifest bryter mot constraint (latest-tag, missing labels, no resource limits, root user, rw-rootfs) | Läs error-meddelandet — alla policies dokumenterade i `sentinel-upload-api/k8s/gatekeeper/` |
 | Pod startar men `models_store` är tomt | Förväntat i Fas 1 | Service returnerar fallback-svar (`label="unknown"`, `model_version="none"`). Fas 2 bakar in `.joblib` i image. |
+| `connection refused` från upload-api trots att sentinel-ml-pod är Running | upload-api:s egress-policy tillåter inte port 8100 till sentinel-ml; eller manifest-ändring inte applicerad på klustret | (1) Säkerställ att `sentinel-upload-api/k8s/base/networkpolicy.yaml` har egress-regel för sentinel-ml. (2) På Hetzner: `cd /srv/sentinel-upload-api && git pull && kubectl apply -k k8s/base/`. Se docs/security-analysis-deployment.md (Operationella lärdomar) för fullständig analys. |
+
+## Manifest-ändringar kräver manuell apply
+
+CI:s `deploy-hetzner`-jobb gör endast `kubectl rollout restart deployment/sentinel-ml` — det hämtar ny image men **applicerar inte ändrade manifests** (NetworkPolicy, ConfigMap, Service). Det är medveten säkerhetsdesign: `ci-deploy`-SA:n har bara `patch/update` på Deployments.
+
+**Tumregel:** Om en PR rör något under `k8s/base/`, kör manuellt på Hetzner-klustret efter merge till main:
+
+```bash
+cd /srv/sentinel-ml
+git pull --ff-only origin main
+kubectl apply -k k8s/base/
+kubectl rollout status deployment/sentinel-ml -n sentinel --timeout=120s
+```
+
+Samma pattern gäller sentinel-upload-api. Fullständig lärdom från incident 2026-06-04: se [docs/security-analysis-deployment.md](../docs/security-analysis-deployment.md) → Operationella lärdomar.
 
 ## Säkerhetsanalys
 
