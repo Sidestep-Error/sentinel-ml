@@ -94,6 +94,19 @@ vilket matchar `MONGODB_URI`-defaulten i `.env.example`.
 plockar upp den nya artefakten vid lifespan-start. Tom `models_store/`
 triggar fallback-svar i endpoints (`label="unknown"`, `model_version="none"`).
 
+## Deploy
+
+sentinel-ml körs som en **intern microservice** i samma `sentinel`-namespace
+som [sentinel-upload-api](https://github.com/Sidestep-Error/sentinel-upload-api)
+på Hetzner k3s. Ingen publik URL — bara upload-api:s pods får ringa
+servicen via `sentinel-ml.sentinel.svc.cluster.local`.
+
+CI/CD vid push till `main`: tester → Docker Hub-push → `kubectl rollout restart`.
+
+Manifest i [k8s/base/](k8s/base/). Setup-procedurer i
+[runbooks/sentinel-ml-deploy.md](runbooks/sentinel-ml-deploy.md).
+Hot-modell och RBAC-resonemang i [docs/security-analysis-deployment.md](docs/security-analysis-deployment.md).
+
 ## Struktur
 
 Se [docs/architecture.md](docs/architecture.md) för fullständig översikt
