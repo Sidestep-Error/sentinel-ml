@@ -54,3 +54,8 @@ Thumbs.db
 *.pem
 *.key
 !cosign.pub
+# Kubernetes secret manifests — committa aldrig riktiga värden.
+# secret.example.yaml är mallen; secret.yaml kopieras och fylls i manuellt
+# på klustret innan apply. Se runbooks/sentinel-ml-deploy.md.
+k8s/base/secret.yaml
+k8s/overlays/*/secret.yaml
