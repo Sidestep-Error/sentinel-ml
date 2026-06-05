@@ -92,13 +92,19 @@ Pod-Security Standards-nivå: **restricted** (strängaste).
 
 ## Known follow-ups
 
-### 1. Separat read-only Mongo-user (medium prioritet)
+### 1. Verifiera Mongo-användarens privilegier (medium prioritet)
 
-Idag delar sentinel-ml `MONGODB_URI` med upload-api (samma kreds).
-Bättre: skapa en dedikerad MongoDB-användare med `read`-rättighet bara
-på `uploads`- och `threat_events`-collections, plus `readWrite` på
-`ml_predictions`-collection. Då kan en kompromitterad sentinel-ml-pod
-inte mutera upload-data.
+sentinel-ml har **egna MongoDB-credentials** (separata från upload-api),
+lagrade som GitHub Secret (`MONGODB_URI`) i sentinel-ml-repot och
+applicerade via `k8s/base/secret.yaml` på Hetzner. Det ger redan
+isolation: en kompromiss av sentinel-ml-pod:en kan inte använda
+upload-api:s kreds (eller tvärtom).
+
+**Att verifiera:** är användaren read-only mot `uploads`- och
+`threat_events`-collections, plus `readWrite` på en separat
+`ml_predictions`-collection? Om kredsen idag har bredare access —
+strama åt. Då har vi minimum-privilegium även på Mongo-nivå
+(utöver nätverks-nivå via NetworkPolicy).
 
 ### 2. Image signing med Cosign (låg prioritet)
 
