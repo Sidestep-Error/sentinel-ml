@@ -85,6 +85,15 @@ class CVERelevanceAssessment(BaseModel):
     rationale: str = Field(min_length=1, max_length=500)
 
 
+class CVERelevancePrediction(BaseModel):
+    """Serializable output envelope for later write-back to ml_predictions."""
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    source: Literal["deterministic"] = "deterministic"
+    related_cves: list[CVERelevanceAssessment] = Field(default_factory=list)
+
+
 def normalize_package_name(name: str) -> str:
     """Normalize package identifiers across SBOM and CVE feeds."""
     return "-".join(name.strip().lower().replace("_", "-").split())
@@ -134,6 +143,94 @@ def severity_from_cvss(cvss_score: float | None) -> SeverityLevel:
     return "low"
 
 
+def sbom_components_from_normalized(items: list[dict]) -> list[SBOMComponent]:
+    """Parse already-normalized SBOM entries into strict component models."""
+    return [SBOMComponent.model_validate(item) for item in items]
+
+
+def sbom_components_from_syft(document: dict) -> list[SBOMComponent]:
+    """Best-effort adapter for common Syft SBOM fields.
+
+    Expected fields are intentionally conservative:
+
+    - artifacts[].name
+    - artifacts[].version
+    - artifacts[].type
+    - artifacts[].purl
+    - artifacts[].cpes or artifact.metadata.cpes
+    """
+    components: list[SBOMComponent] = []
+    for artifact in document.get("artifacts", []):
+        cpes = artifact.get("cpes") or artifact.get("metadata", {}).get("cpes") or []
+        component = SBOMComponent(
+            name=str(artifact["name"]),
+            version=_optional_str(artifact.get("version")),
+            ecosystem=_optional_str(artifact.get("type")),
+            purl=_optional_str(artifact.get("purl")),
+            cpe=_first_string(cpes),
+        )
+        components.append(component)
+    return components
+
+
+def sbom_components_from_trivy(document: dict) -> list[SBOMComponent]:
+    """Best-effort adapter for common Trivy SBOM/package fields."""
+    components: list[SBOMComponent] = []
+    for result in document.get("Results", []):
+        for package in result.get("Packages", []):
+            component = SBOMComponent(
+                name=str(package.get("PkgName") or package.get("Name")),
+                version=_optional_str(package.get("InstalledVersion") or package.get("Version")),
+                ecosystem=_optional_str(package.get("Type") or package.get("PkgType")),
+                purl=_optional_str(package.get("PURL") or package.get("PkgIdentifier", {}).get("PURL")),
+                cpe=_first_string(package.get("CPEs") or package.get("PkgIdentifier", {}).get("CPEs") or []),
+            )
+            components.append(component)
+    return components
+
+
+def cve_records_from_normalized(items: list[dict]) -> list[CVERecord]:
+    """Parse already-normalized vulnerability entries into CVE records."""
+    return [CVERecord.model_validate(item) for item in items]
+
+
+def cve_records_from_trivy(document: dict) -> list[CVERecord]:
+    """Best-effort adapter for common Trivy vulnerability fields."""
+    records: dict[str, CVERecord] = {}
+    for result in document.get("Results", []):
+        for vulnerability in result.get("Vulnerabilities", []):
+            cve_id = _optional_str(vulnerability.get("VulnerabilityID"))
+            package_name = _optional_str(vulnerability.get("PkgName"))
+            if not cve_id or not package_name:
+                continue
+
+            affected = CVEAffectedPackage(
+                name=package_name,
+                ecosystem=_optional_str(vulnerability.get("PkgType") or vulnerability.get("Type")),
+                fixed_version=_optional_str(vulnerability.get("FixedVersion")),
+            )
+            existing = records.get(cve_id)
+            if existing is None:
+                records[cve_id] = CVERecord(
+                    cve_id=cve_id,
+                    summary=_optional_str(vulnerability.get("Title")) or "",
+                    cvss_score=_extract_trivy_cvss(vulnerability),
+                    severity=normalize_severity(_optional_str(vulnerability.get("Severity"))),
+                    affected_packages=[affected],
+                )
+            else:
+                existing.affected_packages.append(affected)
+    return list(records.values())
+
+
+def build_cve_relevance_prediction(
+    cves: list[CVERecord],
+    sbom_components: list[SBOMComponent],
+) -> CVERelevancePrediction:
+    """Produce a serializable deterministic prediction envelope."""
+    return CVERelevancePrediction(related_cves=rank_cve_relevance(cves, sbom_components))
+
+
 def _parse_version(version: str | None) -> Version | None:
     if not version:
         return None
@@ -141,6 +238,46 @@ def _parse_version(version: str | None) -> Version | None:
         return Version(version.strip())
     except InvalidVersion:
         return None
+
+
+def _optional_str(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _first_string(values: list[object]) -> str | None:
+    for value in values:
+        text = _optional_str(value)
+        if text:
+            return text
+    return None
+
+
+def _extract_trivy_cvss(vulnerability: dict) -> float | None:
+    cvss = vulnerability.get("CVSS")
+    if not isinstance(cvss, dict):
+        return None
+
+    scores: list[float] = []
+    for vendor_data in cvss.values():
+        if not isinstance(vendor_data, dict):
+            continue
+        score = vendor_data.get("V3Score") or vendor_data.get("Score")
+        if isinstance(score, int | float):
+            scores.append(float(score))
+    return max(scores) if scores else None
+
+
+def normalize_severity(severity: str | None) -> SeverityLevel | None:
+    """Normalize severity values from vulnerability feeds."""
+    if severity is None:
+        return None
+    normalized = severity.strip().lower()
+    if normalized in {"low", "medium", "high", "critical", "unknown"}:
+        return normalized
+    return None
 
 
 @lru_cache(maxsize=128)

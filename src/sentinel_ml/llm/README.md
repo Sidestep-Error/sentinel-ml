@@ -405,6 +405,22 @@ Den hanterar:
 
 Deterministisk output används här före eventuell LLM-hjälp, så att första bedömningen förblir spårbar och testbar.
 
+Dessutom finns nu små adaptergränssnitt för att minska beroendet till ett specifikt upstream-format:
+
+- `sbom_components_from_normalized(...)`
+- `sbom_components_from_trivy(...)`
+- `sbom_components_from_syft(...)`
+- `cve_records_from_normalized(...)`
+- `cve_records_from_trivy(...)`
+
+De gör bara försiktiga antaganden om vanliga fält och är tänkta som en stabil normaliseringsyta, inte som ett slutligt kontrakt mot upstream.
+
+För write-back eller vidare API-användning finns också ett serialiserbart outputformat:
+
+- `CVERelevancePrediction`
+
+Det formatet innehåller sorterade `related_cves` och är tänkt att kunna användas senare vid skrivning till `ml_predictions`.
+
 ## Benchmark för zero-shot-klassificering
 
 En första benchmarkväg finns nu för LLM zero-shot på threat reports.

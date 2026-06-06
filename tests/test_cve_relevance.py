@@ -3,16 +3,75 @@ from __future__ import annotations
 from sentinel_ml.features.cve_relevance import (
     CVEAffectedPackage,
     CVERecord,
+    CVERelevancePrediction,
     SBOMComponent,
     assess_cve_relevance,
+    build_cve_relevance_prediction,
+    cve_records_from_trivy,
     match_sbom_component,
     normalize_package_name,
+    normalize_severity,
     rank_cve_relevance,
+    sbom_components_from_syft,
+    sbom_components_from_trivy,
 )
+
+TRIVY_SBOM_FIXTURE = {
+    "Results": [
+        {
+            "Packages": [
+                {
+                    "PkgName": "openssl",
+                    "InstalledVersion": "3.0.7",
+                    "Type": "debian",
+                    "PURL": "pkg:deb/debian/openssl@3.0.7",
+                    "CPEs": ["cpe:2.3:a:openssl:openssl:3.0.7:*:*:*:*:*:*:*"],
+                }
+            ]
+        }
+    ]
+}
+
+SYFT_SBOM_FIXTURE = {
+    "artifacts": [
+        {
+            "name": "python-dateutil",
+            "version": "2.8.2",
+            "type": "python",
+            "purl": "pkg:pypi/python-dateutil@2.8.2",
+            "cpes": ["cpe:2.3:a:python-dateutil_project:python-dateutil:2.8.2:*:*:*:*:*:*:*"],
+        }
+    ]
+}
+
+TRIVY_VULNERABILITIES_FIXTURE = {
+    "Results": [
+        {
+            "Vulnerabilities": [
+                {
+                    "VulnerabilityID": "CVE-2026-1000",
+                    "PkgName": "openssl",
+                    "PkgType": "debian",
+                    "InstalledVersion": "3.0.7",
+                    "FixedVersion": "3.0.8",
+                    "Title": "OpenSSL vulnerability",
+                    "Severity": "HIGH",
+                    "CVSS": {"nvd": {"V3Score": 8.8}},
+                }
+            ]
+        }
+    ]
+}
 
 
 def test_normalize_package_name_lowercases_and_normalizes_spacing():
     assert normalize_package_name(" Open_SSL Package ") == "open-ssl-package"
+
+
+def test_normalize_severity_accepts_known_values():
+    assert normalize_severity("HIGH") == "high"
+    assert normalize_severity("unknown") == "unknown"
+    assert normalize_severity("weird") is None
 
 
 def test_match_sbom_component_matches_version_range():
@@ -117,3 +176,46 @@ def test_rank_cve_relevance_orders_relevant_high_cvss_first():
         "CVE-2026-1000",
         "CVE-2026-3000",
     ]
+
+
+def test_sbom_components_from_trivy_parses_common_package_fields():
+    components = sbom_components_from_trivy(TRIVY_SBOM_FIXTURE)
+
+    assert len(components) == 1
+    assert components[0].name == "openssl"
+    assert components[0].version == "3.0.7"
+    assert components[0].ecosystem == "debian"
+    assert components[0].purl == "pkg:deb/debian/openssl@3.0.7"
+
+
+def test_sbom_components_from_syft_parses_common_artifact_fields():
+    components = sbom_components_from_syft(SYFT_SBOM_FIXTURE)
+
+    assert len(components) == 1
+    assert components[0].name == "python-dateutil"
+    assert components[0].version == "2.8.2"
+    assert components[0].ecosystem == "python"
+    assert components[0].purl == "pkg:pypi/python-dateutil@2.8.2"
+
+
+def test_cve_records_from_trivy_parses_vulnerability_entries():
+    records = cve_records_from_trivy(TRIVY_VULNERABILITIES_FIXTURE)
+
+    assert len(records) == 1
+    assert records[0].cve_id == "CVE-2026-1000"
+    assert records[0].cvss_score == 8.8
+    assert records[0].severity == "high"
+    assert records[0].affected_packages[0].fixed_version == "3.0.8"
+
+
+def test_build_cve_relevance_prediction_returns_serializable_envelope():
+    sbom = sbom_components_from_trivy(TRIVY_SBOM_FIXTURE)
+    cves = cve_records_from_trivy(TRIVY_VULNERABILITIES_FIXTURE)
+
+    prediction = build_cve_relevance_prediction(cves, sbom)
+
+    assert isinstance(prediction, CVERelevancePrediction)
+    assert prediction.source == "deterministic"
+    assert len(prediction.related_cves) == 1
+    assert prediction.related_cves[0].cve_id == "CVE-2026-1000"
+    assert prediction.related_cves[0].relevance == "relevant"
