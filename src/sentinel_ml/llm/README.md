@@ -377,7 +377,7 @@ sudo systemctl start ollama
 ## Begränsningar just nu
 
 - API-lagret använder ännu inte LLM-funktionerna i `/predict/threat`.
-- CVE/SBOM-matchning är ännu inte byggd; här finns bara LLM-lagret för relevansbedömning.
+- CVE/SBOM-matchning finns nu som en deterministisk kärna, men är ännu inte kopplad till verklig SBOM-inläsning från `sentinel-upload-api`, Trivy eller Syft.
 - Benchmarkmodulen finns nu, men jämförelsen är ännu inte komplett förrän motsvarande TF-IDF- och spaCy-siffror finns i samma tabell.
 
 ## Nästa steg
@@ -386,9 +386,24 @@ Rimlig ordning härifrån:
 
 1. koppla in `try_classify_threat_report()` i `service/api.py` bakom säkert fallback-beteende
 2. lås ett gemensamt eval-format för LLM, TF-IDF och spaCy
-3. bygg deterministisk CVE/SBOM-matchning
+3. koppla den deterministiska CVE/SBOM-matchningen till verkliga SBOM- och CVE-källor
 4. använd `classify_cve_relevance()` som komplement där exakt matchning inte räcker
 5. utöka prompt-injection-underlaget med fler adversarial-fall
+
+## Deterministisk CVE/SBOM-matchning
+
+En första regelbaserad kärna för CVE-relevans finns i:
+
+- `src/sentinel_ml/features/cve_relevance.py`
+
+Den hanterar:
+
+- normalisering av paketnamn
+- matchning mellan CVE-paket och SBOM-komponenter
+- versionsjämförelse via `version_range` eller `fixed_version`
+- rankning per relevans, CVSS och matchstyrka
+
+Deterministisk output används här före eventuell LLM-hjälp, så att första bedömningen förblir spårbar och testbar.
 
 ## Benchmark för zero-shot-klassificering
 
