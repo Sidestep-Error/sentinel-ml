@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinel-ml
+  namespace: sentinel
+  labels:
+    app.kubernetes.io/name: sentinel-ml
+    app.kubernetes.io/part-of: sentinel-platform
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: sentinel-ml
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8100
+      protocol: TCP

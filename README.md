@@ -33,9 +33,14 @@ exponerar en valfri FastAPI-service (`/predict`) som Sentinel kan ringa.
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
+Copy-Item .env.example .env   # initialisera lokal konfig (gitignored)
 ruff check src tests
 pytest -q
 ```
+
+`.env.example` listar alla miljövariabler [config.py](src/sentinel_ml/config.py)
+känner till. Justera värdena i `.env` för din lokala miljö — t.ex. Mongo-URI om
+du kör mot Atlas istället för lokal Docker.
 
 ## Köra modulen
 
@@ -48,7 +53,59 @@ python -m sentinel_ml.cli extract-iocs path/to/report.txt
 
 # Starta FastAPI-service (för demo eller integration med sentinel-upload-api)
 uvicorn sentinel_ml.service.api:app --reload --port 8100
+
+# Smoke-testa servicen (i en separat terminal) — pingar /health,
+# /predict/threat och /predict/upload med exempel-input
+python scripts/demo_smoke.py
 ```
+
+## Köra med Docker
+
+För live-demo eller en självförsörjande dev-stack utan att behöva
+installera Python-deps lokalt:
+
+```powershell
+docker compose build
+docker compose up
+```
+
+Servicen lyssnar på `http://localhost:8100`. `/health`, `/predict/threat`
+och `/predict/upload` är tillgängliga. Verifiera med smoke-scriptet i
+en separat terminal:
+
+```powershell
+python scripts/demo_smoke.py
+```
+
+Lokal Mongo via compose-profile (för dev utan att starta upstream
+sentinel-upload-api):
+
+```powershell
+docker compose --profile with-mongo up
+```
+
+Mongo körs då på `localhost:27017` med databasen `sentinel_upload`,
+vilket matchar `MONGODB_URI`-defaulten i `.env.example`.
+
+### Modellfiler
+
+`models_store/` mountas read-only från host. Träna en modell på host
+(`python -m sentinel_ml.cli train ...`) och restarta containern — den
+plockar upp den nya artefakten vid lifespan-start. Tom `models_store/`
+triggar fallback-svar i endpoints (`label="unknown"`, `model_version="none"`).
+
+## Deploy
+
+sentinel-ml körs som en **intern microservice** i samma `sentinel`-namespace
+som [sentinel-upload-api](https://github.com/Sidestep-Error/sentinel-upload-api)
+på Hetzner k3s. Ingen publik URL — bara upload-api:s pods får ringa
+servicen via `sentinel-ml.sentinel.svc.cluster.local`.
+
+CI/CD vid push till `main`: tester → Docker Hub-push → `kubectl rollout restart`.
+
+Manifest i [k8s/base/](k8s/base/). Setup-procedurer i
+[runbooks/sentinel-ml-deploy.md](runbooks/sentinel-ml-deploy.md).
+Hot-modell och RBAC-resonemang i [docs/security-analysis-deployment.md](docs/security-analysis-deployment.md).
 
 ## Struktur
 

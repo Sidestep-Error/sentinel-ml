@@ -7,7 +7,30 @@
 | MongoDB | `uploads` | Upload-metadata (hash, content-type, scan-resultat, risk score) | ~hundratals dokument |
 | MongoDB | `threat_events` | GeoIP-anrikade hotevents från Feodo/URLhaus/ThreatFox | ~tusentals dokument |
 
-**Anslutning:** `MONGODB_URI` i `.env`. Använd **read-only**-användare där möjligt — ML-modulen ska aldrig kunna mutera produktionsdata.
+**Anslutning:** `MONGODB_URI` i `.env`. Default i [config.py](../src/sentinel_ml/config.py) matchar upstream: `mongodb://localhost:27017/sentinel_upload`, database `sentinel_upload`. Använd **read-only**-användare i prod — ML-modulen ska aldrig kunna mutera produktionsdata.
+
+### Verifierat Mongo-schema: `uploads`-collection
+
+Verifierat 2026-06-02 mot upstream [sentinel-upload-api/app/models.py](https://github.com/Sidestep-Error/sentinel-upload-api/blob/main/app/models.py) efter merge av PR #68.
+
+| Fält | Typ | Upstream-default | Anteckning |
+|------|-----|------------------|------------|
+| `_id` | ObjectId | (auto) | Injicerat av Mongo |
+| `created_at` | datetime | `now(UTC)` | TTL-index, default 30 dagar |
+| `filename` | str | — | Sanerat (path-traversal-skydd) |
+| `sha256` | str | — | SHA256-hex, indexerat |
+| `content_type` | str | — | Whitelisted (text/image/PDF/Office) |
+| `size_bytes` | int (≥0) | — | Filstorlek i bytes. **Nytt fält per 2026-06-02 (upstream PR #68).** Äldre dokument saknar fältet. |
+| `status` | str | `"accepted"` | `"accepted"` eller `"rejected"` |
+| `decision` | str | `"accepted"` | `"accepted"` / `"review"` / `"rejected"` |
+| `risk_score` | int (0-100) | `0` | Beräknas av upstream `compute_risk` |
+| `risk_reasons` | list[str] | `[]` | Triggade riskregler |
+| `scan_status` | str | `"clean"` | `"clean"` / `"malicious"` / `"error"` |
+| `scan_engine` | str | `"mock"` | `"mock"` eller `"clamav"` |
+| `scan_detail` | str | `"No signature matched"` | Scannerns rapport |
+| `deduplicated` | bool | `false` | True om matchade tidigare sha256 |
+
+[`UploadRecord` i schemas.py](../src/sentinel_ml/data/schemas.py) speglar dessa fält med optional-defaults så äldre dokument validerar utan krasch.
 
 ## Publika dataset
 
