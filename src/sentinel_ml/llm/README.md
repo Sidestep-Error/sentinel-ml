@@ -73,7 +73,7 @@ Viktiga funktioner:
 - `try_classify_threat_report(text, ...)`
 - `classify_cve_relevance(cve_text, stack_summary, ...)`
 
-`try_classify_threat_report()` är förberedd för Roll 1:s API-wiring. Den returnerar ett validerat resultat när LLM-flödet fungerar och `None` när LLM-anropet eller JSON-valideringen faller. På så sätt kan `service/api.py` få ett enkelt fallback-kontrakt utan att Roll 3 tar över API-lagret.
+`try_classify_threat_report()` är avsedd för säker inkoppling i API-lagret. Den returnerar ett validerat resultat när LLM-flödet fungerar och `None` när LLM-anropet eller JSON-valideringen faller. På så sätt kan `service/api.py` använda ett enkelt fallback-kontrakt utan att bero på att modellen alltid svarar korrekt.
 
 ## Hur flödet fungerar
 
@@ -142,7 +142,7 @@ Testet skippar automatiskt om Ollama inte är uppe lokalt.
 
 För att köra LLM-koden och testerna lokalt behöver du en virtuell miljö med projektets beroenden installerade.
 
-> Note: Det kan vara värt att se över ett Docker-baserat flöde för LLM-spåret senare. Då slipper varje teammedlem installera Python-beroenden, Ollama och modeller direkt på sin egen maskin. Lokal installation är enklast just nu för snabb utveckling, men Docker kan ge mer reproducerbar demo- och onboardingmiljö.
+> Note: Det kan vara värt att se över ett Docker-baserat flöde senare. Då slipper varje utvecklingsmiljö installera Python-beroenden, Ollama och modeller direkt lokalt. Lokal installation är enklast just nu för snabb utveckling, men Docker kan ge en mer reproducerbar demo- och onboardingmiljö.
 
 ### 1. Skapa virtuell miljö
 
@@ -378,17 +378,69 @@ sudo systemctl start ollama
 
 - API-lagret använder ännu inte LLM-funktionerna i `/predict/threat`.
 - CVE/SBOM-matchning är ännu inte byggd; här finns bara LLM-lagret för relevansbedömning.
-- Det finns ännu ingen persistens eller benchmarkmodul för att jämföra LLM mot TF-IDF och spaCy.
+- Benchmarkmodulen finns nu, men jämförelsen är ännu inte komplett förrän motsvarande TF-IDF- och spaCy-siffror finns i samma tabell.
 
 ## Nästa steg
 
 Rimlig ordning härifrån:
 
-1. lämna över `try_classify_threat_report()` till Roll 1 för inkoppling bakom säkert fallback-beteende i `service/api.py`
-2. lås gemensamt eval-format med Roll 2
+1. koppla in `try_classify_threat_report()` i `service/api.py` bakom säkert fallback-beteende
+2. lås ett gemensamt eval-format för LLM, TF-IDF och spaCy
 3. bygg deterministisk CVE/SBOM-matchning
 4. använd `classify_cve_relevance()` som komplement där exakt matchning inte räcker
-5. utöka prompt-injection-underlaget till Roll 5
+5. utöka prompt-injection-underlaget med fler adversarial-fall
+
+## Benchmark för zero-shot-klassificering
+
+En första benchmarkväg finns nu för LLM zero-shot på threat reports.
+
+Delar:
+
+- `src/sentinel_ml/eval/llm_threat_benchmark.py`
+- `scripts/eval_llm_threat_classifier.py`
+
+Benchmarken utgår just nu från följande upplägg:
+
+- dataset: `data/real_threat_reports.jsonl`
+- labels: `ransomware`, `phishing`, `ddos`, `malware`, `intrusion`
+- huvudmetrics: `Accuracy`, `Precision-macro`, `Recall-macro`, `F1-macro`
+
+Den mäter också:
+
+- antal giltiga LLM-svar
+- antal ogiltiga LLM-svar
+- genomsnittlig latency i millisekunder
+
+### Jämförelsetabell
+
+Den här tabellen är avsedd för direkt jämförelse mellan LLM, TF-IDF och spaCy på samma dataset och samma test split.
+
+| Model | Accuracy | Precision-macro | Recall-macro | F1-macro | Valid outputs | Invalid outputs | Avg latency ms |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| TF-IDF + Logistic Regression | `TBD` | `TBD` | `TBD` | `TBD` | `N/A` | `N/A` | `TBD` |
+| spaCy | `TBD` | `TBD` | `TBD` | `TBD` | `N/A` | `N/A` | `TBD` |
+| LLM `llama3.2:3b` | `0.672` | `0.460` | `0.400` | `0.413` | `311` | `6` | `462.4` |
+
+Metod för LLM-raden:
+
+- dataset: `data/real_threat_reports.jsonl`
+- test split: `20%`
+- `random_state=42`
+- labels: `ransomware`, `phishing`, `ddos`, `malware`, `intrusion`
+
+### Kör benchmarkscriptet
+
+```bash
+cd ~/sentinel-ml
+./.venv/bin/python scripts/eval_llm_threat_classifier.py data/real_threat_reports.jsonl
+```
+
+Med valfri begränsning av antal exempel:
+
+```bash
+cd ~/sentinel-ml
+./.venv/bin/python scripts/eval_llm_threat_classifier.py data/real_threat_reports.jsonl --limit 100
+```
 
 ## Exempel på användning
 
