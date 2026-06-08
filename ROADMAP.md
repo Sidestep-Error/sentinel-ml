@@ -54,8 +54,8 @@ Detaljerad cross-repo-plan finns i `docs/sentinel-upload-api-integration-playboo
 ### A. Måste klart för Alternativ 6 (Automated Threat Intel)
 
 - [x] Kör slutlig eval för threat-klassificeraren och skriv in slutliga tabeller i `docs/technical-report.md`.
-- [ ] Fyll i jämförelsemodeller (spaCy/LLM) eller markera dem explicit som ej valda med motivering och evidens.
-- [ ] Verifiera IOC-extraktion med jämförelsescript och lägg in kort resultatsammanfattning i rapporten.
+- [x] Fyll i jämförelsemodeller (spaCy/LLM) — dokumenterade som ej valda med motivering + evidens (latency, IOC-uppgift vs klassificeringsuppgift). IOC-jämförelse (regex vs spaCy på 30 CTI-dokument) tillagd som sektion 5.1.1.
+- [x] Verifiera IOC-extraktion med jämförelsescript och lägg in kort resultatsammanfattning i rapporten.
 - [ ] Säkerställ att `/predict/threat` visar: kategori, confidence, IOCs och model_version i demo-flödet.
 - [ ] Lägg in 3 realistiska demoexempel (phishing, ransomware, intrusion) med förväntad output.
 
@@ -100,7 +100,7 @@ Sikta på att kunna visa minst dessa tre övertygande:
 
 ### F. Dag-för-dag (förslag)
 
-- [x] **8-10 juni:** stäng alla "TBD" i metrics för Alternativ 6 + Alternativ 4 + implementera metadata/ClamAV-flödet till ML.
+- [x] **8-10 juni:** stäng alla "TBD" i metrics för Alternativ 6 + Alternativ 4 + implementera metadata/ClamAV-flödet till ML. ✓ Metodjämförelse (spaCy/LLM) dokumenterad, IOC-jämförelse körd och inlagd i rapport.
 - [ ] **11-12 juni:** koppla Trivy-output till CVE/SBOM-relevans + kör prompt-injection med Ollama + uppdatera adversarial-rapport.
 - [ ] **13-14 juni:** implementera direkt textextraktion (.txt/.md/.json/.csv/.eml) + demo-script + backup-video + slides med tabeller/figurer.
 - [ ] **15 juni:** full intern genomkörning (tidtagning 12 min + 3 min buffert).
