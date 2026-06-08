@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sentinel-ml-config
+  namespace: sentinel
+  labels:
+    app.kubernetes.io/name: sentinel-ml
+    app.kubernetes.io/part-of: sentinel-platform
+data:
+  # MongoDB-databas — sentinel-upload-api skriver hit, vi läser därifrån.
+  MONGODB_DB: "sentinel_upload"
+  # Modellartefakter laddas härifrån vid lifespan-start (service/api.py).
+  MODELS_DIR: "/app/models_store"
+  # Reproducerbarhet vid eventuell on-demand training.
+  SENTINEL_ML_SEED: "42"
