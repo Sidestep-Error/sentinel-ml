@@ -377,16 +377,17 @@ sudo systemctl start ollama
 ## Begränsningar just nu
 
 - API-lagret använder ännu inte LLM-funktionerna i `/predict/threat`.
-- CVE/SBOM-matchning finns nu som en deterministisk kärna, men är ännu inte kopplad till verklig SBOM-inläsning från `sentinel-upload-api`, Trivy eller Syft.
-- Benchmarkmodulen finns nu, men jämförelsen är ännu inte komplett förrän motsvarande TF-IDF- och spaCy-siffror finns i samma tabell.
+- CVE/SBOM-matchning finns nu som en deterministisk kärna, men är ännu inte kopplad till verklig SBOM-inläsning från `sentinel-upload-api` eller Trivy-baserat upstream-flöde.
+- Första planerade integrationsvägen för upload-spåret är metadata + ClamAV. Direkt textextraktion för `.txt`, `.md`, `.json`, `.csv` och `.eml` är ett senare steg om tid finns.
+- Benchmarkmodulen finns nu, men jämförelsen är ännu inte helt komplett eftersom spaCy-raden fortfarande saknar resultat.
 
 ## Nästa steg
 
 Rimlig ordning härifrån:
 
-1. koppla in `try_classify_threat_report()` i `service/api.py` bakom säkert fallback-beteende
-2. lås ett gemensamt eval-format för LLM, TF-IDF och spaCy
-3. koppla den deterministiska CVE/SBOM-matchningen till verkliga SBOM- och CVE-källor
+1. koppla ett första normaliserat metadata + ClamAV-flöde till `sentinel-ml`
+2. koppla in `try_classify_threat_report()` i `service/api.py` bakom säkert fallback-beteende där textbaserad input finns
+3. koppla den deterministiska CVE/SBOM-matchningen till verkligt normaliserat JSON-upstream
 4. använd `classify_cve_relevance()` som komplement där exakt matchning inte räcker
 5. utöka prompt-injection-underlaget med fler adversarial-fall
 
@@ -448,16 +449,26 @@ Den här tabellen är avsedd för direkt jämförelse mellan LLM, TF-IDF och spa
 
 | Model | Accuracy | Precision-macro | Recall-macro | F1-macro | Valid outputs | Invalid outputs | Avg latency ms |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| TF-IDF + Logistic Regression | `TBD` | `TBD` | `TBD` | `TBD` | `N/A` | `N/A` | `TBD` |
+| TF-IDF + Logistic Regression | `0.943` | `0.955` | `0.841` | `0.875` | `N/A` | `N/A` | `TBD` |
 | spaCy | `TBD` | `TBD` | `TBD` | `TBD` | `N/A` | `N/A` | `TBD` |
 | LLM `llama3.2:3b` | `0.672` | `0.460` | `0.400` | `0.413` | `311` | `6` | `462.4` |
 
-Metod för LLM-raden:
+Metod för jämförelsen:
 
 - dataset: `data/real_threat_reports.jsonl`
 - test split: `20%`
 - `random_state=42`
 - labels: `ransomware`, `phishing`, `ddos`, `malware`, `intrusion`
+
+Per klass för `TF-IDF + Logistic Regression`:
+
+| Class | Precision | Recall | F1 | Test Examples |
+|---|---:|---:|---:|---:|
+| `ransomware` | `0.98` | `0.98` | `0.98` | `47` |
+| `phishing` | `0.97` | `0.97` | `0.97` | `76` |
+| `malware` | `0.93` | `0.97` | `0.95` | `139` |
+| `intrusion` | `0.89` | `0.85` | `0.87` | `48` |
+| `ddos` | `1.00` | `0.43` | `0.60` | `7` |
 
 ### Kör benchmarkscriptet
 

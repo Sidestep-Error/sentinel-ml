@@ -29,9 +29,9 @@ till `docs/data-sources.md`.)*
 
 | Modell | F1-macro | Precision-macro | Recall-macro | Träningstid |
 |--------|----------|------------------|---------------|-------------|
-| TF-IDF + LR | TBD | TBD | TBD | TBD |
+| TF-IDF + LR | 0.875 | 0.955 | 0.841 | TBD |
 | spaCy NER + LR | TBD | TBD | TBD | TBD |
-| LLM zero-shot (llama3.2:3b) | TBD | TBD | TBD | TBD |
+| LLM zero-shot (llama3.2:3b) | 0.413 | 0.460 | 0.400 | TBD |
 
 *(Konklusion: vilken vann och varför. Trade-off vs. komplexitet.)*
 
