@@ -53,7 +53,8 @@ class UploadRecord(BaseModel):
     still validate.
     """
 
-    sha256: str
+    model_config = {"populate_by_name": True}
+
     filename: str
     content_type: str
     size_bytes: int | None = Field(default=None, ge=0)

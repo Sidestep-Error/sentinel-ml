@@ -54,6 +54,18 @@ Thumbs.db
 *.pem
 *.key
 !cosign.pub
+
+# --- Local artifacts: ai-detection runtime data ---
+ai-detection/*.log
+ai-detection/active_alerts.json
+ai-detection/pipeline_alerts.json
+ai-detection/response_alerts.json
+ai-detection/incident_log.json
+ai-detection/anomaly_detection_results.csv
+ai-detection/anomaly_report.txt
+ai-detection/detection_comparison.json
+ai-detection/baseline_alerts.json
+ai-detection/test_alerts.json
 # Kubernetes secret manifests — committa aldrig riktiga värden.
 # secret.example.yaml är mallen; secret.yaml kopieras och fylls i manuellt
 # på klustret innan apply. Se runbooks/sentinel-ml-deploy.md.
