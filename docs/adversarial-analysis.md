@@ -75,6 +75,7 @@
 
 **Status:** Ej genomfört — Ollama var inte tillgängligt vid testkörningen.
 Kör `ollama serve` och kör scriptet igen för att genomföra testet.
+Ägare: kollega som ansvarar för LLM/Ollama-spåret.
 
         ---
 

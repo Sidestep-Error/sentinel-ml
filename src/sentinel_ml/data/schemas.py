@@ -44,6 +44,24 @@ class ThreatReport(BaseModel):
     iocs: list[IOC] = Field(default_factory=list)
 
 
+class MalwareSample(BaseModel):
+    """Metadata record for malware-family modeling (Spår C).
+
+    The shape mirrors generated/downloaded MalwareBazaar-style JSONL rows.
+    """
+
+    sha256: str
+    file_name: str | None = None
+    file_size: int = Field(default=0, ge=0)
+    file_type: str | None = None
+    file_type_mime: str | None = None
+    signature: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    imphash: str | None = None
+    first_seen: str | None = None
+    family: str | None = None
+
+
 class UploadRecord(BaseModel):
     """Projection of sentinel-upload-api's `uploads` collection.
 

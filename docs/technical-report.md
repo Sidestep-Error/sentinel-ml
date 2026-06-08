@@ -77,8 +77,8 @@ Alla modeller utvärderades med 80/20 train/test-split, `random_state=42`, på `
 | Modell | Accuracy | F1-macro | Precision-macro | Recall-macro |
 |--------|----------|----------|-----------------|--------------|
 | TF-IDF + Logistic Regression | **0.943** | **0.875** | **0.955** | **0.841** |
-| spaCy NER + LR | TBD | TBD | TBD | TBD |
-| LLM zero-shot (llama3.2:3b) | TBD | TBD | TBD | TBD |
+| spaCy NER + LR | Pågår (kollega) | Pågår (kollega) | Pågår (kollega) | Pågår (kollega) |
+| LLM zero-shot (llama3.2:3b) | Pågår (kollega) | Pågår (kollega) | Pågår (kollega) | Pågår (kollega) |
 
 **Per klass — TF-IDF + LR:**
 
@@ -96,8 +96,8 @@ Alla modeller utvärderades med 80/20 train/test-split, `random_state=42`, på `
 
 | Modell | Precision | Recall | F1 | Träningstid |
 |--------|-----------|--------|----|-------------|
-| TF-IDF + IsolationForest | TBD | TBD | TBD | TBD |
-| IsolationForest (strukturerade features) | TBD | TBD | TBD | TBD |
+| TF-IDF + IsolationForest | 0.370 | 0.370 | 0.370 | Ej uppmätt i scriptkörning |
+| IsolationForest (strukturerade features) | Pågår (se detector.py-spår) | Pågår | Pågår | Pågår |
 
 ### 5.3 Spår C — Malware-familje-klassificerare (MalwareBazaar metadata)
 
@@ -180,7 +180,13 @@ Endpoints:
 
 ## 10. Slutsatser
 
-*(Fylls i efter avslutade experiment.)*
+De icke-LLM-baserade delarna är nu reproducerbart körbara med dokumenterade metrics:
+
+- Spår A (Threat report-klassificering) visar stark prestanda med F1-macro 0.875 på riktig CTI-data.
+- Spår B (TF-IDF + IsolationForest) fungerar end-to-end men har lägre kvalitet (F1 0.370) och kräver vidare iteration.
+- Spår C (Malware metadata) är tydligt ett delspår: bättre än slumpen men inte produktionsnivå utan beteendedata.
+
+LLM-jämförelser och prompt-injection-slutresultat slutförs av kollega som äger Ollama-spåret.
 
 ## Referenser
 
