@@ -1,7 +1,4 @@
 """
-chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
-Grupp: Sidestep Error
-
 Modulens ansvar:
 Denna testmodul jämför två detektionsstrategier: regelbaserad logik och AI-baserad
 anomalidetektering. Modulen skapar syntetiska angreppsscenarier, kör båda metoderna,

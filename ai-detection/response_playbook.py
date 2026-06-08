@@ -1,7 +1,4 @@
 """
-chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
-Grupp: Sidestep Error
-
 Modulens ansvar:
 Denna modul implementerar en automatiserad respons-playbook för säkerhetsincidenter.
 Den tar emot larm från detektionsledet och utför fördefinierade åtgärder beroende

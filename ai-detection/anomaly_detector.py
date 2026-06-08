@@ -1,7 +1,4 @@
 """
-chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
-Grupp: Sidestep Error
-
 Modulens ansvar:
 Denna modul implementerar en AI-stödd pipeline för anomalidetektering i loggdata.
 Fokus ligger på att transformera råa Wazuh-alerts till tidsfönsterbaserade features,
@@ -36,27 +33,41 @@ def load_alerts(file_path: str | Path) -> pd.DataFrame:
     och normaliserar datatyper för tid, nivå och port så att efterföljande steg
     får stabil indata.
 
-    Args:
-        file_path: Sökväg till JSON-fil med Wazuh-alerts.
-
-    Returns:
-        DataFrame med en rad per alert. Returnerar tom DataFrame om ingen data finns.
     """
-    with open(file_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+    file_path = Path(file_path)
+    data = json.loads(file_path.read_text(encoding="utf-8"))
+
+    if isinstance(data, dict) and "hits" in data:
+        raw_hits = data.get("hits", {}).get("hits", [])
+    elif isinstance(data, list):
+        raw_hits = data
+    else:
+        raw_hits = []
 
     records = []
-    for hit in data.get("hits", {}).get("hits", []):
-        source = hit.get("_source", {})
+    for hit in raw_hits:
+        source = hit.get("_source", hit) if isinstance(hit, dict) else {}
+        rule = source.get("rule", {}) if isinstance(source, dict) else {}
+        data_section = source.get("data", {}) if isinstance(source, dict) else {}
+        agent = source.get("agent", {}) if isinstance(source, dict) else {}
+
+        timestamp = (
+            source.get("timestamp")
+            or source.get("@timestamp")
+            or hit.get("@timestamp")
+            if isinstance(hit, dict)
+            else None
+        )
+
         records.append(
             {
-                "timestamp": source.get("timestamp", ""),
-                "rule_id": source.get("rule", {}).get("id", 0),
-                "rule_level": source.get("rule", {}).get("level", 0),
-                "description": source.get("rule", {}).get("description", ""),
-                "src_ip": source.get("data", {}).get("srcip", "unknown"),
-                "dst_port": source.get("data", {}).get("dstport", 0),
-                "agent_name": source.get("agent", {}).get("name", "unknown"),
+                "timestamp": timestamp,
+                "rule_id": rule.get("id", source.get("rule_id", "unknown")),
+                "rule_level": rule.get("level", source.get("rule_level", 0)),
+                "description": rule.get("description", source.get("description", "")),
+                "src_ip": data_section.get("srcip", source.get("src_ip", "unknown")),
+                "dst_port": data_section.get("dstport", source.get("dst_port", 0)),
+                "agent_name": agent.get("name", source.get("agent_name", "unknown")),
             }
         )
 

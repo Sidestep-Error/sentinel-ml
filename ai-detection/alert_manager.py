@@ -1,7 +1,4 @@
 """
-chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
-Grupp: Sidestep Error
-
 Modulens ansvar:
 Denna modul tar resultat från AI-baserad anomalidetektering och översätter dem
 till operativa larm med tydlig allvarlighetsgrad. Larmen struktureras i JSON-format

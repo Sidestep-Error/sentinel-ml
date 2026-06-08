@@ -1,7 +1,4 @@
 """
-chas academy kurs 5 - Nätverks-, OT & AI-säkerhet
-Grupp: Sidestep Error
-
 Modulens ansvar:
 Denna modul fungerar som ett enkelt SOAR-liknande exportsteg som översätter
 aktiva AI-larm till en radbaserad logg med ett konsekvent JSON-format.
