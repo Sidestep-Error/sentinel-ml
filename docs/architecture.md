@@ -71,3 +71,64 @@
 - **Hash-baserade IOC-uppslagningar logges, inte själva data.** Vi loggar att vi sett en SHA-256, inte filinnehållet.
 - **LLM-output valideras** mot förväntad JSON-shape innan den passas vidare. Skyddar mot prompt injection.
 - Se [adversarial-analysis-plan.md](adversarial-analysis-plan.md) för fullständig hotbild mot ML-systemet.
+
+## Deploy (Hetzner k3s)
+
+sentinel-ml deployas som en intern microservice i `sentinel`-namespace
+bredvid sentinel-upload-api. Ingen publik URL — all trafik filtreras
+via NetworkPolicy så att bara upload-api:s pods kan ringa servicen.
+
+```
+                  internet
+                     │
+                     │ TLS 443 (Let's Encrypt)
+                     ▼
+              ingress-nginx
+                     │
+                     ▼
+      ┌──────────────────────────────┐
+      │ sentinel namespace (k3s)     │
+      │                              │
+      │  ┌────────────────────────┐  │
+      │  │ sentinel-upload-api    │  │  ← public-facing
+      │  │  :8000                 │  │
+      │  └───────────┬────────────┘  │
+      │              │ HTTP :8100    │
+      │              ▼               │
+      │  ┌────────────────────────┐  │
+      │  │ sentinel-ml            │  │  ← internal-only
+      │  │  :80 → :8100           │  │
+      │  │  ClusterIP             │  │
+      │  └───────────┬────────────┘  │
+      │              │               │
+      └──────────────┼───────────────┘
+                     │ :27017 (egress, TLS)
+                     ▼
+              MongoDB Atlas
+```
+
+**Resurser i [k8s/base/](../k8s/base/):**
+
+| Manifest | Roll |
+|----------|------|
+| `deployment.yaml` | 1 replica, non-root UID 10001, read-only rootfs, resource limits |
+| `service.yaml` | ClusterIP, port 80 → containerns 8100 |
+| `configmap.yaml` | `MONGODB_DB`, `MODELS_DIR`, `SENTINEL_ML_SEED` |
+| `secret.yaml` | `MONGODB_URI` (gitignored, kopieras från `secret.example.yaml`) |
+| `networkpolicy.yaml` | Ingress endast från upload-api; egress DNS + Mongo + HTTPS |
+| `kustomization.yaml` | Bundlar resurserna för `kubectl apply -k` |
+
+**CI/CD-flöde:**
+
+```
+push till main
+   ↓
+lint-and-test (ruff, pytest på 3.11 + 3.12) + security (pip-audit)
+   ↓
+dockerhub-push (jonitsx/sentinel-ml:main, :latest, :<sha>)
+   ↓
+deploy-hetzner (kubectl rollout restart deployment/sentinel-ml -n sentinel)
+```
+
+Detaljer: [runbooks/sentinel-ml-deploy.md](../runbooks/sentinel-ml-deploy.md).
+Hot-modell + RBAC: [docs/security-analysis-deployment.md](security-analysis-deployment.md).

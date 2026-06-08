@@ -52,3 +52,162 @@ jobs:
         # --skip-editable: skip our own package (sentinel-ml) - it's not on PyPI.
         # No --strict: we want to fail on vulnerabilities, not on "could not audit editable".
         run: pip-audit --skip-editable --ignore-vuln PYSEC-2022-43012
+
+      # kubeconform validerar k8s-manifests mot officiella schemas.
+      # -strict: inga okända fält tillåtna
+      # -kubernetes-version: matchar upload-api:s CI för konsistens
+      #   (k3s 1.34 körs i prod men 1.31-schemat är bakåtkompatibelt)
+      - name: Validate Kubernetes manifests (kubeconform)
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/work ghcr.io/yannh/kubeconform:latest \
+            -strict -summary -kubernetes-version 1.31.0 \
+            /work/k8s/base/deployment.yaml \
+            /work/k8s/base/service.yaml \
+            /work/k8s/base/configmap.yaml \
+            /work/k8s/base/networkpolicy.yaml
+
+  # ─────────────────────────────────────────────────────────────
+  # IMAGE-SECURITY: bygger containern lokalt, scannar för CVEs och
+  # genererar SBOM. Trasiga images pushas aldrig — dockerhub-push
+  # depends på det här jobbet. Körs på PR + push så vi fångar
+  # supply chain-issues innan merge.
+  # ─────────────────────────────────────────────────────────────
+  image-security:
+    name: Image security (Trivy + SBOM)
+    runs-on: ubuntu-24.04
+    needs: [lint-and-test, security]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Bygger imagen lokalt — pushas inte här. Trivy scannar samma
+      # image som senare pushas vid main-push (om scan passerar).
+      - name: Build Docker image (no push)
+        run: |
+          docker build --pull --no-cache -f Dockerfile -t sentinel-ml:ci .
+
+      # Trivy skannar imagen för kända CVEs.
+      # --ignore-unfixed: skippar CVEer utan tillgänglig fix
+      # --exit-code 1: failar jobbet vid HIGH/CRITICAL → blockerar push
+      # Pinnad version för reproducerbarhet.
+      - name: Trivy scan (fixable HIGH/CRITICAL)
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.69.1 \
+            image --scanners vuln --ignore-unfixed --exit-code 1 \
+            --severity HIGH,CRITICAL sentinel-ml:ci
+
+      # Syft genererar SBOM (Software Bill of Materials) i SPDX-format.
+      # Sparas som artifact för supply chain-granskning + rapport-material.
+      - name: Generate SBOM (Syft)
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v ${{ github.workspace }}:/work \
+            anchore/syft:latest \
+            packages sentinel-ml:ci -o spdx-json=/work/sbom.spdx.json
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-spdx
+          path: sbom.spdx.json
+
+  # ─────────────────────────────────────────────────────────────
+  # DOCKERHUB-PUSH: bygger och pushar containerimage till Docker Hub.
+  # Körs bara vid push till main — inte på PRs eller develop (vi har
+  # ingen develop-branch).
+  # ─────────────────────────────────────────────────────────────
+  dockerhub-push:
+    name: Docker Hub push
+    runs-on: ubuntu-24.04
+    needs: [lint-and-test, security, image-security]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Snabb misslyckande om någon secret saknas — bättre felmeddelande än
+      # att docker/login-action kraschar med kryptisk anonymous auth error.
+      - name: Validate Docker secrets
+        run: |
+          test -n "${{ secrets.DOCKER_IMAGE }}" || (echo "DOCKER_IMAGE missing" && exit 1)
+          test -n "${{ secrets.DOCKER_USERNAME }}" || (echo "DOCKER_USERNAME missing" && exit 1)
+          test -n "${{ secrets.DOCKER_PASSWORD }}" || (echo "DOCKER_PASSWORD missing" && exit 1)
+
+      - name: Validate DOCKER_IMAGE format
+        run: |
+          echo "${{ secrets.DOCKER_IMAGE }}" | grep -Eq '^[a-z0-9]+([._-][a-z0-9]+)*/[a-z0-9]+([._-][a-z0-9]+)*$' \
+            || (echo "DOCKER_IMAGE must be owner/repo (no tag, no protocol)" && exit 1)
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Tre taggar:
+      #   :latest — vad docker compose pull default-hämtar
+      #   :main   — explicit branch-spårning, vad deployment.yaml refererar
+      #   :<sha>  — immutable pinning för rollback / incident response
+      - name: Determine tags
+        id: tags
+        run: |
+          {
+            echo "value<<EOF"
+            echo "${{ env.DOCKER_IMAGE }}:latest"
+            echo "${{ env.DOCKER_IMAGE }}:main"
+            echo "${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.value }}
+
+  # ─────────────────────────────────────────────────────────────
+  # DEPLOY-HETZNER: triggar rollout restart på k3s-klustret.
+  # Återanvänder ci-deploy-SA som upload-api skapade via Terraform
+  # — RBAC-rollen täcker alla deployments i sentinel-namespace.
+  # ─────────────────────────────────────────────────────────────
+  deploy-hetzner:
+    name: Deploy to Hetzner (sentinel)
+    runs-on: ubuntu-24.04
+    needs: [dockerhub-push]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      # Kubeconfigen lagras base64-kodad i GitHub Secrets och dekodas till
+      # en temporär fil. Innehåller en SA-token med minimal RBAC — bara
+      # get/list/watch/patch/update på deployments i sentinel-ns.
+      - name: Set up kubeconfig
+        env:
+          KUBECONFIG_HETZNER_B64: ${{ secrets.KUBECONFIG_HETZNER_B64 }}
+        run: |
+          test -n "$KUBECONFIG_HETZNER_B64" || (echo "KUBECONFIG_HETZNER_B64 missing" && exit 1)
+          mkdir -p ~/.kube
+          echo "$KUBECONFIG_HETZNER_B64" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      # Tvingar k8s att hämta den nya :main-imagen och rullar restart.
+      # Misslyckas steget rullar k8s automatiskt tillbaka till föregående revision.
+      - name: Rollout restart
+        run: |
+          kubectl rollout restart deployment/sentinel-ml -n sentinel
+          kubectl rollout status deployment/sentinel-ml -n sentinel --timeout=120s
+
+      # Raderar kubeconfigen oavsett utfall — credentials läcker inte
+      # om jobbet kraschar mitt i körningen.
+      - name: Clean up kubeconfig
+        if: always()
+        run: rm -f ~/.kube/config
