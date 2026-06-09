@@ -85,5 +85,5 @@ Slutsats:
 
 ## Läs vidare
 
-- [LLM/CVE teknisk referens](/home/viktor/sentinel-ml/docs/llm-cve-technical-reference.md)
-- [LLM/CVE-integrationsguide](/home/viktor/sentinel-ml/docs/llm-cve-integration-guide.md)
+- [LLM/CVE teknisk referens](../../../docs/llm-cve-technical-reference.md)
+- [LLM/CVE-integrationsguide](../../../docs/llm-cve-integration-guide.md)
