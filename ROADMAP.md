@@ -1,6 +1,6 @@
 # ROADMAP — sentinel-ml
 
-**Senast uppdaterad:** 2026-06-08
+**Senast uppdaterad:** 2026-06-09
 **Deadline:** 2026-06-19 (≈ 3,5 veckor)
 **Examineras mot:** LM2, LM6, LM8, LM11, LM12 (se `guides/week-9-group-project.html` i sentinel-upload-api)
 
@@ -33,23 +33,23 @@ Praktisk prioritet för tidsplan:
 
 Detaljerad cross-repo-plan finns i `docs/sentinel-ml-upload-api-integration-architecture.md`.
 
-## Projektkrav status (2026-06-08)
+## Projektkrav status (2026-06-09)
 
 ### G-krav
 
 - [x] Fungerande ML-baserat säkerhetsverktyg (API + modeller + end-to-end-flöden)
 - [x] Dokumenterade modellresultat med relevanta metriker (accuracy, precision, recall, F1)
 - [x] Teknisk dokumentation av arkitektur, dataflöde och implementation
-- [ ] Säkerhetsanalys helt stängd (prompt-injection-resultat saknas ännu)
-- [ ] Presentation med live-demo i vecka 11 (inte genomförd ännu)
+- [ ] Säkerhetsanalys helt stängd (prompt-injection-resultat saknas ännu — kollegan)
+- [ ] Presentation med live-demo i vecka 11 (Demo Day 16 juni)
 
 ### VG-krav (utöver G)
 
-- [ ] Jämförelse av flera ML-metoder helt stängd (spaCy/LLM-jämförelse kvar)
-- [x] Avancerad feature engineering/modellarkitektur (flera pipelines och detektionsspår)
-- [ ] Robusthetstestning helt stängd (prompt-injection + riktade ART-attacker kvar)
-- [ ] Integration med befintlig säkerhetsinfrastruktur helt stängd (backend klart, UI i sentinel-upload-api kvar)
-- [x] Välstrukturerad, reproducerbar kodbas med tester och tydlig dokumentation
+- [x] Jämförelse av flera ML-metoder — IOC regex vs spaCy (30 CTI-dok), log anomaly TF-IDF vs strukturerad IF, threat classifier metodval motiverat med latency-evidens
+- [x] Avancerad feature engineering/modellarkitektur (hybrid IOC, tre ML-pipelines, spaCy EntityRuler)
+- [ ] Robusthetstestning helt stängd (prompt-injection kvar — kollegan)
+- [ ] Integration med befintlig säkerhetsinfrastruktur (backend klart, UI i sentinel-upload-api kvar)
+- [x] Välstrukturerad, reproducerbar kodbas — 104 tester (inkl. 8 outcome-tester), ruff ren, CI grön
 
 ### A. Måste klart för Alternativ 6 (Automated Threat Intel)
 
@@ -64,10 +64,10 @@ Detaljerad cross-repo-plan finns i `docs/sentinel-ml-upload-api-integration-arch
 ### B. Måste klart för Alternativ 4 (Log-anomali med LLM)
 
 - [x] Kör och dokumentera slutlig log-anomaly-evaluering (precision/recall/F1) i `docs/technical-report.md`.
-- [ ] Kör prompt-injection-testet med aktiv Ollama och uppdatera `docs/adversarial-analysis.md`.
-- [ ] Visa i demo att loggar kan prioriteras/kategoriseras och sammanfattas till en incidenttext.
-- [ ] Säkerställ fallback-beteende om Ollama är nere (ska visas eller nämnas i demo).
-- [ ] Lägg till 1 tydlig bild/tabell i presentationen som visar "normal vs anomali".
+- [x] Verifierat fallback-beteende om Ollama är nere — `summarize.py` degraderar till regelbaserad text; lazy-import fix applicerad.
+- [x] Demo-tabell "normal vs anomali" dokumenterad i `docs/demo-examples.md` (Scenario 4) med verifierade scores och talkpunkter.
+- [x] Best Heist-demo (`scripts/demo_attack_live.py`) — HTTP-attack mot live API; visar att 77 % av attackloggar undkommer detektion utan mimicry.
+- [ ] Kör prompt-injection-testet med aktiv Ollama och uppdatera `docs/adversarial-analysis.md`. (kollegan)
 
 LLM-relaterade punkter i denna sektion ägs av kollega som kör Ollama-spåret.
 
@@ -84,28 +84,30 @@ LLM-relaterade punkter i denna sektion ägs av kollega som kör Ollama-spåret.
 
 ### D. G-krav: stäng alla öppna punkter
 
-- [ ] Slutför teknisk rapport (ta bort "Pågående", "TBD", "Ej testat" där resultat finns).
-- [ ] Säkerställ att adversarial-analysen innehåller poisoning + evasion + prompt-injection.
-- [ ] Förbered 10-15 min demo med backup-video.
+- [x] Teknisk rapport klar — alla "Pågår"/"TBD"-platshållare stängda (2026-06-09).
+- [ ] Adversarial-analysen komplett — poisoning ✓, evasion ✓, prompt-injection saknas (kollegan, 11-12 juni).
+- [ ] Förbered 10-15 min demo med backup-video (13-14 juni).
 - [ ] Verifiera att alla i gruppen har meningsfulla commits innan inlämning.
-- [x] Kör testsvit + lint och dokumentera att projektet är reproducerbart från README.
+- [x] Testsvit: 104 tester (inkl. 8 outcome-tester), ruff ren, CI grön.
 
 ### E. VG-krav: minsta säkra väg (3 starka punkter)
 
-Sikta på att kunna visa minst dessa tre övertygande:
+**Status 2026-06-09: 3 av 5 säkra, VG-gränsen uppnådd.**
 
-- [ ] **Jämförelse av flera ML-metoder** (klart i tabell + motiverat modellval).
-- [ ] **Robusthetstestning mot adversarial attacks** (alla tre attacker redovisade).
-- [ ] **Integration med befintlig säkerhetsinfrastruktur** (sentinel-upload-api + FastAPI-kontrakt + demo).
+- [x] **Jämförelse av flera ML-metoder** — IOC regex vs spaCy (riktiga siffror), log anomaly TF-IDF vs strukturerad IF, threat classifier motiverat modellval.
+- [ ] **Robusthetstestning mot adversarial attacks** — poisoning + evasion klara; prompt-injection kvar (kollegan).
+- [ ] **Integration med befintlig säkerhetsinfrastruktur** — backend-kontrakt klart inkl. sha256-fix; application-kod i sentinel-upload-api saknas (Jon).
+- [x] **Avancerad feature engineering** — hybrid IOC, tre ML-pipelines, EntityRuler.
+- [x] **Välstrukturerad kodbas** — 104 tester, outcome-tester, ruff, CI.
 
-### F. Dag-för-dag (förslag)
+### F. Dag-för-dag (uppdaterad 2026-06-09)
 
-- [x] **8-10 juni:** stäng alla "TBD" i metrics för Alternativ 6 + Alternativ 4 + implementera metadata/ClamAV-flödet till ML. ✓ Metodjämförelse (spaCy/LLM) dokumenterad, IOC-jämförelse körd och inlagd i rapport.
-- [ ] **11-12 juni:** koppla Trivy-output till CVE/SBOM-relevans + kör prompt-injection med Ollama + uppdatera adversarial-rapport.
-- [ ] **13-14 juni:** implementera direkt textextraktion (.txt/.md/.json/.csv/.eml) + demo-script + backup-video + slides med tabeller/figurer.
-- [ ] **15 juni:** full intern genomkörning (tidtagning 12 min + 3 min buffert).
-- [ ] **16 juni (Demo Day):** live-demo + backup redo.
-- [ ] **17-18 juni:** slutputs dokumentation + commit hygiene + release-tag.
+- [x] **8-9 juni:** stäng alla "TBD" i metrics, upload-klassificerare tränad på 2 000 poster, MongoDB populerad (2 017 poster), outcome-tester, Best Heist-demo, lazy-import-fix i `summarize.py` och `llm/__init__.py`, sha256-kontrakt fixat, Copilot-commit skriven om.
+- [ ] **11-12 juni:** prompt-injection med Ollama (kollegan) + Jon: integration PR i sentinel-upload-api.
+- [ ] **13-14 juni:** slides med F1-tabeller + confusion matrix + demo-script timad + backup-video inspelad.
+- [ ] **15 juni:** full intern genomkörning (12 min + 3 min buffert).
+- [ ] **16 juni (Demo Day):** live-demo mot Hetzner + backup redo.
+- [ ] **17-18 juni:** slutputs dokumentation + release-tag `v1.0.0`.
 - [ ] **19 juni:** slutinlämning.
 
 ### Nästa repo-steg: sentinel-upload-api
@@ -115,6 +117,41 @@ Sikta på att kunna visa minst dessa tre övertygande:
 - [ ] Persista svar i `ml_predictions` per `upload_id`.
 - [ ] Visa liveflow-fält i upload-detaljvyn i UI.
 - [ ] Verifiera graceful degradation när sentinel-ml inte svarar.
+
+### Checklista inför fredag 2026-06-12 (måste vara klart)
+
+Detta är den operativa stopp-listan inför intern deadline på fredag.
+
+- [ ] **Cross-repo integration klar i sentinel-upload-api**
+  - DoD: `SentinelMlClient` finns, `/predict/liveflow` anropas med timeout 500 ms, payload innehåller `upload`, `upload_text`, `cve_relevance`.
+  - Evidens: länkad PR + diff + kort körlogg från lyckat anrop.
+- [ ] **Graceful degradation verifierad**
+  - DoD: Upload-flödet i sentinel-upload-api fungerar även när sentinel-ml är nere; inga 500-fel i UI på grund av ML-timeout.
+  - Evidens: två testkörningar (ML up/down) dokumenterade i PR-beskrivning.
+- [ ] **ML-resultat syns i UI**
+  - DoD: upload-detalj visar minst `label`, `confidence`, IOC-count/lista och `matched_cves`.
+  - Evidens: 2 skärmbilder (normal + malicious case).
+- [ ] **Prompt-injection-resultat stängt (kollegans spår)**
+  - DoD: `docs/adversarial-analysis.md` uppdaterad med metod, testfall, success rate och slutsats.
+  - Evidens: commit-referens + tabell/sektion i rapport.
+- [ ] **Teknisk rapport konsoliderad och konsekvent**
+  - DoD: inga dubbla/konflikterande sektioner i `docs/technical-report.md`; alla TBD/Pågår borttagna i slutversion.
+  - Evidens: snabb peer review (1 godkännande i teamet) + markerad "demo version" i filens topp.
+- [ ] **Demo-manus klart och tidat**
+  - DoD: 10-12 min manus med ordning: problem -> metod -> liveflow -> adversarial -> slutsats.
+  - Evidens: genomkörning en gång utan avbrott och tidslogg.
+- [ ] **Backup-material klart**
+  - DoD: backup-video 3-5 min + lokalt fallback-scenario om live-miljö fallerar.
+  - Evidens: videofil + checkad fallback-sekvens i manus.
+- [ ] **Release hygiene för fredagspunkter**
+  - DoD: `ROADMAP.md` och `CHANGELOG.md` uppdaterade med vad som faktiskt blev klart under veckan.
+  - Evidens: separat "fredagscommit" med tydlig sammanfattning.
+
+**Go/No-Go fredag 2026-06-12:**
+
+- **GO** om alla punkter ovan är klara.
+- **Villkorat GO** om endast prompt-injection återstår men övriga punkter är klara och fallback-plan finns i demo.
+- **NO-GO** om cross-repo UI/integration inte är fungerande.
 
 ---
 

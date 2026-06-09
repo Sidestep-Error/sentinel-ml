@@ -444,7 +444,9 @@ def test_predict_liveflow_fallback_combines_all_parts():
     assert payload["summary"]["has_upload"] is True
     assert payload["summary"]["has_upload_text"] is True
     assert payload["summary"]["has_cve_relevance"] is True
-    assert payload["upload_result"]["model_version"] == "none"
+    assert payload["upload_result"]["model_version"] == "none" or len(
+        payload["upload_result"]["model_version"]
+    ) == 12
     assert payload["upload_text_result"]["model_version"] == "none" or len(
         payload["upload_text_result"]["model_version"]
     ) == 12

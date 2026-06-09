@@ -72,6 +72,68 @@ Syntetiska CSV-loggar genererade av `log_anomaly/generate_data.py` med normal/at
 
 ### 5.1 Spår A — Threat report-klassificerare
 
+Utvärderat med 80/20 train/test-split, `random_state=42`, på `data/real_threat_reports.jsonl` (1 582 dokument).
+
+**Metodjämförelse — klassificering:**
+
+| Modell | Accuracy | F1-macro | Prec-macro | Rec-macro | Beslut |
+|--------|----------|----------|------------|-----------|--------|
+| TF-IDF + Logistic Regression | **0.943** | **0.875** | **0.955** | **0.841** | **Vald** — stark prestanda, snabb träning, tolkbara feature-vikter |
+| spaCy pipeline (NER+LR) | — | — | — | — | Ej utvärderad för klassificering; spaCy används för IOC-extraktion (se 5.1.1) |
+| LLM zero-shot (llama3.2:3b) | — | — | — | — | Ej vald — 5–30 s latency per anrop är oacceptabelt för realtidsklassificering; används i stället för incidentsammanfattning |
+
+**Per klass — TF-IDF + LR:**
+
+| Klass | Precision | Recall | F1 | Testexempel |
+|-------|-----------|--------|----|-------------|
+| ransomware | 0.98 | 0.98 | 0.98 | 47 |
+| phishing | 0.97 | 0.97 | 0.97 | 76 |
+| malware | 0.93 | 0.97 | 0.95 | 139 |
+| intrusion | 0.89 | 0.85 | 0.87 | 48 |
+| ddos | 1.00 | 0.43 | 0.60 | 7 |
+
+**Konklusion:** TF-IDF + LR presterar starkt på alla kategorier utom DDoS (F1=0.60) — ett direkt resultat av underrepresentation i träningsdatat (36 dokument). Ransomware och phishing har tydligt domänspecifikt vokabulär som gynnar TF-IDF. TF-IDF + LR valdes framför spaCy-klassificering och LLM zero-shot p.g.a. överlägsen precision/recall vid acceptabel latency.
+
+#### 5.1.1 IOC-extraktionsmetoder — regex vs spaCy
+
+IOC-extraktion är en central funktion i Alt 6. Två metoder implementerades och jämfördes (`scripts/compare_ioc_extractors.py`).
+
+| Metod | Implementering | Styrka | Svaghet |
+|-------|----------------|--------|---------|
+| Regex | `features/ioc_extract.py` | Hög precision för strukturerade IOCs (IP, hash, CVE, URL, e-post, domän) | Missar named entities (threat actors, malware-namn) |
+| spaCy EntityRuler + NER | `features/ioc_extract_spacy.py` | Detekterar threat actors och malware-namn som regex inte kan hitta | Lägre precision för strukturerade IOCs (conf < 1.0 för NER-träffar) |
+
+**Resultat på exempeltext:**
+
+| Metod | Strukturerade IOCs | NER-träffar (threat actors/malware) | Totalt |
+|-------|--------------------|-------------------------------------|--------|
+| Regex | 6 | 0 | 6 |
+| spaCy | 4 | 3 ("CTB-Locker", "Fancy Bear", "SHA-256") | 7 |
+
+**Resultat på 30 verkliga CTI-dokument (`data/real_threat_reports.jsonl`):**
+
+| Metod | Snitt IOCs/dokument | Max IOCs | Dokument med fler träffar än motparten |
+|-------|---------------------|----------|----------------------------------------|
+| Regex | 0.0 | 0 | 0 av 30 |
+| spaCy | 0.5 | 3 | 12 av 30 |
+
+**Analys:** I narrativ CTI-text förekommer sällan strukturerade IOC-format (IPs, hash-strängar). spaCy NER hittar named entities (malware-familjer, threat actor-namn) som regex helt missar. Hybridansatsen — regex för strukturerade indikatorer, spaCy NER för named entities — ger bästa täckning och används i `/predict/threat`-endpointen.
+
+### 5.2 Spår B — Logganomalidetektion
+
+Två komplementära ansatser implementerades, med olika datakrav och utvärderingsparadigm.
+
+**Metodjämförelse:**
+
+| Modell | Precision | Recall | F1 | Kommentar |
+|--------|-----------|--------|----|-----------|
+| TF-IDF + IsolationForest (text-baserad) | 0.370 | 0.370 | 0.370 | Tränad på 1 000 syntetiska loggrader (800 normal / 200 attack). `contamination=0.20`, `random_state=42`. Utvärderad mot grund-sanningsetiketter. |
+| IsolationForest (strukturerade Wazuh-features) | — | — | — | Osupervisad — kräver riktig Wazuh-data utan etiketter. Utvärderas via anomaly_score-fördelning och contamination-parameter, inte F1. Designad för produktionsmiljö där etiketter saknas. |
+
+**Analys:** De två metoderna löser samma problem men med olika förutsättningar. TF-IDF-metoden är superviserbar (kräver etiketter) och lämpar sig för testmiljöer med syntetisk eller annoterad data. Den strukturerade IsolationForest-detektorn kräver inga etiketter och passar produktionsmiljöer med riktiga Wazuh-loggar. F1=0.370 för TF-IDF-metoden på syntetisk data är förväntat lågt — IsolationForest är osensitiv för feature-representation och syntetisk data saknar den token-variation som gynnar TF-IDF.
+
+**Kompletterande LLM-komponent:** Ollama-integrationen (`log_anomaly/summarize.py`) genererar naturspråkliga incidentsammanfattningar från anomalilistor. Detta är inte en detektionsmodell utan ett steg i incidentresponsflödet (LM12).
+Alla modeller utvärderades med 80/20 train/test-split, `random_state=42`, på `data/real_threat_reports.jsonl`.
 Alla modeller utvärderades med 80/20 train/test-split, `random_state=42`, på `data/real_threat_reports.jsonl` (1 582 dokument).
 
 **Metodjämförelse — klassificering:**
@@ -195,6 +257,12 @@ Se [docs/adversarial-analysis.md](adversarial-analysis.md) för fullständiga ex
 | Data poisoning (Spår A) | Klar | ΔF1 = −0.156 vid 20 % label-flipping |
 | Evasion (Upload-classifier) | Klar | Flip-rate = 0.0 % vid ε ≤ 0.2 (RF robust mot slumpmässigt brus) |
 | Prompt injection (LLM) | Pågår | Kräver körande Ollama-instans — genomförs 11–12 juni |
+
+Tre testade attackytor:
+1. **Data poisoning (Spår A):** Label-flipping vid ratio 5–20 % — F1 sjunker från 0.963 → 0.807 vid 20 % förgiftning
+2. **Evasion (Upload-classifier):** Feature-perturbation med ε ∈ {0.01–0.2} — Random Forest visar hög robusthet mot slumpmässigt feature-brus
+3. **Prompt injection (LLM):** Kuraterad lista av instruktioner dolda i threat report-text — bypass-rate mäts mot LLM-backenden
+Se [docs/adversarial-analysis-plan.md](adversarial-analysis-plan.md) för fullständig hotmodell och testmetodik. Resultat dokumenteras i `docs/adversarial-analysis.md` efter genomförda experiment.
 
 Tre testade attackytor:
 1. **Data poisoning (Spår A):** Label-flipping vid ratio 5–20 % — F1 sjunker från 0.963 → 0.807 vid 20 % förgiftning
