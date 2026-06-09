@@ -613,30 +613,6 @@ def create_app() -> FastAPI:
             ),
         )
 
-    @app.post("/predict/log-anomaly", response_model=LogAnomalyResponse)
-    def predict_log_anomaly(req: LogAnomalyRequest, request: Request) -> LogAnomalyResponse:
-        loaded = _get_loaded(request, "log_anomaly_model")
-        if loaded is None or not req.logs:
-            return LogAnomalyResponse(
-                predictions=[
-                    LogLinePrediction(line=line, is_anomaly=False, score=0.0)
-                    for line in req.logs
-                ],
-                model_version=FALLBACK_VERSION,
-            )
-        results = tfidf_detector.predict(loaded.artifact, req.logs)
-        return LogAnomalyResponse(
-            predictions=[
-                LogLinePrediction(
-                    line=r["line"],
-                    is_anomaly=r["is_anomaly"],
-                    score=r["score"],
-                )
-                for r in results
-            ],
-            model_version=loaded.version,
-        )
-
     return app
 
 
