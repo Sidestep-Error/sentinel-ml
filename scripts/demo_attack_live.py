@@ -75,16 +75,27 @@ def main(
     detected_after = _print_results(camouflaged_preds, "KAMUFLERADE attackloggar")
 
     # Sammanfattning
-    evasion_rate = 1 - detected_after / len(_ATTACK_LOGS) if detected_after < len(_ATTACK_LOGS) else 0
+    n = len(attack_logs)
+    evaded = max(0, detected_before - detected_after)
+    missed_base = n - detected_before
+
     print(f"\n{'═'*60}")
     print(f"  RESULTAT")
     print(f"{'═'*60}")
-    print(f"  Detekterade före attack:  {detected_before}/{len(_ATTACK_LOGS)}")
-    print(f"  Detekterade efter attack: {detected_after}/{len(_ATTACK_LOGS)}")
-    print(f"  Undanmanövrerade:         {detected_before - detected_after} loggar")
-    print(f"  Evasion rate:             {evasion_rate*100:.0f}%")
+    print(f"  Attackloggar totalt:       {n}")
+    print(f"  Detekterade (original):    {detected_before}/{n}  ({detected_before/n*100:.0f}%)")
+    print(f"  Detekterade (kamuflerade): {detected_after}/{n}  ({detected_after/n*100:.0f}%)")
+    print(f"  Undanmanövrerade av attack:{evaded} loggar")
+    print(f"  Missades redan från start: {missed_base} loggar  ← redan ett problem")
     print()
-    print("  Slutsats: TF-IDF-detektorn är sårbar mot keyword-kamouflering.")
+    if evaded > 0:
+        print("  ⚠  Mimicry-attack lyckades delvis — keyword-kamouflering fungerar.")
+    else:
+        print("  De starka attackmönstren (SSH brute force, AVC) klarar kamouflering.")
+        print("  Men observera: {missed_base} loggar undkommer redan UTAN attack.".format(
+            missed_base=missed_base))
+        print("  Reverse shell och path traversal evade detection utan modifiering.")
+    print()
     print("  Motåtgärd: semantisk analys (LLM) eller sekvensbaserad detektion.")
     print(f"{'═'*60}")
 
