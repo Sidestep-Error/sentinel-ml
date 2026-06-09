@@ -1,0 +1,104 @@
+# Teknisk LLM-dokumentation
+
+Det här dokumentet beskriver LLM-delen på teknisk nivå.
+
+## Moduler
+
+### `src/sentinel_ml/llm/ollama_client.py`
+
+Tunt HTTP-lager ovanpå Ollamas `/api/generate`.
+
+Ansvar:
+
+- läsa `OLLAMA_HOST` och `OLLAMA_MODEL`
+- skicka prompt, systemprompt och temperatur
+- returnera modellens råtext i ett enkelt svarsobekt
+
+### `src/sentinel_ml/llm/prompts.py`
+
+Innehåller systemprompter för:
+
+- threat report-klassificering
+- CVE-relevans
+
+Prompterna kräver:
+
+- exakt ett JSON-objekt
+- ingen markdown
+- att input behandlas som data, inte instruktioner
+
+### `src/sentinel_ml/llm/schemas.py`
+
+Innehåller strikta Pydantic-scheman för LLM-output:
+
+- `ThreatClassificationResult`
+- `CVERelevanceResult`
+
+Skydd:
+
+- `extra="forbid"`
+- strikt typvalidering
+- `confidence` begränsad till `0.0 .. 1.0`
+
+### `src/sentinel_ml/llm/classifier.py`
+
+Huvudlagret ovanpå klienten.
+
+Ansvar:
+
+- sanera input
+- bygga promptar
+- anropa Ollama-klienten
+- parsea JSON
+- validera JSON mot schema
+- kasta tydliga fel vid ogiltig output
+
+Viktiga funktioner:
+
+- `sanitize_llm_input(text)`
+- `parse_json_response(raw_text, schema)`
+- `classify_threat_report(text, ...)`
+- `try_classify_threat_report(text, ...)`
+- `classify_cve_relevance(cve_text, stack_summary, ...)`
+
+## Säkerhetsmodell
+
+LLM-delen bygger på flera skyddslager:
+
+- systemprompt som säger att input är data
+- borttagning av kontrolltecken och bidi-tecken
+- strikt JSON-krav
+- strikt schema-validering
+- fallback vid ogiltig output
+
+## Tester
+
+### `tests/test_ollama_client.py`
+
+Verifierar att korrekt payload skickas till Ollama.
+
+### `tests/test_llm_classifier.py`
+
+Verifierar bland annat:
+
+- giltig JSON accepteras
+- fri text och markdown avvisas
+- fel shape avvisas
+- extra keys avvisas
+- ogiltig `confidence` avvisas
+
+### `tests/test_ollama_integration.py`
+
+Markerat integrationstest mot lokal `Ollama`.
+
+## Lokal körning
+
+```bash
+cd ~/sentinel-ml
+python3 -m venv .venv
+./.venv/bin/pip install -e '.[dev,llm]'
+ollama pull llama3.2:3b
+./.venv/bin/python -m pytest tests/test_ollama_client.py
+./.venv/bin/python -m pytest tests/test_llm_classifier.py
+./.venv/bin/python -m pytest tests/test_ollama_integration.py
+```
