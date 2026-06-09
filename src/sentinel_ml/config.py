@@ -40,6 +40,13 @@ class Settings(BaseSettings):
     data_dir: Path = Field(default=Path("./data"), alias="DATA_DIR")
     models_dir: Path = Field(default=Path("./models_store"), alias="MODELS_DIR")
 
+    # --- Hash-bridge (Spar A IOC -> upload scanning) ---
+    # Optional threat-reports JSONL whose hash IOCs become the known-malicious
+    # set. Unset/missing => the hash-bridge simply reports no match (degrades).
+    known_malicious_hashes_path: Path | None = Field(
+        default=None, alias="KNOWN_MALICIOUS_HASHES_PATH"
+    )
+
 
 def get_settings() -> Settings:
     """Return a fresh settings instance.

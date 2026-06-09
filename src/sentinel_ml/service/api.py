@@ -34,6 +34,7 @@ from pydantic import BaseModel
 from sentinel_ml import __version__
 from sentinel_ml.config import get_settings
 from sentinel_ml.data.schemas import IOC, Prediction, UploadRecord
+from sentinel_ml.features.hash_match import collect_hashes_from_reports, match_upload_hash
 from sentinel_ml.features.ioc_extract import extract_iocs
 from sentinel_ml.features.upload_meta import build_feature_matrix
 from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM
@@ -101,6 +102,7 @@ class UploadIngestResponse(BaseModel):
     scan_engine: str
     scan_detail: str
     risk_score: int
+    known_malicious: bool = False
 
 
 class UploadTextIngestRequest(BaseModel):
@@ -192,6 +194,7 @@ class LiveFlowSummary(BaseModel):
     has_cve_relevance: bool
     ioc_count: int = 0
     matched_cves: int = 0
+    known_malicious_hash: bool = False
 
 
 class LiveFlowResponse(BaseModel):
@@ -239,6 +242,25 @@ def _try_load(path: Path, loader: Callable[[Path], Any]) -> LoadedModel | None:
     return LoadedModel(artifact=artifact, version=_artifact_version(path))
 
 
+def _load_malicious_hashes(path: Path | None) -> set[str]:
+    """Build the known-malicious hash set at startup. Empty set on any problem."""
+    if path is None:
+        return set()
+    p = Path(path)
+    if not p.exists():
+        logger.info("Known-malicious hash source missing at %s — hash-bridge inactive", p)
+        return set()
+    try:
+        from sentinel_ml.data.loaders import load_threat_reports_jsonl
+
+        hashes = collect_hashes_from_reports(load_threat_reports_jsonl(p))
+        logger.info("Hash-bridge: loaded %d known-malicious hashes", len(hashes))
+        return hashes
+    except Exception:  # noqa: BLE001 — degrade rather than crash startup
+        logger.exception("Failed to load known-malicious hashes from %s", p)
+        return set()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
@@ -252,12 +274,18 @@ async def lifespan(app: FastAPI):
     app.state.log_anomaly_model = _try_load(
         models_dir / LOG_ANOMALY_ARTIFACT_NAME, tfidf_detector.load
     )
+    app.state.malicious_hashes = _load_malicious_hashes(settings.known_malicious_hashes_path)
     yield
 
 
 def _get_loaded(request: Request, attr: str) -> LoadedModel | None:
     """Read a loaded model off app state, tolerating tests that skip lifespan."""
     return getattr(request.app.state, attr, None)
+
+
+def _get_malicious_hashes(request: Request) -> set[str]:
+    """Read the known-malicious hash set off app state (empty if lifespan skipped)."""
+    return getattr(request.app.state, "malicious_hashes", set())
 
 
 def _call_ollama(text: str) -> LLMAnalysis | None:
@@ -487,6 +515,7 @@ def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> Upload
         scan_engine=req.scan_engine,
         scan_detail=req.scan_detail,
         risk_score=req.risk_score,
+        known_malicious=match_upload_hash(req.sha256, _get_malicious_hashes(request)),
     )
 
 
@@ -610,6 +639,7 @@ def create_app() -> FastAPI:
                 has_cve_relevance=cve_result is not None,
                 ioc_count=ioc_count,
                 matched_cves=matched_cves,
+                known_malicious_hash=upload_result.known_malicious if upload_result else False,
             ),
         )
 
