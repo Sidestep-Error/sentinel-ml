@@ -269,7 +269,8 @@ def _call_ollama(text: str) -> LLMAnalysis | None:
     instead of crashing the service at import time.
     """
     try:
-        from sentinel_ml.llm.ollama_client import OllamaClient  # noqa: PLC0415
+        from sentinel_ml.llm.ollama_client import OllamaClient
+
         client = OllamaClient(timeout=30.0)
         response = client.generate(prompt=text, system=CLASSIFY_THREAT_REPORT_SYSTEM)
         data = json.loads(response.text)
@@ -610,6 +611,30 @@ def create_app() -> FastAPI:
                 ioc_count=ioc_count,
                 matched_cves=matched_cves,
             ),
+        )
+
+    @app.post("/predict/log-anomaly", response_model=LogAnomalyResponse)
+    def predict_log_anomaly(req: LogAnomalyRequest, request: Request) -> LogAnomalyResponse:
+        loaded = _get_loaded(request, "log_anomaly_model")
+        if loaded is None or not req.logs:
+            return LogAnomalyResponse(
+                predictions=[
+                    LogLinePrediction(line=line, is_anomaly=False, score=0.0)
+                    for line in req.logs
+                ],
+                model_version=FALLBACK_VERSION,
+            )
+        results = tfidf_detector.predict(loaded.artifact, req.logs)
+        return LogAnomalyResponse(
+            predictions=[
+                LogLinePrediction(
+                    line=r["line"],
+                    is_anomaly=r["is_anomaly"],
+                    score=r["score"],
+                )
+                for r in results
+            ],
+            model_version=loaded.version,
         )
 
     return app
