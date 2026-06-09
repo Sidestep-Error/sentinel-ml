@@ -278,7 +278,7 @@ Implementerade motåtgärder:
 
 ## 8. Integration
 
-Se [docs/integration-with-sentinel-upload-api.md](integration-with-sentinel-upload-api.md).
+Se [docs/sentinel-ml-upload-api-integration-architecture.md](sentinel-ml-upload-api-integration-architecture.md).
 
 Valt mönster: **HTTP-service (mönster 2)**. sentinel-ml körs som fristående FastAPI-service på port 8080. sentinel-upload-api anropar `/predict/threat` och `/predict/upload` med 500 ms timeout och degraderar tyst vid fel.
 

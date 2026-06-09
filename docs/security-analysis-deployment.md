@@ -119,7 +119,7 @@ produktion: External Secrets Operator + Vault eller liknande.
 ### 4. ml_predictions-collection write-back (Fas 2)
 
 När modellerna börjar producera predictions ska de skrivas till en
-separat collection enligt [integration-doc](integration-with-sentinel-upload-api.md).
+separat collection enligt [integration-doc](sentinel-ml-upload-api-integration-architecture.md).
 Hot: race conditions, oavsiktlig skrivning till `uploads`-collection.
 Mitigering: explicit collection-namn i loader-kod, integration-test som
 verifierar att vi bara skriver till `ml_predictions`.
@@ -178,7 +178,7 @@ Detta gäller både sentinel-ml och sentinel-upload-api — samma deploy-mönste
 ## Referenser
 
 - [runbooks/sentinel-ml-deploy.md](../runbooks/sentinel-ml-deploy.md) — deploy-procedurer
-- [docs/integration-with-sentinel-upload-api.md](integration-with-sentinel-upload-api.md) — kontrakt mellan tjänsterna
+- [docs/sentinel-ml-upload-api-integration-architecture.md](sentinel-ml-upload-api-integration-architecture.md) — kontrakt mellan tjänsterna
 - [docs/adversarial-analysis-plan.md](adversarial-analysis-plan.md) — hotbild mot ML-modellen själv (Spår C)
 - sentinel-upload-api `k8s/gatekeeper/` — OPA-constraints (deras repo)
 - sentinel-upload-api `infra/terraform/hetzner/` — `ci-deploy`-SA definition

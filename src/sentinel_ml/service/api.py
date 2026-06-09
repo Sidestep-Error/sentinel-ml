@@ -23,17 +23,27 @@ import re
 from collections.abc import Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from email import policy
 from email.parser import Parser
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 from sentinel_ml import __version__
 from sentinel_ml.config import get_settings
+from sentinel_ml.data.predictions import upsert_ml_prediction_document
 from sentinel_ml.data.schemas import IOC, Prediction, UploadRecord
+from sentinel_ml.features.cve_relevance import (
+    CVERelevancePrediction,
+    build_cve_relevance_prediction,
+    cve_records_from_normalized,
+    cve_records_from_trivy,
+    sbom_components_from_normalized,
+    sbom_components_from_trivy,
+)
 from sentinel_ml.features.hash_match import collect_hashes_from_reports, match_upload_hash
 from sentinel_ml.features.ioc_extract import extract_iocs
 from sentinel_ml.features.upload_meta import build_feature_matrix
@@ -182,6 +192,11 @@ class CVERelevanceResponse(BaseModel):
     summary: CVERelevanceSummary
 
 
+class TrivyCVERelevanceRequest(BaseModel):
+    sbom_document: dict[str, Any]
+    vulnerability_document: dict[str, Any]
+
+
 class LiveFlowRequest(BaseModel):
     upload: UploadIngestRequest | None = None
     upload_text: UploadTextIngestRequest | None = None
@@ -202,6 +217,19 @@ class LiveFlowResponse(BaseModel):
     upload_text_result: UploadTextIngestResponse | None = None
     cve_relevance_result: CVERelevanceResponse | None = None
     summary: LiveFlowSummary
+
+
+class MLPredictionDocument(BaseModel):
+    upload_id: str
+    ml_provider: str = "sentinel-ml"
+    ml_liveflow: LiveFlowResponse
+    created_at: datetime
+
+
+class MLPredictionWriteBackResponse(BaseModel):
+    persisted: bool
+    collection: str = "ml_predictions"
+    document: MLPredictionDocument
 
 
 class LogAnomalyRequest(BaseModel):
@@ -485,6 +513,22 @@ def _cve_relevance(req: CVERelevanceRequest) -> CVERelevanceResponse:
     )
 
 
+def _cve_relevance_prediction(req: CVERelevanceRequest) -> CVERelevancePrediction:
+    components = sbom_components_from_normalized(
+        [component.model_dump(mode="json") for component in req.sbom_components]
+    )
+    cves = cve_records_from_normalized([cve.model_dump(mode="json") for cve in req.cves])
+    return build_cve_relevance_prediction(cves, components)
+
+
+def _cve_relevance_prediction_from_trivy(
+    req: TrivyCVERelevanceRequest,
+) -> CVERelevancePrediction:
+    components = sbom_components_from_trivy(req.sbom_document)
+    cves = cve_records_from_trivy(req.vulnerability_document)
+    return build_cve_relevance_prediction(cves, components)
+
+
 def _predict_upload_record(record: UploadRecord, request: Request) -> UploadResponse:
     loaded = _get_loaded(request, "upload_model")
     if loaded is None:
@@ -550,6 +594,52 @@ def _predict_upload_text_ingest(
         iocs=iocs,
         extracted_text=final_text,
         text_truncated=truncated,
+    )
+
+
+def _predict_liveflow(req: LiveFlowRequest, request: Request) -> LiveFlowResponse:
+    upload_result = _predict_upload_ingest(req.upload, request) if req.upload else None
+    upload_text_result = (
+        _predict_upload_text_ingest(req.upload_text, request) if req.upload_text else None
+    )
+    cve_result = _cve_relevance(req.cve_relevance) if req.cve_relevance else None
+
+    ioc_count = len(upload_text_result.iocs) if upload_text_result else 0
+    matched_cves = cve_result.summary.matched_cves if cve_result else 0
+
+    return LiveFlowResponse(
+        upload_result=upload_result,
+        upload_text_result=upload_text_result,
+        cve_relevance_result=cve_result,
+        summary=LiveFlowSummary(
+            has_upload=upload_result is not None,
+            has_upload_text=upload_text_result is not None,
+            has_cve_relevance=cve_result is not None,
+            ioc_count=ioc_count,
+            matched_cves=matched_cves,
+            known_malicious_hash=upload_result.known_malicious if upload_result else False,
+        ),
+    )
+
+
+def _resolve_upload_id(req: LiveFlowRequest) -> str:
+    if req.upload is not None:
+        return req.upload.upload_id
+    if req.upload_text is not None:
+        return req.upload_text.upload_id
+    raise HTTPException(
+        status_code=400,
+        detail="liveflow-document requires upload or upload_text to provide upload_id",
+    )
+
+
+def _build_ml_prediction_document(
+    req: LiveFlowRequest, response: LiveFlowResponse
+) -> MLPredictionDocument:
+    return MLPredictionDocument(
+        upload_id=_resolve_upload_id(req),
+        ml_liveflow=response,
+        created_at=datetime.now(UTC),
     )
 
 
@@ -623,30 +713,41 @@ def create_app() -> FastAPI:
     def predict_cve_relevance(req: CVERelevanceRequest) -> CVERelevanceResponse:
         return _cve_relevance(req)
 
+    @app.post("/predict/cve-relevance-prediction", response_model=CVERelevancePrediction)
+    def predict_cve_relevance_prediction(
+        req: CVERelevanceRequest,
+    ) -> CVERelevancePrediction:
+        return _cve_relevance_prediction(req)
+
+    @app.post("/predict/cve-relevance-trivy", response_model=CVERelevancePrediction)
+    def predict_cve_relevance_trivy(
+        req: TrivyCVERelevanceRequest,
+    ) -> CVERelevancePrediction:
+        return _cve_relevance_prediction_from_trivy(req)
+
     @app.post("/predict/liveflow", response_model=LiveFlowResponse)
     def predict_liveflow(req: LiveFlowRequest, request: Request) -> LiveFlowResponse:
-        upload_result = _predict_upload_ingest(req.upload, request) if req.upload else None
-        upload_text_result = (
-            _predict_upload_text_ingest(req.upload_text, request) if req.upload_text else None
-        )
-        cve_result = _cve_relevance(req.cve_relevance) if req.cve_relevance else None
+        return _predict_liveflow(req, request)
 
-        ioc_count = len(upload_text_result.iocs) if upload_text_result else 0
-        matched_cves = cve_result.summary.matched_cves if cve_result else 0
+    @app.post("/predict/liveflow-document", response_model=MLPredictionDocument)
+    def predict_liveflow_document(req: LiveFlowRequest, request: Request) -> MLPredictionDocument:
+        response = _predict_liveflow(req, request)
+        return _build_ml_prediction_document(req, response)
 
-        return LiveFlowResponse(
-            upload_result=upload_result,
-            upload_text_result=upload_text_result,
-            cve_relevance_result=cve_result,
-            summary=LiveFlowSummary(
-                has_upload=upload_result is not None,
-                has_upload_text=upload_text_result is not None,
-                has_cve_relevance=cve_result is not None,
-                ioc_count=ioc_count,
-                matched_cves=matched_cves,
-                known_malicious_hash=upload_result.known_malicious if upload_result else False,
-            ),
-        )
+    @app.post("/predict/liveflow-writeback", response_model=MLPredictionWriteBackResponse)
+    def predict_liveflow_writeback(
+        req: LiveFlowRequest, request: Request
+    ) -> MLPredictionWriteBackResponse:
+        document = _build_ml_prediction_document(req, _predict_liveflow(req, request))
+        try:
+            upsert_ml_prediction_document(document)
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("Failed to write ml_predictions for upload_id=%s", document.upload_id)
+            raise HTTPException(
+                status_code=503,
+                detail="failed to persist ml prediction document",
+            ) from exc
+        return MLPredictionWriteBackResponse(persisted=True, document=document)
 
     return app
 
