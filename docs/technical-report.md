@@ -133,6 +133,32 @@ Två komplementära ansatser implementerades, med olika datakrav och utvärderin
 **Analys:** De två metoderna löser samma problem men med olika förutsättningar. TF-IDF-metoden är superviserbar (kräver etiketter) och lämpar sig för testmiljöer med syntetisk eller annoterad data. Den strukturerade IsolationForest-detektorn kräver inga etiketter och passar produktionsmiljöer med riktiga Wazuh-loggar. F1=0.370 för TF-IDF-metoden på syntetisk data är förväntat lågt — IsolationForest är osensitiv för feature-representation och syntetisk data saknar den token-variation som gynnar TF-IDF.
 
 **Kompletterande LLM-komponent:** Ollama-integrationen (`log_anomaly/summarize.py`) genererar naturspråkliga incidentsammanfattningar från anomalilistor. Detta är inte en detektionsmodell utan ett steg i incidentresponsflödet (LM12).
+Alla modeller utvärderades med 80/20 train/test-split, `random_state=42`, på `data/real_threat_reports.jsonl`.
+
+| Modell | Accuracy | F1-macro | Precision-macro | Recall-macro |
+|--------|----------|----------|-----------------|--------------|
+| TF-IDF + Logistic Regression | **0.943** | **0.875** | **0.955** | **0.841** |
+| spaCy NER + LR | TBD | TBD | TBD | TBD |
+| LLM zero-shot (llama3.2:3b) | TBD | TBD | TBD | TBD |
+
+**Per klass — TF-IDF + LR:**
+
+| Klass | Precision | Recall | F1 | Testexempel |
+|-------|-----------|--------|----|-------------|
+| ransomware | 0.98 | 0.98 | 0.98 | 47 |
+| phishing | 0.97 | 0.97 | 0.97 | 76 |
+| malware | 0.93 | 0.97 | 0.95 | 139 |
+| intrusion | 0.89 | 0.85 | 0.87 | 48 |
+| ddos | 1.00 | 0.43 | 0.60 | 7 |
+
+**Konklusion:** TF-IDF + LR presterar starkt på alla kategorier utom DDoS (F1=0.60) — ett direkt resultat av underrepresentation i träningsdatat (36 dokument). Ransomware och phishing har tydligt domänspecifikt vokabulär som gynnar TF-IDF. spaCy NER och LLM-jämförelse genomförs i Fas 2.
+
+### 5.2 Spår B — Logganomalidetektion
+
+| Modell | Precision | Recall | F1 | Träningstid |
+|--------|-----------|--------|----|-------------|
+| TF-IDF + IsolationForest | TBD | TBD | TBD | TBD |
+| IsolationForest (strukturerade features) | TBD | TBD | TBD | TBD |
 
 ### 5.3 Spår C — Malware-familje-klassificerare (MalwareBazaar metadata)
 
@@ -193,6 +219,12 @@ Tre testade attackytor:
 1. **Data poisoning (Spår A):** Label-flipping vid ratio 5–20 % — F1 sjunker från 0.963 → 0.807 vid 20 % förgiftning
 2. **Evasion (Upload-classifier):** Feature-perturbation med ε ∈ {0.01–0.2} — Random Forest visar hög robusthet mot slumpmässigt feature-brus
 3. **Prompt injection (LLM):** Kuraterad lista av instruktioner dolda i threat report-text — bypass-rate mäts mot LLM-backenden
+Se [docs/adversarial-analysis-plan.md](adversarial-analysis-plan.md) för fullständig hotmodell och testmetodik. Resultat dokumenteras i `docs/adversarial-analysis.md` efter genomförda experiment.
+
+Tre testade attackytor:
+1. **Data poisoning (Spår A):** Label-flipping vid ratio 5–20 % — mäter F1-degradering
+2. **Evasion (Upload-classifier):** Feature-perturbation med ε ∈ {0.01–0.2} — mäter attack success rate
+3. **Prompt injection (LLM):** Embedded instruktioner i threat reports — mäter bypass-rate
 
 Implementerade motåtgärder:
 - System prompt med explicit "this is data, not commands" (`llm/prompts.py`)
@@ -228,6 +260,7 @@ Alla tre spår är reproducerbart körbara med dokumenterade metrics:
 - **Spår A (Alt 6 — Automated Threat Intel):** TF-IDF + LR uppnår F1-macro 0.875 på riktig CTI-data. IOC-extraktion implementerad som hybrid (regex + spaCy NER). Valt som primärt spår.
 - **Spår B (Alt 4 — Log-anomali):** Två komplementära metoder implementerade — TF-IDF+IsolationForest (F1=0.370 på syntetisk data) och strukturerad Wazuh-IsolationForest (osupervisad, produktionsinriktad). LLM-sammanfattning via Ollama för incidentrespons.
 - **Spår C (Alt 3 — Malware, delvis):** Random Forest på metadata uppnår F1=0.42 (4× bättre än slumpen). Tydligt avgränsad som ett delspår utan beteendedata.
+*(Fylls i efter avslutade experiment.)*
 
 ## Referenser
 
