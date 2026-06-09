@@ -225,6 +225,93 @@ def test_predict_cve_relevance_matches_sbom_components():
     assert len(payload["results"][0]["matched_components"]) == 1
 
 
+def test_predict_cve_relevance_prediction_returns_serializable_envelope():
+    response = client.post(
+        "/predict/cve-relevance-prediction",
+        json={
+            "sbom_components": [
+                {
+                    "name": "openssl",
+                    "version": "3.0.7",
+                    "ecosystem": "debian",
+                    "purl": "pkg:deb/debian/openssl@3.0.7",
+                    "cpe": "cpe:2.3:a:openssl:openssl:3.0.7:*:*:*:*:*:*:*",
+                }
+            ],
+            "cves": [
+                {
+                    "cve_id": "CVE-2024-12345",
+                    "summary": "OpenSSL vulnerability affecting versions before 3.0.8",
+                    "cvss_score": 8.8,
+                    "severity": "high",
+                    "affected_packages": [
+                        {
+                            "name": "openssl",
+                            "ecosystem": "debian",
+                            "fixed_version": "3.0.8",
+                        }
+                    ],
+                }
+            ],
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["source"] == "deterministic"
+    assert len(payload["related_cves"]) == 1
+    assert payload["related_cves"][0]["cve_id"] == "CVE-2024-12345"
+    assert payload["related_cves"][0]["relevance"] == "relevant"
+
+
+def test_predict_cve_relevance_trivy_uses_adapter_path():
+    response = client.post(
+        "/predict/cve-relevance-trivy",
+        json={
+            "sbom_document": {
+                "Results": [
+                    {
+                        "Packages": [
+                            {
+                                "PkgName": "openssl",
+                                "InstalledVersion": "3.0.7",
+                                "Type": "debian",
+                                "PURL": "pkg:deb/debian/openssl@3.0.7",
+                                "CPEs": [
+                                    "cpe:2.3:a:openssl:openssl:3.0.7:*:*:*:*:*:*:*"
+                                ],
+                            }
+                        ]
+                    }
+                ]
+            },
+            "vulnerability_document": {
+                "Results": [
+                    {
+                        "Vulnerabilities": [
+                            {
+                                "VulnerabilityID": "CVE-2026-1000",
+                                "PkgName": "openssl",
+                                "PkgType": "debian",
+                                "InstalledVersion": "3.0.7",
+                                "FixedVersion": "3.0.8",
+                                "Title": "OpenSSL vulnerability",
+                                "Severity": "HIGH",
+                                "CVSS": {"nvd": {"V3Score": 8.8}},
+                            }
+                        ]
+                    }
+                ]
+            },
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["source"] == "deterministic"
+    assert len(payload["related_cves"]) == 1
+    assert payload["related_cves"][0]["cve_id"] == "CVE-2026-1000"
+    assert payload["related_cves"][0]["relevance"] == "relevant"
+
+
 def test_predict_upload_text_ingest_fallback_with_extracted_text():
     response = client.post(
         "/predict/upload-text-ingest",

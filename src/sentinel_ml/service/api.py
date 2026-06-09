@@ -36,6 +36,14 @@ from sentinel_ml import __version__
 from sentinel_ml.config import get_settings
 from sentinel_ml.data.predictions import upsert_ml_prediction_document
 from sentinel_ml.data.schemas import IOC, Prediction, UploadRecord
+from sentinel_ml.features.cve_relevance import (
+    CVERelevancePrediction,
+    build_cve_relevance_prediction,
+    cve_records_from_normalized,
+    cve_records_from_trivy,
+    sbom_components_from_normalized,
+    sbom_components_from_trivy,
+)
 from sentinel_ml.features.ioc_extract import extract_iocs
 from sentinel_ml.features.upload_meta import build_feature_matrix
 from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM
@@ -180,6 +188,11 @@ class CVERelevanceSummary(BaseModel):
 class CVERelevanceResponse(BaseModel):
     results: list[CVERelevanceItem]
     summary: CVERelevanceSummary
+
+
+class TrivyCVERelevanceRequest(BaseModel):
+    sbom_document: dict[str, Any]
+    vulnerability_document: dict[str, Any]
 
 
 class LiveFlowRequest(BaseModel):
@@ -467,6 +480,22 @@ def _cve_relevance(req: CVERelevanceRequest) -> CVERelevanceResponse:
     )
 
 
+def _cve_relevance_prediction(req: CVERelevanceRequest) -> CVERelevancePrediction:
+    components = sbom_components_from_normalized(
+        [component.model_dump(mode="json") for component in req.sbom_components]
+    )
+    cves = cve_records_from_normalized([cve.model_dump(mode="json") for cve in req.cves])
+    return build_cve_relevance_prediction(cves, components)
+
+
+def _cve_relevance_prediction_from_trivy(
+    req: TrivyCVERelevanceRequest,
+) -> CVERelevancePrediction:
+    components = sbom_components_from_trivy(req.sbom_document)
+    cves = cve_records_from_trivy(req.vulnerability_document)
+    return build_cve_relevance_prediction(cves, components)
+
+
 def _predict_upload_record(record: UploadRecord, request: Request) -> UploadResponse:
     loaded = _get_loaded(request, "upload_model")
     if loaded is None:
@@ -648,6 +677,18 @@ def create_app() -> FastAPI:
     @app.post("/predict/cve-relevance", response_model=CVERelevanceResponse)
     def predict_cve_relevance(req: CVERelevanceRequest) -> CVERelevanceResponse:
         return _cve_relevance(req)
+
+    @app.post("/predict/cve-relevance-prediction", response_model=CVERelevancePrediction)
+    def predict_cve_relevance_prediction(
+        req: CVERelevanceRequest,
+    ) -> CVERelevancePrediction:
+        return _cve_relevance_prediction(req)
+
+    @app.post("/predict/cve-relevance-trivy", response_model=CVERelevancePrediction)
+    def predict_cve_relevance_trivy(
+        req: TrivyCVERelevanceRequest,
+    ) -> CVERelevancePrediction:
+        return _cve_relevance_prediction_from_trivy(req)
 
     @app.post("/predict/liveflow", response_model=LiveFlowResponse)
     def predict_liveflow(req: LiveFlowRequest, request: Request) -> LiveFlowResponse:
