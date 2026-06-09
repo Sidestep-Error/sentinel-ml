@@ -15,8 +15,6 @@ still answers during development.
 from __future__ import annotations
 
 import csv
-from email import policy
-from email.parser import Parser
 import hashlib
 import io
 import json
@@ -25,6 +23,8 @@ import re
 from collections.abc import Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from email import policy
+from email.parser import Parser
 from pathlib import Path
 from typing import Any
 
