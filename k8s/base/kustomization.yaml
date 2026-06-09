@@ -6,6 +6,7 @@ resources:
   # secret.yaml är gitignored — kopiera secret.example.yaml och fyll i värden
   # innan första apply. Se runbooks/sentinel-ml-deploy.md.
   - secret.yaml
+  - pvc.yaml
   - deployment.yaml
   - service.yaml
   - networkpolicy.yaml
