@@ -39,6 +39,8 @@ ringer `/predict/threat` och `/predict/upload` synkront eller asynkront.
 | POST | `/predict/cve-relevance` | SBOM/CVE payload | `{results, summary}` med relevansscore per CVE |
 | POST | `/predict/upload-text-ingest` | Upload+text payload | `{upload_id, source, prediction, iocs, extracted_text, text_truncated, ...}` |
 | POST | `/predict/liveflow` | Kombinerad payload | `{upload_result, upload_text_result, cve_relevance_result, summary}` |
+| POST | `/predict/liveflow-document` | Kombinerad payload | `{upload_id, ml_provider, ml_liveflow, created_at}` |
+| POST | `/predict/liveflow-writeback` | Kombinerad payload | `{persisted, collection, document}` |
 
 **Authentication:** För kursprojektets demo räcker ingen auth (intern K8s-service,
 NetworkPolicy begränsar tillgång). I produktion: mTLS eller delad HMAC-secret.
@@ -212,3 +214,5 @@ Implementerat API-stöd för steg 4 (backend-aggregator):
 - `/predict/liveflow` accepterar valfria delobjekt: `upload`, `upload_text`, `cve_relevance`.
 - Returnerar delresultat per flöde + en `summary` med indikatorer (`has_*`) samt nyckeltal (`ioc_count`, `matched_cves`).
 - Gör det enkelt för UI att rendera ett sammanhållet demoresultat från en enda request.
+- `/predict/liveflow-document` returnerar samma innehåll inbäddat i ett write-back-färdigt dokument för `ml_predictions`.
+- `/predict/liveflow-writeback` gör samma sak och skriver dessutom dokumentet direkt till `ml_predictions`.

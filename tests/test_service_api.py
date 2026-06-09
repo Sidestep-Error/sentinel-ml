@@ -14,6 +14,7 @@ from fastapi.testclient import TestClient
 from sentinel_ml.data.schemas import UploadRecord
 from sentinel_ml.features.upload_meta import build_feature_matrix
 from sentinel_ml.models import threat_classifier, upload_classifier
+from sentinel_ml.service import api as service_api
 from sentinel_ml.service.api import app, create_app
 
 # Module-level client uses the package's `app`, which was created without a
@@ -398,3 +399,141 @@ def test_predict_liveflow_uses_loaded_models(app_with_models):
     assert payload["upload_result"]["model_version"] != "none"
     assert payload["upload_text_result"]["prediction"]["label"] in {"ransomware", "phishing"}
     assert payload["upload_text_result"]["model_version"] != "none"
+
+
+def test_predict_liveflow_document_wraps_response_for_ml_predictions():
+    response = client.post(
+        "/predict/liveflow-document",
+        json={
+            "upload": {
+                "upload_id": "upload-300",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "size_bytes": 58213,
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "risk_score": 78,
+                "source": "upload",
+            }
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["upload_id"] == "upload-300"
+    assert payload["ml_provider"] == "sentinel-ml"
+    assert payload["ml_liveflow"]["summary"]["has_upload"] is True
+    assert payload["ml_liveflow"]["summary"]["has_upload_text"] is False
+    assert payload["ml_liveflow"]["upload_result"]["source"] == "upload"
+    assert payload["ml_liveflow"]["upload_result"]["prediction"]["label"] == "unknown"
+    assert payload["created_at"].endswith("Z")
+
+
+def test_predict_liveflow_document_uses_loaded_models(app_with_models):
+    with TestClient(app_with_models) as c:
+        response = c.post(
+            "/predict/liveflow-document",
+            json={
+                "upload": {
+                    "upload_id": "upload-301",
+                    "filename": "invoice.eml",
+                    "content_type": "message/rfc822",
+                    "size_bytes": 58213,
+                    "scan_status": "malicious",
+                    "scan_engine": "clamav",
+                    "scan_detail": "Phishing.Email.Generic",
+                    "risk_score": 78,
+                    "source": "upload",
+                },
+                "upload_text": {
+                    "upload_id": "upload-301",
+                    "filename": "invoice.eml",
+                    "content_type": "message/rfc822",
+                    "scan_status": "malicious",
+                    "scan_engine": "clamav",
+                    "scan_detail": "Phishing.Email.Generic",
+                    "extracted_text": "ransomware activity on host and CVE-2024-99999",
+                    "source": "upload_text",
+                },
+            },
+        )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["upload_id"] == "upload-301"
+    assert payload["ml_provider"] == "sentinel-ml"
+    assert payload["ml_liveflow"]["upload_result"]["model_version"] != "none"
+    assert payload["ml_liveflow"]["upload_text_result"]["model_version"] != "none"
+    assert payload["ml_liveflow"]["summary"]["has_upload"] is True
+    assert payload["ml_liveflow"]["summary"]["has_upload_text"] is True
+
+
+def test_predict_liveflow_document_rejects_request_without_upload_id():
+    response = client.post(
+        "/predict/liveflow-document",
+        json={
+            "cve_relevance": {
+                "sbom_components": [{"name": "openssl", "version": "3.0.7"}],
+                "cves": [],
+            }
+        },
+    )
+    assert response.status_code == 400
+    assert "upload_id" in response.json()["detail"]
+
+
+def test_predict_liveflow_writeback_persists_document(monkeypatch):
+    stored: dict[str, object] = {}
+
+    def fake_upsert(document):
+        stored["document"] = document.model_dump(mode="json")
+
+    monkeypatch.setattr(service_api, "upsert_ml_prediction_document", fake_upsert)
+
+    response = client.post(
+        "/predict/liveflow-writeback",
+        json={
+            "upload": {
+                "upload_id": "upload-400",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "size_bytes": 58213,
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "risk_score": 78,
+                "source": "upload",
+            }
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["persisted"] is True
+    assert payload["collection"] == "ml_predictions"
+    assert payload["document"]["upload_id"] == "upload-400"
+    assert stored["document"]["upload_id"] == "upload-400"
+
+
+def test_predict_liveflow_writeback_returns_503_on_persist_failure(monkeypatch):
+    def fake_upsert(_document):
+        raise RuntimeError("mongo unavailable")
+
+    monkeypatch.setattr(service_api, "upsert_ml_prediction_document", fake_upsert)
+
+    response = client.post(
+        "/predict/liveflow-writeback",
+        json={
+            "upload": {
+                "upload_id": "upload-401",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "size_bytes": 58213,
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "risk_score": 78,
+                "source": "upload",
+            }
+        },
+    )
+    assert response.status_code == 503
+    assert response.json()["detail"] == "failed to persist ml prediction document"

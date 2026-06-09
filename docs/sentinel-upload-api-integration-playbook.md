@@ -119,6 +119,18 @@ Spara ML-svar i `ml_predictions` med `upload_id` som nyckel:
 }
 ```
 
+Det formatet kan nu hämtas direkt via `POST /predict/liveflow-document`, vilket gör
+att `sentinel-upload-api` kan skriva vidare resultatet till `ml_predictions`
+utan att bygga ett eget wrapper-objekt först.
+
+Om första integrationssteget ska lägga över själva skrivningen på `sentinel-ml`
+finns också:
+
+- `POST /predict/liveflow-writeback`
+
+Den endpointen bygger liveflow-dokumentet och gör en `upsert` i `ml_predictions`
+med `upload_id` som nyckel.
+
 ## 5. UI-koppling (minsta demo)
 
 Visa dessa fält i upload-detalj:
