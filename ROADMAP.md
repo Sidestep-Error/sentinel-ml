@@ -56,8 +56,8 @@ Detaljerad cross-repo-plan finns i `docs/sentinel-upload-api-integration-playboo
 - [x] Kör slutlig eval för threat-klassificeraren och skriv in slutliga tabeller i `docs/technical-report.md`.
 - [x] Fyll i jämförelsemodeller (spaCy/LLM) — dokumenterade som ej valda med motivering + evidens (latency, IOC-uppgift vs klassificeringsuppgift). IOC-jämförelse (regex vs spaCy på 30 CTI-dokument) tillagd som sektion 5.1.1.
 - [x] Verifiera IOC-extraktion med jämförelsescript och lägg in kort resultatsammanfattning i rapporten.
-- [ ] Säkerställ att `/predict/threat` visar: kategori, confidence, IOCs och model_version i demo-flödet.
-- [ ] Lägg in 3 realistiska demoexempel (phishing, ransomware, intrusion) med förväntad output.
+- [x] Säkerställ att `/predict/threat` visar: kategori, confidence, IOCs och model_version i demo-flödet. ✓ Verifierat via TestClient.
+- [x] Lägg in 3 realistiska demoexempel (phishing, ransomware, intrusion) med förväntad output. ✓ Se `docs/demo-examples.md`.
 
 **Klart när:** metrics + modellval + API-demo + IOC-evidens finns dokumenterat och är reproducerbart.
 

@@ -36,7 +36,6 @@ from sentinel_ml.config import get_settings
 from sentinel_ml.data.schemas import IOC, Prediction, UploadRecord
 from sentinel_ml.features.ioc_extract import extract_iocs
 from sentinel_ml.features.upload_meta import build_feature_matrix
-from sentinel_ml.llm.ollama_client import OllamaClient
 from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM
 from sentinel_ml.log_anomaly import tfidf_detector
 from sentinel_ml.models import threat_classifier, upload_classifier
@@ -261,8 +260,15 @@ def _get_loaded(request: Request, attr: str) -> LoadedModel | None:
 
 
 def _call_ollama(text: str) -> LLMAnalysis | None:
-    """Call Ollama for LLM-based threat classification. Returns None on any failure."""
+    """Call Ollama for LLM-based threat classification. Returns None on any failure.
+
+    OllamaClient is imported locally so the optional ``[llm]`` dependency
+    (httpx) is only required when the LLM path actually runs. The production
+    image installs base deps only — a missing httpx degrades to None here
+    instead of crashing the service at import time.
+    """
     try:
+        from sentinel_ml.llm.ollama_client import OllamaClient  # noqa: PLC0415
         client = OllamaClient(timeout=30.0)
         response = client.generate(prompt=text, system=CLASSIFY_THREAT_REPORT_SYSTEM)
         data = json.loads(response.text)
