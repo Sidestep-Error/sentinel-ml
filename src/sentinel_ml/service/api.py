@@ -83,6 +83,7 @@ class UploadIngestRequest(BaseModel):
     upload_id: str
     filename: str
     content_type: str
+    sha256: str | None = None
     size_bytes: int | None = None
     scan_status: str = "clean"
     scan_engine: str = "unknown"
@@ -466,6 +467,7 @@ def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> Upload
     record = UploadRecord(
         filename=req.filename,
         content_type=req.content_type,
+        sha256=req.sha256,
         size_bytes=req.size_bytes,
         scan_status=req.scan_status,
         decision="accepted",

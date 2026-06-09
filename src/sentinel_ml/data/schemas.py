@@ -75,6 +75,7 @@ class UploadRecord(BaseModel):
 
     filename: str
     content_type: str
+    sha256: str | None = None
     size_bytes: int | None = Field(default=None, ge=0)
     scan_status: str = "clean"  # "clean" | "malicious" | "error"
     decision: str = "accepted"  # "accepted" | "review" | "rejected"
