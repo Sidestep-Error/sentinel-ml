@@ -1,6 +1,6 @@
 # LLM/CVE-översikt
 
-Det här dokumentet är startpunkten för LLM/CVE-spåret i `sentinel-ml`.
+Startpunkt för LLM/CVE-delarna i `sentinel-ml`.
 
 ## Syfte
 
@@ -18,6 +18,12 @@ Spåret täcker två områden:
    - stöd för `Trivy`-liknande input
    - serialiserbar output för vidare integration
 
+## Dokumentstruktur
+
+- `src/sentinel_ml/llm/README.md`: översikt, status och beslut
+- `docs/llm-cve-technical-reference.md`: teknisk referens för LLM-moduler, skydd och tester
+- `docs/llm-cve-integration-guide.md`: integrationsflöden, payloads och endpoint-exempel
+
 ## Viktigaste beslut
 
 - `LLM` körs lokalt via `Ollama`
@@ -29,13 +35,16 @@ Spåret täcker två områden:
 
 ## Status
 
-Det som är byggt:
+Byggt just nu:
 
 - `ollama_client.py`, `prompts.py`, `schemas.py`, `classifier.py`
 - strikt JSON-parse och schema-validering för LLM-output
 - zero-shot-benchmark för threat reports
 - deterministisk CVE/SBOM-kärna
 - API-endpoints för:
+  - `POST /predict/upload-text-ingest`
+  - `POST /predict/liveflow`
+  - `POST /predict/liveflow-document`
   - `POST /predict/liveflow-writeback`
   - `POST /predict/cve-relevance`
   - `POST /predict/cve-relevance-prediction`
@@ -76,5 +85,5 @@ Slutsats:
 
 ## Läs vidare
 
-- [Teknisk LLM-dokumentation](/home/viktor/sentinel-ml/docs/llm-technical-reference.md)
+- [LLM/CVE teknisk referens](/home/viktor/sentinel-ml/docs/llm-cve-technical-reference.md)
 - [LLM/CVE-integrationsguide](/home/viktor/sentinel-ml/docs/llm-cve-integration-guide.md)

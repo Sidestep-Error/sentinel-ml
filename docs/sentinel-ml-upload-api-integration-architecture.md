@@ -1,4 +1,4 @@
-# Integration med sentinel-upload-api
+# Arkitektur för integration mellan sentinel-ml och sentinel-upload-api
 
 ## Princip
 

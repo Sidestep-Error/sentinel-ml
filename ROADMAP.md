@@ -31,7 +31,7 @@ Praktisk prioritet för tidsplan:
 - [x] Sammanhållet liveflöde (backend-aggregator `/predict/liveflow`)
 - [ ] Sammanhållet liveflöde i UI
 
-Detaljerad cross-repo-plan finns i `docs/sentinel-upload-api-integration-playbook.md`.
+Detaljerad cross-repo-plan finns i `docs/sentinel-ml-upload-api-integration-architecture.md`.
 
 ## Projektkrav status (2026-06-08)
 

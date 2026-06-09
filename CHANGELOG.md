@@ -14,7 +14,7 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `POST /predict/cve-relevance` — SBOM/CVE-relevans med komponentmatchning (namn/ekosystem/version)
   - `POST /predict/upload-text-ingest` — säkert text-ingestflöde för `.txt`, `.md`, `.json`, `.csv`, `.eml` med IOC-extraktion
   - `POST /predict/liveflow` — aggregator som sammanfogar upload, upload-text och cve-relevans i ett enhetligt demosvar
-- **`docs/sentinel-upload-api-integration-playbook.md`** — konkret cross-repo guide för integration i `sentinel-upload-api` (klient, payload-mappning, persistens, UI, DoD)
+- **`docs/llm-cve-integration-guide.md`** — konkret integrationsguide för LLM/CVE-flöden, payloads, persistens och endpoint-exempel
 - **`tests/test_service_api.py`** — nya API-tester för `upload-ingest`, `cve-relevance`, `upload-text-ingest` och `liveflow` (fallback + loaded-model paths)
 - **`scripts/generate_synthetic_threat_reports.py`** — genererar 250 syntetiska threat reports (50/kategori) i JSONL-format för baseline-träning (#28)
 - **`scripts/download_real_threat_reports.py`** — laddar ner och konverterar `mrmoor/cyber-threat-intelligence` (CC-BY-4.0, ~10k rader) till ThreatReport JSONL; keyword-baserad dokumentklassificering ger 1 582 lablade rapporter (#29)
@@ -47,7 +47,7 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `src/sentinel_ml/cli.py` — tre nya kommandon tillagda
 - `pyproject.toml` — lade till `S311`-undantag i per-file-ignores för `generate_data.py` och `attack.py` (pseudo-slump för syntetisk data, ej kryptografisk)
 - `src/sentinel_ml/data/schemas.py` — `MalwareSample` återinförd för att återställa reproducerbar malware-evaluering
-- `docs/integration-with-sentinel-upload-api.md` — uppdaterad endpoint-tabell och kontrakt för upload/ClamAV, text-ingest, CVE-relevans och liveflow
+- `docs/sentinel-ml-upload-api-integration-architecture.md` — uppdaterad endpoint-tabell och kontrakt för upload/ClamAV, text-ingest, CVE-relevans och liveflow
 - `ROADMAP.md` — uppdaterad med avbockade levererade integrationssteg samt ärlig status för G/VG-projektkraven
 
 ---
@@ -92,7 +92,7 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - **Spår C** — Adversarial harness: evasion (ART), data poisoning, prompt injection
 - `pyproject.toml` med pinnade beroenden och ruff/pytest-konfiguration
 - CI-pipeline (GitHub Actions): ruff, pytest, pip-audit
-- Dokumentation: `docs/architecture.md`, `docs/data-sources.md`, `docs/integration-with-sentinel-upload-api.md`, `docs/adversarial-analysis-plan.md`
+- Dokumentation: `docs/architecture.md`, `docs/data-sources.md`, `docs/sentinel-ml-upload-api-integration-architecture.md`, `docs/adversarial-analysis-plan.md`
 - `ROADMAP.md` med fas-indelning och rollfördelning
 - Kursledare godkände scope (`bygga vidare på Sentinel`)
 
