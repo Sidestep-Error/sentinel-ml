@@ -24,6 +24,7 @@ class Settings(BaseSettings):
         default="mongodb://localhost:27017/sentinel_upload", alias="MONGODB_URI"
     )
     mongodb_db: str = Field(default="sentinel_upload", alias="MONGODB_DB")
+    mongodb_db_upload: str = Field(default="sentinel_upload", alias="MONGODB_DB_UPLOAD")
 
     # --- LLM (Ollama, local) ---
     ollama_host: str = Field(default="http://localhost:11434", alias="OLLAMA_HOST")

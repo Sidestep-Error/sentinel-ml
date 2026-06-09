@@ -1,5 +1,13 @@
 #!/usr/bin/env python
-"""Download and convert mrmoor/cyber-threat-intelligence to ThreatReport JSONL."""
+"""Download and convert mrmoor/cyber-threat-intelligence to ThreatReport JSONL.
+
+License: CC-BY-4.0  https://huggingface.co/datasets/mrmoor/cyber-threat-intelligence
+Label strategy: keyword-based document classification (ransomware > phishing > ddos > malware > intrusion).
+Documents matching no category are skipped.
+
+Usage:
+  python scripts/download_real_threat_reports.py
+"""
 
 from __future__ import annotations
 
