@@ -9,8 +9,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from sentinel_ml.llm.ollama_client import OllamaClient
-
 logger = logging.getLogger(__name__)
 
 _SYSTEM_PROMPT = (
@@ -34,7 +32,7 @@ def _rule_based_summary(alerts: list[dict[str, Any]]) -> str:
 def summarize_alerts(
     alerts: list[dict[str, Any]],
     *,
-    client: OllamaClient | None = None,
+    client: Any | None = None,
 ) -> str:
     """Generate an LLM incident summary. Falls back to rule-based if Ollama fails."""
     if not alerts:
@@ -47,6 +45,7 @@ def summarize_alerts(
     prompt = f"Säkerhetsanomalier:\n{alert_text}\n\nSkriv en incidentsammanfattning."
 
     try:
+        from sentinel_ml.llm.ollama_client import OllamaClient  # noqa: PLC0415
         llm = client or OllamaClient()
         response = llm.generate(prompt, system=_SYSTEM_PROMPT)
         return response.text

