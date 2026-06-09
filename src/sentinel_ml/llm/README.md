@@ -66,6 +66,31 @@ Byggt just nu:
 - vidare LLM-analys
 - prompt-injection-underlag för adversarial-spåret
 
+## Lokal Ollama med Docker
+
+Lokal Ollama kan köras via repoets `docker-compose.yml`.
+
+Starta Ollama:
+
+```bash
+docker compose --profile with-ollama up -d ollama
+docker exec -it sentinel-ml-ollama ollama pull llama3.2:3b
+```
+
+Kör `sentinel-ml` mot Docker-Ollama:
+
+```bash
+OLLAMA_HOST=http://ollama:11434 docker compose --profile with-ollama up -d sentinel-ml
+```
+
+Verifiera att modellen finns:
+
+```bash
+curl http://localhost:11434/api/tags
+```
+
+Om `llama3.2:3b` syns i svaret är lokal Ollama redo för LLM-test och integration.
+
 ## Benchmarkläge
 
 | Modell | Accuracy | F1-macro | Precision-macro | Recall-macro |
