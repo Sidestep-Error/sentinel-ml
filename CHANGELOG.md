@@ -6,6 +6,29 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased] — branch `feat/ML`
+
+### Tillagt (2026-06-09)
+
+- **`scripts/generate_upload_training_data.py`** — genererar 2 000 träningsposter för upload-klassificeraren: 1 000 malicious mappade från `data/malware_samples.jsonl` (MalwareBazaar-metadata) + 1 000 syntetiska clean-filer (PDF/PNG/CSV/TXT). Alla poster har `scan_status="clean"` för att simulera att ClamAV inte flaggat filen — exakt det use-case modellen ska täcka.
+- **`scripts/train_upload_classifier.py`** — tränar upload-klassificeraren från JSONL-fil med label-fält; rapporterar accuracy/precision/recall/F1 per klass samt feature importance-tabell.
+- **`tests/test_outcomes.py`** — 8 outcome-tester som verifierar att ML-modellerna ger rätt svar på kända indata (inte bara att svarsstrukturen är korrekt): phishing→phishing, ransomware→ransomware, intrusion→intrusion med confidence-trösklar; SSH-brute-force→flaggad, normala loggar→ej flaggade. Hoppar automatiskt om artefakter saknas.
+- **`scripts/demo_attack_live.py`** — Best Heist-demo: genererar attackloggar lokalt och skickar dem till en körande sentinel-ml-service (Hetzner eller localhost) via HTTP `/predict/log-anomaly`. Visar detektionsgrad före och efter mimicry-kamouflering; avslöjar att 77 % av genererade attackloggar redan undkommer detektion utan någon modifiering.
+- **`docs/demo-examples.md`** — Scenario 4 (Log-anomali) tillagd med verifierad before/after-tabell och talkpunkter för presentationen.
+- **MongoDB-ingest** — 2 000 träningsposter infogade i `uploads`-collection (totalt 2 017 poster, `rejected: 1011 / accepted: 1006`). Löser Jon:s klass-distributions-fråga.
+
+### Fixat (2026-06-09)
+
+- **`src/sentinel_ml/llm/__init__.py`** — merge-artefakt från `feat/llm-cve`: filen innehöll dubbel docstring och `from __future__ import annotations` efter module-level imports. Rensat till minimal version utan eagera httpx-beroenden (se varning i filen).
+- **`src/sentinel_ml/log_anomaly/summarize.py`** — samma lazy-import-fix som `api.py` (#44): `OllamaClient` importeras nu inuti `summarize_alerts` istället för på modulnivå, så prod-imagen startar utan httpx.
+- **`src/sentinel_ml/service/api.py`** — `sha256: str | None = None` tillagd i `UploadIngestRequest` och passeras vidare till `UploadRecord`; löser kontraktsmissmatch som Jon identifierade.
+- **`src/sentinel_ml/data/schemas.py`** — `sha256: str | None = None` tillagd i `UploadRecord` för att spegla upstream sentinel-upload-api.
+- **`tests/test_service_api.py`** — uppdaterad assertion i `test_predict_liveflow_fallback_combines_all_parts` för att acceptera både `"none"` och 12-tecken hash (nu när `upload_classifier.joblib` existerar).
+- **`docs/technical-report.md`** — alla "Pågår"-platshållare stängda: metodjämförelsetabell för Spår A omskriven med explicit beslut och IOC-jämförelsedata; Spår B strukturerad IsolationForest beskriven korrekt som osupervisad; adversarial-status uppdaterad per experiment.
+- **git-historik** — Copilot-commit `07755ac` på `feat/ML` skriven om till `kristoffer.toivanen@chasacademy.se` via `git filter-branch`; force-push med `--force-with-lease`.
+
+---
+
 ## [Unreleased] — branch `stoffes_feature`
 
 ### Tillagt
