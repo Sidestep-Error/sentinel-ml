@@ -2,6 +2,16 @@
 
 Det här katalogen innehåller den första fungerande LLM-integrationen för `sentinel-ml`.
 
+## Nuvarande roll i projektet
+
+LLM-spåret är i nuläget främst ett **offline-spår** för:
+
+- benchmark och jämförelse mot klassiska modeller
+- strukturerad säkerhetsanalys i rapport och demo
+- vidareutveckling av CVE-relevans ovanpå deterministisk logik
+
+Det betyder att **LLM inte är tänkt som primär live-klassificering** i det första driftflödet. Den rollen ligger just nu på de **klassiska modellerna**, eftersom de är snabbare, mer deterministiska och gav bättre resultat på samma testset.
+
 Målet med implementationen är att kunna använda lokal Ollama för två typer av säkerhetsrelaterad inferens:
 
 - zero-shot-klassificering av threat reports
@@ -73,7 +83,7 @@ Viktiga funktioner:
 - `try_classify_threat_report(text, ...)`
 - `classify_cve_relevance(cve_text, stack_summary, ...)`
 
-`try_classify_threat_report()` är avsedd för säker inkoppling i API-lagret. Den returnerar ett validerat resultat när LLM-flödet fungerar och `None` när LLM-anropet eller JSON-valideringen faller. På så sätt kan `service/api.py` använda ett enkelt fallback-kontrakt utan att bero på att modellen alltid svarar korrekt.
+`try_classify_threat_report()` är byggd för säker framtida inkoppling i API-lagret. Den returnerar ett validerat resultat när LLM-flödet fungerar och `None` när LLM-anropet eller JSON-valideringen faller. På så sätt kan `service/api.py` använda ett enkelt fallback-kontrakt utan att bero på att modellen alltid svarar korrekt.
 
 ## Hur flödet fungerar
 
@@ -100,6 +110,36 @@ Om modellen svarar med fri text, markdown, fel keys eller ogiltiga värden kasta
 5. Modellens svar parseas och valideras mot `CVERelevanceResult`.
 
 Det här gör att LLM-delen blir ett kontrollerat analyslager, inte en fri textgenerator som resten av systemet måste gissa sig runt.
+
+## Benchmarkläge
+
+På samma testset och split som den klassiska modellen är nuläget:
+
+| Modell | Accuracy | F1-macro | Precision-macro | Recall-macro |
+|---|---:|---:|---:|---:|
+| `TF-IDF + Logistic Regression` | `0.943` | `0.875` | `0.955` | `0.841` |
+| `LLM zero-shot (llama3.2:3b)` | `0.672` | `0.413` | `0.460` | `0.400` |
+
+Kompletterande observationer för LLM-spåret:
+
+- genomsnittlig latens: cirka `462 ms`
+- ogiltiga JSON-svar: `6` av `317`
+
+Slutsatsen just nu är därför:
+
+- **klassisk modell** är bäst lämpad för första liveflödet
+- **LLM** behålls som benchmark-, analys- och vidareutvecklingsspår
+- **spaCy** är fortfarande relevant i jämförelsen, men dess klassificeringssiffror är ännu inte ifyllda
+
+## Hur detta används i Sentinel just nu
+
+Den praktiska riktningen i projektet är:
+
+1. **Liveflöde:** metadata + `ClamAV` + klassisk modell
+2. **Nästa steg om tid finns:** textextraktion + `IOC`-extraktion för `.txt`, `.md`, `.json`, `.csv`, `.eml`
+3. **Offline-spår:** LLM-benchmark, strukturerad hotanalys och vidare arbete med CVE-relevans
+
+Det betyder att katalogen `src/sentinel_ml/llm/` främst beskriver den byggda **LLM-grunden**, inte att hela upload-flödet redan kör LLM live i produktion eller demo.
 
 ## Säkerhetsmodell
 
