@@ -35,6 +35,10 @@ ringer `/predict/threat` och `/predict/upload` synkront eller asynkront.
 | GET | `/health` | – | `{status, version}` |
 | POST | `/predict/threat` | `{text: str}` | `{category, confidence, iocs, model_version}` |
 | POST | `/predict/upload` | `UploadRecord` JSON | `{label, confidence, explanation, model_version}` |
+| POST | `/predict/upload-ingest` | Upload+ClamAV payload | `{upload_id, source, prediction, model_version, ...}` |
+| POST | `/predict/cve-relevance` | SBOM/CVE payload | `{results, summary}` med relevansscore per CVE |
+| POST | `/predict/upload-text-ingest` | Upload+text payload | `{upload_id, source, prediction, iocs, extracted_text, text_truncated, ...}` |
+| POST | `/predict/liveflow` | Kombinerad payload | `{upload_result, upload_text_result, cve_relevance_result, summary}` |
 
 **Authentication:** För kursprojektets demo räcker ingen auth (intern K8s-service,
 NetworkPolicy begränsar tillgång). I produktion: mTLS eller delad HMAC-secret.
@@ -102,3 +106,109 @@ Final decision: accepted
 | `ml_predictions`-collection läsning | ✓ | – |
 | UI som visar ML-output | ✓ | – |
 | Adversarial test-data | – | ✓ |
+
+## Kontraktsförslag för demo-flöde (2026-06-08)
+
+För att minimera integrationsrisk används följande payload-kontrakt mellan
+upload/scan, ML och LLM-delarna.
+
+### 1) Upload + ClamAV -> ML/LLM ingress
+
+```json
+{
+  "upload_id": "upload-123",
+  "filename": "invoice.eml",
+  "content_type": "message/rfc822",
+  "size_bytes": 58213,
+  "scan_status": "malicious",
+  "scan_engine": "clamav",
+  "scan_detail": "Phishing.Email.Generic",
+  "risk_score": 78,
+  "source": "upload"
+}
+```
+
+Syfte:
+
+- Första AI/ML-flöde med låg integrationskostnad.
+- Kan användas direkt för metadata-baserad klassificering och prioritering.
+
+### 2) Upload + extraherad text -> LLM/IOC
+
+```json
+{
+  "upload_id": "upload-123",
+  "filename": "invoice.eml",
+  "content_type": "message/rfc822",
+  "scan_status": "malicious",
+  "scan_engine": "clamav",
+  "scan_detail": "Phishing.Email.Generic",
+  "extracted_text": "Please review the attached payroll update and log in here...",
+  "source": "upload_text"
+}
+```
+
+Syfte:
+
+- Underlag för IOC-extraktion och LLM-analys i samma request-kontext.
+- Kräver parsersteg för .txt/.md/.json/.csv/.eml innan anrop.
+
+Implementerat API-stöd:
+
+- `/predict/upload-text-ingest` accepterar antingen färdig `extracted_text` eller `raw_content`.
+- Vid `raw_content` sker typstyrd extraktion för `.txt`, `.md`, `.json`, `.csv`, `.eml`.
+- Säkerhetsräcken: kontrollteckensrensning, max inlängd och truncering (`text_truncated`).
+
+### 3) SBOM/CVE -> CVE-relevans
+
+```json
+{
+  "sbom_components": [
+    {
+      "name": "openssl",
+      "version": "3.0.7",
+      "ecosystem": "debian",
+      "purl": "pkg:deb/debian/openssl@3.0.7",
+      "cpe": "cpe:2.3:a:openssl:openssl:3.0.7:*:*:*:*:*:*:*"
+    }
+  ],
+  "cves": [
+    {
+      "cve_id": "CVE-2024-12345",
+      "summary": "OpenSSL vulnerability affecting versions before 3.0.8",
+      "cvss_score": 8.8,
+      "severity": "high",
+      "affected_packages": [
+        {
+          "name": "openssl",
+          "ecosystem": "debian",
+          "fixed_version": "3.0.8"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Syfte:
+
+- Knyta Trivy/SBOM-data till CVE-relevansgradering i threat-flödet.
+- Låg modellrisk, hög nytta för operativ prioritering.
+
+Förväntad respons från `/predict/cve-relevance`:
+
+- `results[]`: en rad per CVE med `relevance_score`, `matched_components` och kort `reason`.
+- `summary`: antal matchade CVE och antal high/critical som matchar er SBOM.
+
+### Rekommenderad implementationsordning
+
+1. Upload + ClamAV -> ML
+2. SBOM/CVE -> relevans
+3. Upload text -> LLM/IOC
+4. Slå ihop allt i ett enhetligt liveflöde i UI
+
+Implementerat API-stöd för steg 4 (backend-aggregator):
+
+- `/predict/liveflow` accepterar valfria delobjekt: `upload`, `upload_text`, `cve_relevance`.
+- Returnerar delresultat per flöde + en `summary` med indikatorer (`has_*`) samt nyckeltal (`ioc_count`, `matched_cves`).
+- Gör det enkelt för UI att rendera ett sammanhållet demoresultat från en enda request.

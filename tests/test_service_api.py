@@ -60,6 +60,30 @@ def test_predict_upload_fallback_shape_when_no_model(sample_upload_record: Uploa
     assert payload["model_version"] == "none"
 
 
+def test_predict_upload_ingest_fallback_shape_when_no_model():
+    response = client.post(
+        "/predict/upload-ingest",
+        json={
+            "upload_id": "upload-123",
+            "filename": "invoice.eml",
+            "content_type": "message/rfc822",
+            "size_bytes": 58213,
+            "scan_status": "malicious",
+            "scan_engine": "clamav",
+            "scan_detail": "Phishing.Email.Generic",
+            "risk_score": 78,
+            "source": "upload",
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["upload_id"] == "upload-123"
+    assert payload["source"] == "upload"
+    assert payload["prediction"]["label"] == "unknown"
+    assert payload["prediction"]["confidence"] == 0.0
+    assert payload["model_version"] == "none"
+
+
 def _make_upload_record(scan_status: str, filename: str, size: int) -> UploadRecord:
     return UploadRecord(
         sha256="a" * 64,
@@ -131,3 +155,246 @@ def test_predict_upload_uses_loaded_model(
     assert 0.0 <= payload["prediction"]["confidence"] <= 1.0
     assert payload["model_version"] != "none"
     assert len(payload["model_version"]) == 12
+
+
+def test_predict_upload_ingest_uses_loaded_model(app_with_models):
+    with TestClient(app_with_models) as c:
+        response = c.post(
+            "/predict/upload-ingest",
+            json={
+                "upload_id": "upload-123",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "size_bytes": 58213,
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "risk_score": 78,
+                "source": "upload",
+            },
+        )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["upload_id"] == "upload-123"
+    assert payload["source"] == "upload"
+    assert payload["prediction"]["label"] in {"clean", "malicious"}
+    assert 0.0 <= payload["prediction"]["confidence"] <= 1.0
+    assert payload["model_version"] != "none"
+    assert len(payload["model_version"]) == 12
+
+
+def test_predict_cve_relevance_matches_sbom_components():
+    response = client.post(
+        "/predict/cve-relevance",
+        json={
+            "sbom_components": [
+                {
+                    "name": "openssl",
+                    "version": "3.0.7",
+                    "ecosystem": "debian",
+                    "purl": "pkg:deb/debian/openssl@3.0.7",
+                    "cpe": "cpe:2.3:a:openssl:openssl:3.0.7:*:*:*:*:*:*:*",
+                }
+            ],
+            "cves": [
+                {
+                    "cve_id": "CVE-2024-12345",
+                    "summary": "OpenSSL vulnerability affecting versions before 3.0.8",
+                    "cvss_score": 8.8,
+                    "severity": "high",
+                    "affected_packages": [
+                        {
+                            "name": "openssl",
+                            "ecosystem": "debian",
+                            "fixed_version": "3.0.8",
+                        }
+                    ],
+                }
+            ],
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["summary"]["total_cves"] == 1
+    assert payload["summary"]["matched_cves"] == 1
+    assert payload["summary"]["matched_high_or_critical"] == 1
+    assert len(payload["results"]) == 1
+    assert payload["results"][0]["cve_id"] == "CVE-2024-12345"
+    assert payload["results"][0]["relevance_score"] > 0.0
+    assert len(payload["results"][0]["matched_components"]) == 1
+
+
+def test_predict_upload_text_ingest_fallback_with_extracted_text():
+    response = client.post(
+        "/predict/upload-text-ingest",
+        json={
+            "upload_id": "upload-123",
+            "filename": "invoice.eml",
+            "content_type": "message/rfc822",
+            "scan_status": "malicious",
+            "scan_engine": "clamav",
+            "scan_detail": "Phishing.Email.Generic",
+            "extracted_text": "Please review and login at http://evil.example now",
+            "source": "upload_text",
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["upload_id"] == "upload-123"
+    assert payload["source"] == "upload_text"
+    assert payload["prediction"]["label"] == "unknown"
+    assert payload["model_version"] == "none"
+    assert payload["text_truncated"] is False
+    ioc_values = {i["value"] for i in payload["iocs"]}
+    assert "http://evil.example" in ioc_values
+
+
+def test_predict_upload_text_ingest_extracts_eml_and_uses_model(app_with_models):
+    raw_eml = (
+        "From: attacker@example.com\n"
+        "Subject: Payroll update\n"
+        "\n"
+        "Urgent ransomware activity detected on host. CVE-2024-99999"
+    )
+    with TestClient(app_with_models) as c:
+        response = c.post(
+            "/predict/upload-text-ingest",
+            json={
+                "upload_id": "upload-124",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "raw_content": raw_eml,
+                "source": "upload_text",
+            },
+        )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["model_version"] != "none"
+    assert payload["prediction"]["label"] in {"ransomware", "phishing"}
+    assert "Subject: Payroll update" in payload["extracted_text"]
+    ioc_values = {i["value"] for i in payload["iocs"]}
+    assert "CVE-2024-99999" in ioc_values
+
+
+def test_predict_upload_text_ingest_extracts_json_raw_content():
+    with TestClient(app) as c:
+        response = c.post(
+            "/predict/upload-text-ingest",
+            json={
+                "upload_id": "upload-125",
+                "filename": "alert.json",
+                "content_type": "application/json",
+                "raw_content": '{"message":"contact 1.2.3.4"}',
+                "source": "upload_text",
+            },
+        )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["extracted_text"].startswith('{"message"')
+    ioc_values = {i["value"] for i in payload["iocs"]}
+    assert "1.2.3.4" in ioc_values
+
+
+def test_predict_liveflow_fallback_combines_all_parts():
+    response = client.post(
+        "/predict/liveflow",
+        json={
+            "upload": {
+                "upload_id": "upload-123",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "size_bytes": 58213,
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "risk_score": 78,
+                "source": "upload",
+            },
+            "upload_text": {
+                "upload_id": "upload-123",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "extracted_text": "See CVE-2024-99999 at http://evil.example",
+                "source": "upload_text",
+            },
+            "cve_relevance": {
+                "sbom_components": [
+                    {
+                        "name": "openssl",
+                        "version": "3.0.7",
+                        "ecosystem": "debian",
+                        "purl": "pkg:deb/debian/openssl@3.0.7",
+                        "cpe": "cpe:2.3:a:openssl:openssl:3.0.7:*:*:*:*:*:*:*",
+                    }
+                ],
+                "cves": [
+                    {
+                        "cve_id": "CVE-2024-12345",
+                        "summary": "OpenSSL vulnerability affecting versions before 3.0.8",
+                        "cvss_score": 8.8,
+                        "severity": "high",
+                        "affected_packages": [
+                            {
+                                "name": "openssl",
+                                "ecosystem": "debian",
+                                "fixed_version": "3.0.8",
+                            }
+                        ],
+                    }
+                ],
+            },
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["summary"]["has_upload"] is True
+    assert payload["summary"]["has_upload_text"] is True
+    assert payload["summary"]["has_cve_relevance"] is True
+    assert payload["upload_result"]["model_version"] == "none"
+    assert payload["upload_text_result"]["model_version"] == "none" or len(
+        payload["upload_text_result"]["model_version"]
+    ) == 12
+    assert payload["summary"]["ioc_count"] >= 1
+    assert payload["summary"]["matched_cves"] == 1
+
+
+def test_predict_liveflow_uses_loaded_models(app_with_models):
+    with TestClient(app_with_models) as c:
+        response = c.post(
+            "/predict/liveflow",
+            json={
+                "upload": {
+                    "upload_id": "upload-200",
+                    "filename": "invoice.eml",
+                    "content_type": "message/rfc822",
+                    "size_bytes": 58213,
+                    "scan_status": "malicious",
+                    "scan_engine": "clamav",
+                    "scan_detail": "Phishing.Email.Generic",
+                    "risk_score": 78,
+                    "source": "upload",
+                },
+                "upload_text": {
+                    "upload_id": "upload-200",
+                    "filename": "invoice.eml",
+                    "content_type": "message/rfc822",
+                    "scan_status": "malicious",
+                    "scan_engine": "clamav",
+                    "scan_detail": "Phishing.Email.Generic",
+                    "extracted_text": "ransomware activity on host and CVE-2024-99999",
+                    "source": "upload_text",
+                },
+            },
+        )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["upload_result"]["prediction"]["label"] in {"clean", "malicious"}
+    assert payload["upload_result"]["model_version"] != "none"
+    assert payload["upload_text_result"]["prediction"]["label"] in {"ransomware", "phishing"}
+    assert payload["upload_text_result"]["model_version"] != "none"

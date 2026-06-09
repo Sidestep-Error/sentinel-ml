@@ -9,6 +9,13 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased] — branch `stoffes_feature`
 
 ### Tillagt
+- **Liveflow-integration (2026-06-08):**
+  - `POST /predict/upload-ingest` — ingest av Upload+ClamAV-payload till upload-klassificeraren
+  - `POST /predict/cve-relevance` — SBOM/CVE-relevans med komponentmatchning (namn/ekosystem/version)
+  - `POST /predict/upload-text-ingest` — säkert text-ingestflöde för `.txt`, `.md`, `.json`, `.csv`, `.eml` med IOC-extraktion
+  - `POST /predict/liveflow` — aggregator som sammanfogar upload, upload-text och cve-relevans i ett enhetligt demosvar
+- **`docs/sentinel-upload-api-integration-playbook.md`** — konkret cross-repo guide för integration i `sentinel-upload-api` (klient, payload-mappning, persistens, UI, DoD)
+- **`tests/test_service_api.py`** — nya API-tester för `upload-ingest`, `cve-relevance`, `upload-text-ingest` och `liveflow` (fallback + loaded-model paths)
 - **`scripts/generate_synthetic_threat_reports.py`** — genererar 250 syntetiska threat reports (50/kategori) i JSONL-format för baseline-träning (#28)
 - **`scripts/download_real_threat_reports.py`** — laddar ner och konverterar `mrmoor/cyber-threat-intelligence` (CC-BY-4.0, ~10k rader) till ThreatReport JSONL; keyword-baserad dokumentklassificering ger 1 582 lablade rapporter (#29)
 - **`scripts/eval_threat_classifier.py`** — kör train/test-split och rapporterar accuracy/precision/recall/F1 per klass (#31)
@@ -39,6 +46,9 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `src/sentinel_ml/service/api.py` — laddar nu även `log_anomaly_tfidf.joblib` vid uppstart via lifespan
 - `src/sentinel_ml/cli.py` — tre nya kommandon tillagda
 - `pyproject.toml` — lade till `S311`-undantag i per-file-ignores för `generate_data.py` och `attack.py` (pseudo-slump för syntetisk data, ej kryptografisk)
+- `src/sentinel_ml/data/schemas.py` — `MalwareSample` återinförd för att återställa reproducerbar malware-evaluering
+- `docs/integration-with-sentinel-upload-api.md` — uppdaterad endpoint-tabell och kontrakt för upload/ClamAV, text-ingest, CVE-relevans och liveflow
+- `ROADMAP.md` — uppdaterad med avbockade levererade integrationssteg samt ärlig status för G/VG-projektkraven
 
 ---
 
