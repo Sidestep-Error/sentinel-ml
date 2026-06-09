@@ -263,15 +263,20 @@ def _get_loaded(request: Request, attr: str) -> LoadedModel | None:
 def _call_ollama(text: str) -> LLMAnalysis | None:
     """Call Ollama for LLM-based threat classification. Returns None on any failure.
 
-    OllamaClient is imported locally so the optional ``[llm]`` dependency
-    (httpx) is only required when the LLM path actually runs. The production
-    image installs base deps only — a missing httpx degrades to None here
-    instead of crashing the service at import time.
+    Gated behind ``settings.llm_enabled`` (default False): the deployed path
+    runs the classical models and never touches Ollama unless explicitly opted
+    in. When enabled, OllamaClient is imported locally so the optional ``[llm]``
+    dependency (httpx) is only required at that point — the production image
+    installs base deps only, so a missing httpx degrades to None here instead
+    of crashing the service at import time.
     """
+    settings = get_settings()
+    if not settings.llm_enabled:
+        return None
     try:
         from sentinel_ml.llm.ollama_client import OllamaClient
 
-        client = OllamaClient(timeout=30.0)
+        client = OllamaClient(timeout=settings.ollama_timeout_seconds)
         response = client.generate(prompt=text, system=CLASSIFY_THREAT_REPORT_SYSTEM)
         data = json.loads(response.text)
         return LLMAnalysis(
