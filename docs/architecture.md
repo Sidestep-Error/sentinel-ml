@@ -66,7 +66,7 @@
 
 ## Säkerhet
 
-- **Read-only mot Sentinel-MongoDB** i `data/loaders.py`. Skriver bara till separat `ml_predictions`-collection (om alls).
+- **Read-only mot Sentinel-MongoDB** i `data/loaders.py`. sentinel-ml är stateless och har inga skrivrättigheter — persistens av prediktioner (`ml_predictions`-collection) ägs av sentinel-upload-api.
 - **Inga hemligheter i koden.** Mongo-URI, Ollama-host etc. kommer från `.env`/K8s Secret.
 - **Hash-baserade IOC-uppslagningar logges, inte själva data.** Vi loggar att vi sett en SHA-256, inte filinnehållet.
 - **LLM-output valideras** mot förväntad JSON-shape innan den passas vidare. Skyddar mot prompt injection.

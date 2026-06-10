@@ -27,12 +27,8 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **`docs/technical-report.md`** — alla "Pågår"-platshållare stängda: metodjämförelsetabell för Spår A omskriven med explicit beslut och IOC-jämförelsedata; Spår B strukturerad IsolationForest beskriven korrekt som osupervisad; adversarial-status uppdaterad per experiment.
 - **git-historik** — Copilot-commit `07755ac` på `feat/ML` skriven om till `kristoffer.toivanen@chasacademy.se` via `git filter-branch`; force-push med `--force-with-lease`.
 
----
-
-## [Unreleased] — branch `stoffes_feature`
-
-### Tillagt
-- **Liveflow-integration (2026-06-08):**
+### Tillagt (2026-06-08)
+- **Liveflow-integration:**
   - `POST /predict/upload-ingest` — ingest av Upload+ClamAV-payload till upload-klassificeraren
   - `POST /predict/cve-relevance` — SBOM/CVE-relevans med komponentmatchning (namn/ekosystem/version)
   - `POST /predict/upload-text-ingest` — säkert text-ingestflöde för `.txt`, `.md`, `.json`, `.csv`, `.eml` med IOC-extraktion
@@ -65,7 +61,7 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `sentinel-ml attack-demo` — kör mimicry-attackdemon
 - **`tests/test_log_anomaly.py`** — 18 tester för `generate_data`, `tfidf_detector`, `alert_manager`, `attack` och API-endpointen
 
-### Ändrat
+### Ändrat (2026-06-08)
 - `src/sentinel_ml/service/api.py` — laddar nu även `log_anomaly_tfidf.joblib` vid uppstart via lifespan
 - `src/sentinel_ml/cli.py` — tre nya kommandon tillagda
 - `pyproject.toml` — lade till `S311`-undantag i per-file-ignores för `generate_data.py` och `attack.py` (pseudo-slump för syntetisk data, ej kryptografisk)
@@ -121,7 +117,7 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/Sidestep-Error/sentinel-ml/compare/main...stoffes_feature
+[Unreleased]: https://github.com/Sidestep-Error/sentinel-ml/compare/main...feat/ML
 [0.1.0]: https://github.com/Sidestep-Error/sentinel-ml/compare/0.0.2...main
 [0.0.2]: https://github.com/Sidestep-Error/sentinel-ml/compare/0.0.1...0.0.2
 [0.0.1]: https://github.com/Sidestep-Error/sentinel-ml/releases/tag/0.0.1
