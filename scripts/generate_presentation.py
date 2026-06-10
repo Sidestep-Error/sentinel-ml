@@ -154,7 +154,7 @@ def _architecture_slide(prs: Presentation) -> None:
     shape2.fill.solid(); shape2.fill.fore_color.rgb = TEAL
     shape2.line.color.rgb = GREEN
     _box(slide, Inches(5.75), Inches(1.25), Inches(3.7), Inches(0.5),
-         "sentinel-ml (port 8080)", font_size=15, bold=True, color=WHITE)
+         "sentinel-ml (port 8100)", font_size=15, bold=True, color=WHITE)
     _box(slide, Inches(5.75), Inches(1.65), Inches(3.7), Inches(0.5),
          "FastAPI · scikit-learn · spaCy · Ollama", font_size=11, color=LIGHT_GRAY)
 

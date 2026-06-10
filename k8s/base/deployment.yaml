@@ -79,8 +79,11 @@ spec:
         # och uvicorn kan skriva temporära filer dit under inferens.
         - name: tmp
           emptyDir: {}
-        # models_store är initialt tom — service degraderar till fallback-svar
-        # (label="unknown", model_version="none") tills vi bakar in tränade
-        # .joblib-filer i image:n (Fas 2). Se docs/security-analysis-deployment.md.
+        # models_store ligger på en PersistentVolumeClaim så de tränade
+        # .joblib-filerna överlever pod-omstarter (emptyDir nollställdes vid
+        # varje rollout). Volymen populeras en gång via en loader-pod — se
+        # runbooks/sentinel-ml-load-models.md. Tills den är populerad
+        # degraderar servicen till fallback (label="unknown").
         - name: models
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: sentinel-ml-models
