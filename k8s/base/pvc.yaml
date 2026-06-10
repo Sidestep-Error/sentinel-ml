@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sentinel-ml-models
+  namespace: sentinel
+  labels:
+    app.kubernetes.io/name: sentinel-ml
+    app.kubernetes.io/part-of: sentinel-platform
+spec:
+  # Single-node k3s; the deployment is 1 replica. RWO is sufficient and the
+  # local-path provisioner (k3s default) only supports RWO anyway.
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      # Trained .joblib artifacts are a few MB each; 500Mi leaves ample room
+      # for future models + an optional known-malicious-hashes JSONL.
+      storage: 500Mi
