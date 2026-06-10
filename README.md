@@ -110,7 +110,7 @@ Hot-modell och RBAC-resonemang i [docs/security-analysis-deployment.md](docs/sec
 ## Struktur
 
 Se [docs/architecture.md](docs/architecture.md) för fullständig översikt
-och [docs/integration-with-sentinel-upload-api.md](docs/integration-with-sentinel-upload-api.md)
+och [docs/sentinel-ml-upload-api-integration-architecture.md](docs/sentinel-ml-upload-api-integration-architecture.md)
 för hur modulen kopplas till det befintliga API:t.
 
 ## Säkerhet

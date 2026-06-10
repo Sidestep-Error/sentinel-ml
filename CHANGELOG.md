@@ -71,6 +71,50 @@ Versionshantering: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased] — branch `stoffes_feature`
+
+### Tillagt
+- **Liveflow-integration (2026-06-08):**
+  - `POST /predict/upload-ingest` — ingest av Upload+ClamAV-payload till upload-klassificeraren
+  - `POST /predict/cve-relevance` — SBOM/CVE-relevans med komponentmatchning (namn/ekosystem/version)
+  - `POST /predict/upload-text-ingest` — säkert text-ingestflöde för `.txt`, `.md`, `.json`, `.csv`, `.eml` med IOC-extraktion
+  - `POST /predict/liveflow` — aggregator som sammanfogar upload, upload-text och cve-relevans i ett enhetligt demosvar
+- **`docs/llm-cve-integration-guide.md`** — konkret integrationsguide för LLM/CVE-flöden, payloads, persistens och endpoint-exempel
+- **`tests/test_service_api.py`** — nya API-tester för `upload-ingest`, `cve-relevance`, `upload-text-ingest` och `liveflow` (fallback + loaded-model paths)
+- **`scripts/generate_synthetic_threat_reports.py`** — genererar 250 syntetiska threat reports (50/kategori) i JSONL-format för baseline-träning (#28)
+- **`scripts/download_real_threat_reports.py`** — laddar ner och konverterar `mrmoor/cyber-threat-intelligence` (CC-BY-4.0, ~10k rader) till ThreatReport JSONL; keyword-baserad dokumentklassificering ger 1 582 lablade rapporter (#29)
+- **`scripts/eval_threat_classifier.py`** — kör train/test-split och rapporterar accuracy/precision/recall/F1 per klass (#31)
+- **`scripts/compare_ioc_extractors.py`** — jämförelseverktyg för regex- vs spaCy-extraktion (#33)
+- **`src/sentinel_ml/features/ioc_extract_spacy.py`** — spaCy-baserad IOC-extraktion (Fas 2): EntityRuler för strukturerade IOCs + pre-trained NER för malware-namn och threat actors som regex inte kan hitta (#33)
+- **`src/sentinel_ml/data/schemas.py`** — `UploadRecord` gjord flexibel med optionella fält för att matcha verklig Atlas-data; stöder `status`-alias för `decision`
+- **`src/sentinel_ml/config.py`** — ny inställning `MONGODB_DB_UPLOAD` (default `sentinel_upload`) för att hantera att uploads och threat events ligger i separata databaser
+- **`src/sentinel_ml/data/loaders.py`** — `_get_collection` väljer nu rätt databas per collection (`uploads` → `sentinel_upload`, övriga → `sentinel`)
+- **`src/sentinel_ml/log_anomaly/`** — nytt paket för logganomalier enligt [r87-e/ais-grupp-logganomali](https://github.com/r87-e/ais-grupp-logganomali)-konventioner:
+  - `tfidf_detector.py` — TF-IDF + IsolationForest på råa loggtexter; ger jämförbar ML-metod mot strukturerad detektor (VG-krav: algoritmjämförelse)
+  - `detector.py` — IsolationForest på strukturerade Wazuh-tidsfeatures (portad från `ai-detection/`, anpassad till projektstil)
+  - `generate_data.py` — syntetisk CSV-loggdata med `line`/`label`-kolumner (normal/attack); genereras automatiskt om `data/logs.csv` saknas
+  - `train.py` — träningsentry för TF-IDF-detektorn; rapporterar precision/recall/F1
+  - `alert_manager.py` — larmklassificering (critical/high/medium) baserad på z-score och IsolationForest-score
+  - `response_playbook.py` — SOAR-playbook: IP-blockering via iptables, agent-isolering (Wazuh-stub), larmutskick
+  - `summarize.py` — LLM-incidentsammanfattning via befintlig `OllamaClient`; faller tillbaka på regelbaserad text om Ollama ej är igång
+  - `attack.py` — mimicry-attackdemonstration: kamuflerar attackloggar med godartade prefix/suffix för att undvika TF-IDF-detektion (VG-krav: robusthetstestning)
+- **`POST /predict/log-anomaly`** — ny FastAPI-endpoint som tar en lista råa loggtexter och returnerar per-rad anomaliflagg och score; faller tillbaka på `model_version="none"` om ingen modell laddats
+- **CLI-kommandon:**
+  - `sentinel-ml train log-anomaly` — tränar TF-IDF-modellen
+  - `sentinel-ml detect-anomalies <csv>` — kör detektion och skriver anomalier som JSON
+  - `sentinel-ml attack-demo` — kör mimicry-attackdemon
+- **`tests/test_log_anomaly.py`** — 18 tester för `generate_data`, `tfidf_detector`, `alert_manager`, `attack` och API-endpointen
+
+### Ändrat
+- `src/sentinel_ml/service/api.py` — laddar nu även `log_anomaly_tfidf.joblib` vid uppstart via lifespan
+- `src/sentinel_ml/cli.py` — tre nya kommandon tillagda
+- `pyproject.toml` — lade till `S311`-undantag i per-file-ignores för `generate_data.py` och `attack.py` (pseudo-slump för syntetisk data, ej kryptografisk)
+- `src/sentinel_ml/data/schemas.py` — `MalwareSample` återinförd för att återställa reproducerbar malware-evaluering
+- `docs/sentinel-ml-upload-api-integration-architecture.md` — uppdaterad endpoint-tabell och kontrakt för upload/ClamAV, text-ingest, CVE-relevans och liveflow
+- `ROADMAP.md` — uppdaterad med avbockade levererade integrationssteg samt ärlig status för G/VG-projektkraven
+
+---
+
 ## [0.1.0] — 2026-06-02
 
 ### Tillagt

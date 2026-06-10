@@ -1,4 +1,4 @@
-"""Feature extraction for Spar B (upload-classifier).
+"""Feature extraction for Spår B (upload-classifier).
 
 Input: UploadRecord. Output: numpy feature vector + a parallel list of
 column names so we can interpret feature importances later.

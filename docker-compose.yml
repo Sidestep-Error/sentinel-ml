@@ -6,6 +6,11 @@
 # Med lokal Mongo för helt självförsörjande dev-miljö:
 #   docker compose --profile with-mongo up
 #
+# Med lokal Ollama i Docker:
+#   docker compose --profile with-ollama up -d ollama
+#   docker exec -it sentinel-ml-ollama ollama pull llama3.2:3b
+#   OLLAMA_HOST=http://ollama:11434 docker compose --profile with-ollama up -d sentinel-ml
+#
 # Models_store mountas read-only -- träna en modell på host, restarta containern.
 
 services:
@@ -40,5 +45,16 @@ services:
       - mongo_data:/data/db
     restart: unless-stopped
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sentinel-ml-ollama
+    profiles: ["with-ollama"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
 volumes:
   mongo_data:
+  ollama_data:
