@@ -33,6 +33,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH"
 
+# Patcha OS-paket i basimagen (python:3.12-slim ligger ofta några dagar efter
+# Debians säkerhetsuppdateringar). Drar in fixade openssl/libssl m.fl. så att
+# Trivy-scannern (--severity HIGH,CRITICAL, fixable) inte blockerar bygget.
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # Non-root user matchar sentinel-upload-api-konvention (UID 10001).
 # K8s pod-spec sätter runAsUser: 10001 — UID måste finnas i image:n så
 # att ägarskap på /app/models_store mappas till rätt process-identitet.

@@ -4,7 +4,7 @@
 
 ## 1. Sammanfattning
 
-sentinel-ml är ett ML-baserat säkerhetsmodul byggt ovanpå sentinel-upload-api. Vi byggde två ML-spår: ett NLP-spår (Spår A) som klassificerar hotrapporter per angreppstyp och extraherar IOCs, samt ett logganomalispår (Spår B) som detekterar avvikelser i säkerhetsloggar med IsolationForest. Spår A uppnår F1-macro 0.875 på riktig CTI-data (mrmoor/cyber-threat-intelligence). Systemet exponeras som en FastAPI-service med Ollama-integration för LLM-baserad analys.
+sentinel-ml är ett ML-baserat säkerhetsmodul byggt ovanpå sentinel-upload-api. Vi byggde tre ML-spår: ett NLP-spår (Spår A) som klassificerar hotrapporter per angreppstyp och extraherar IOCs, ett logganomalispår (Spår B) som detekterar avvikelser i säkerhetsloggar med IsolationForest, samt ett malware-metadataspår (Spår C) som klassificerar malware-familjer på MalwareBazaar-metadata. Spår A uppnår F1-macro 0.875 på riktig CTI-data (mrmoor/cyber-threat-intelligence). Systemet exponeras som en FastAPI-service med Ollama-integration för LLM-baserad analys.
 
 ## 2. Problem och mål
 
@@ -25,7 +25,7 @@ Se [docs/architecture.md](architecture.md) för fullständig översikt. Systemet
 sentinel-upload-api (MongoDB, port 3000)
          │ MongoDB read (uploads, threat_events)
          ▼
-sentinel-ml FastAPI service (port 8080)
+sentinel-ml FastAPI service (port 8100)
   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
   │  data/   │→ │features/ │→ │ models/  │→ │  eval/   │
   └──────────┘  └──────────┘  └──────────┘  └──────────┘
@@ -36,7 +36,7 @@ sentinel-ml FastAPI service (port 8080)
                └─────────┘   └──────────┘
 ```
 
-Kontraktet mot sentinel-upload-api är MongoDB + HTTP — inga kodimporter. sentinel-ml skriver till `ml_predictions`-collection; sentinel-upload-api läser därifrån.
+Kontraktet mot sentinel-upload-api är MongoDB + HTTP — inga kodimporter. sentinel-ml är **stateless** och läser endast (read-only) från Sentinels MongoDB. Persistens av prediktioner ägs av sentinel-upload-api: den anropar sentinel-ml via HTTP, tar emot svaret och skriver det till `ml_predictions`-collection per `upload_id`. Detta håller sentinel-ml utan skrivrättigheter mot databasen och begränsar blast radius vid kompromiss.
 
 ## 4. Datakällor och förbehandling
 
@@ -280,7 +280,7 @@ Implementerade motåtgärder:
 
 Se [docs/sentinel-ml-upload-api-integration-architecture.md](sentinel-ml-upload-api-integration-architecture.md).
 
-Valt mönster: **HTTP-service (mönster 2)**. sentinel-ml körs som fristående FastAPI-service på port 8080. sentinel-upload-api anropar `/predict/threat` och `/predict/upload` med 500 ms timeout och degraderar tyst vid fel.
+Valt mönster: **HTTP-service (mönster 2)**. sentinel-ml körs som fristående FastAPI-service på port 8100. sentinel-upload-api anropar `/predict/threat` och `/predict/upload` med 500 ms timeout och degraderar tyst vid fel.
 
 Endpoints:
 

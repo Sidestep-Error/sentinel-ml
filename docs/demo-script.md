@@ -49,7 +49,7 @@
 
 **Visar:** Arkitekturslide med dataflödesdiagram
 
-> "sentinel-ml är en fristående FastAPI-service på port 8080. sentinel-upload-api
+> "sentinel-ml är en fristående FastAPI-service på port 8100. sentinel-upload-api
 > anropar oss via HTTP med 500 millisekunder timeout och degraderar tyst om vi inte svarar —
 > det påverkar aldrig uppladdningsflödet."
 >

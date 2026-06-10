@@ -6,7 +6,7 @@ Kör lokalt, anropar Hetzner (eller valfri URL) via HTTP.
 Usage:
   python scripts/demo_attack_live.py
   python scripts/demo_attack_live.py --url https://sentinel-ml.ditt-kluster.example
-  python scripts/demo_attack_live.py --url http://localhost:8080
+  python scripts/demo_attack_live.py --url http://localhost:8100
 """
 
 from __future__ import annotations
@@ -46,7 +46,7 @@ def _print_results(predictions: list[dict], title: str) -> int:
 
 
 def main(
-    url: str = typer.Option("http://localhost:8080", envvar="SENTINEL_ML_URL",
+    url: str = typer.Option("http://localhost:8100", envvar="SENTINEL_ML_URL",
                             help="Base URL till sentinel-ml-service"),
 ) -> None:
     attack_logs = _get_attack_logs(n=30)

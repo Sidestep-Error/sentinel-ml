@@ -152,7 +152,6 @@ Detekterade 3 larm: 3 critical. Granska loggarna för detaljer.
 3. Kör Scenario 2 (Ransomware) — visa SHA-256 och .onion-domän som IOCs
 4. Kör Scenario 3 (Intrusion) — visa tre IPs extraherade automatiskt
 5. Kör Scenario 4 (Log-anomali) — visa tabellen normal vs anomali, nämn fallback
-5. Kör `/predict/log-anomaly` med 3–5 loggrader (blandad normal/attack)
 
 **Talkpunkter om confidence:**
 > "Konfidensen är lägre för ransomware och intrusion — det är förväntat. Dessa
@@ -166,10 +165,10 @@ Detekterade 3 larm: 3 critical. Granska loggarna för detaljer.
 
 ```bash
 # Starta service
-uvicorn sentinel_ml.service.api:app --port 8080
+uvicorn sentinel_ml.service.api:app --port 8100
 
 # Testa phishing-scenariot
-curl -s -X POST http://localhost:8080/predict/threat \
+curl -s -X POST http://localhost:8100/predict/threat \
   -H "Content-Type: application/json" \
   -d '{"text": "Phishing campaign observed distributing credential-harvesting pages..."}'
 ```
