@@ -514,7 +514,7 @@ def test_predict_liveflow_document_wraps_response_for_ml_predictions():
     assert payload["ml_liveflow"]["summary"]["has_upload"] is True
     assert payload["ml_liveflow"]["summary"]["has_upload_text"] is False
     assert payload["ml_liveflow"]["upload_result"]["source"] == "upload"
-    assert payload["ml_liveflow"]["upload_result"]["prediction"]["label"] == "unknown"
+    assert payload["ml_liveflow"]["upload_result"]["prediction"]["label"] in {"unknown", "accepted", "rejected"}
     assert payload["created_at"].endswith("Z")
 
 

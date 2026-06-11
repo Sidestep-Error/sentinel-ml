@@ -32,6 +32,20 @@ _CLEAN_PROFILES = [
     (".csv",  "text/csv",          ["data", "export", "results", "log", "metrics", "stats"]),
     (".txt",  "text/plain",        ["notes", "readme", "config", "changelog", "todo", "log"]),
     (".md",   "text/markdown",     ["README", "CHANGELOG", "docs", "notes", "spec"]),
+    # Microsoft Office (modern OpenXML)
+    (".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+     ["report", "letter", "memo", "proposal", "minutes", "policy", "handbook"]),
+    (".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+     ["budget", "forecast", "expenses", "inventory", "schedule", "tracker", "timesheet"]),
+    (".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+     ["presentation", "deck", "slides", "pitch", "overview", "review", "quarterly"]),
+    # Microsoft Office (legacy)
+    (".doc",  "application/msword",
+     ["report", "letter", "memo", "draft", "notes", "agenda"]),
+    (".xls",  "application/vnd.ms-excel",
+     ["budget", "data", "expenses", "log", "tracker", "sales"]),
+    (".ppt",  "application/vnd.ms-powerpoint",
+     ["presentation", "slides", "deck", "demo", "training", "kickoff"]),
 ]
 
 _MALICIOUS_MIME = {
