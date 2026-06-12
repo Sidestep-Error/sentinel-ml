@@ -27,8 +27,15 @@ class Settings(BaseSettings):
     mongodb_db_upload: str = Field(default="sentinel_upload", alias="MONGODB_DB_UPLOAD")
 
     # --- LLM (Ollama, local) ---
+    # LLM calls are OFF by default. The deployed/prod path runs the classical
+    # models; Ollama is only called when explicitly enabled (e.g. local demo).
+    # This keeps the LLM off the request path unless someone opts in.
+    llm_enabled: bool = Field(default=False, alias="LLM_ENABLED")
     ollama_host: str = Field(default="http://localhost:11434", alias="OLLAMA_HOST")
     ollama_model: str = Field(default="llama3.2:3b", alias="OLLAMA_MODEL")
+    # Kept short so a misconfigured/unreachable Ollama degrades fast instead of
+    # stalling the threat endpoint.
+    ollama_timeout_seconds: float = Field(default=3.0, alias="OLLAMA_TIMEOUT_SECONDS")
 
     # --- MLflow ---
     mlflow_tracking_uri: str = Field(default="file:./mlruns", alias="MLFLOW_TRACKING_URI")
@@ -36,9 +43,28 @@ class Settings(BaseSettings):
     # --- Reproducibility ---
     seed: int = Field(default=42, alias="SENTINEL_ML_SEED")
 
+    # --- Logging ---
+    # Root log level for the service process. Uvicorn only configures its own
+    # loggers, so the app must configure the root logger itself (service/api.py)
+    # for sentinel_ml INFO lines to reach stdout/stderr.
+    log_level: str = Field(default="INFO", alias="LOG_LEVEL")
+
     # --- Paths ---
     data_dir: Path = Field(default=Path("./data"), alias="DATA_DIR")
     models_dir: Path = Field(default=Path("./models_store"), alias="MODELS_DIR")
+
+    # --- Hash-bridge (Spar A IOC -> upload scanning) ---
+    # Optional threat-reports JSONL whose hash IOCs become the known-malicious
+    # set. Unset/missing => the hash-bridge simply reports no match (degrades).
+    known_malicious_hashes_path: Path | None = Field(
+        default=None, alias="KNOWN_MALICIOUS_HASHES_PATH"
+    )
+    # Optional malware-samples JSONL (MalwareBazaar metadata, the shape written
+    # by scripts/download_malwarebazaar.py) whose sha256 values are unioned into
+    # the same known-malicious set. Unset/missing => degrades the same way.
+    malware_samples_path: Path | None = Field(
+        default=None, alias="MALWARE_SAMPLES_PATH"
+    )
 
 
 def get_settings() -> Settings:

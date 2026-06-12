@@ -1,0 +1,50 @@
+# One-off helper to populate the sentinel-ml-models PVC with trained .joblib
+# artifacts. NOT part of kustomize — apply manually, then delete when done.
+# Full procedure: runbooks/sentinel-ml-load-models.md
+#
+# Security context mirrors the app pod (UID/GID/fsGroup 10001, readonly rootfs,
+# drop ALL caps) so it passes the same OPA policies and so the PVC ends up
+# owned by the same identity the app reads as.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sentinel-ml-models-loader
+  namespace: sentinel
+  labels:
+    # Must NOT match the sentinel-ml Deployment/Service selector
+    # (app.kubernetes.io/name: sentinel-ml): a matching label makes the
+    # Service route traffic here and makes `kubectl logs/port-forward
+    # deploy/sentinel-ml` resolve to this pod instead of the app pod.
+    app.kubernetes.io/name: sentinel-ml-models-loader
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    fsGroup: 10001
+  containers:
+    - name: loader
+      image: busybox:1.36
+      # Idle so we can `kubectl cp` into the mounted PVC, then delete the pod.
+      command: ["sh", "-c", "echo loader ready; sleep 3600"]
+      resources:
+        requests:
+          cpu: 50m
+          memory: 32Mi
+        limits:
+          cpu: 200m
+          memory: 64Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+      volumeMounts:
+        - name: models
+          mountPath: /models
+  volumes:
+    - name: models
+      persistentVolumeClaim:
+        claimName: sentinel-ml-models

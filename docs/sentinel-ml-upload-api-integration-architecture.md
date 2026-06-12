@@ -1,4 +1,4 @@
-# Integration med sentinel-upload-api
+# Arkitektur för integration mellan sentinel-ml och sentinel-upload-api
 
 ## Princip
 
@@ -37,8 +37,12 @@ ringer `/predict/threat` och `/predict/upload` synkront eller asynkront.
 | POST | `/predict/upload` | `UploadRecord` JSON | `{label, confidence, explanation, model_version}` |
 | POST | `/predict/upload-ingest` | Upload+ClamAV payload | `{upload_id, source, prediction, model_version, ...}` |
 | POST | `/predict/cve-relevance` | SBOM/CVE payload | `{results, summary}` med relevansscore per CVE |
+| POST | `/predict/cve-relevance-prediction` | SBOM/CVE payload | `{source, related_cves}` för serialiserbar deterministisk output |
+| POST | `/predict/cve-relevance-trivy` | Trivy SBOM + vulnerability payload | `{source, related_cves}` via Trivy-adapter |
 | POST | `/predict/upload-text-ingest` | Upload+text payload | `{upload_id, source, prediction, iocs, extracted_text, text_truncated, ...}` |
 | POST | `/predict/liveflow` | Kombinerad payload | `{upload_result, upload_text_result, cve_relevance_result, summary}` |
+| POST | `/predict/liveflow-document` | Kombinerad payload | `{upload_id, ml_provider, ml_liveflow, created_at}` |
+| POST | `/predict/liveflow-writeback` | Kombinerad payload | `{persisted, collection, document}` |
 
 **Authentication:** För kursprojektets demo räcker ingen auth (intern K8s-service,
 NetworkPolicy begränsar tillgång). I produktion: mTLS eller delad HMAC-secret.
@@ -200,6 +204,19 @@ Förväntad respons från `/predict/cve-relevance`:
 - `results[]`: en rad per CVE med `relevance_score`, `matched_components` och kort `reason`.
 - `summary`: antal matchade CVE och antal high/critical som matchar er SBOM.
 
+För serialiserbar output som är lätt att skriva vidare till `ml_predictions` finns också:
+
+- `POST /predict/cve-relevance-prediction`
+
+För Trivy-baserat upstream utan separat normalisering i upload-sidan finns:
+
+- `POST /predict/cve-relevance-trivy`
+
+Den endpointen använder befintliga adaptrar för:
+
+- `Results[].Packages` i Trivy SBOM-liknande data
+- `Results[].Vulnerabilities` i Trivy vulnerability-liknande data
+
 ### Rekommenderad implementationsordning
 
 1. Upload + ClamAV -> ML
@@ -212,3 +229,5 @@ Implementerat API-stöd för steg 4 (backend-aggregator):
 - `/predict/liveflow` accepterar valfria delobjekt: `upload`, `upload_text`, `cve_relevance`.
 - Returnerar delresultat per flöde + en `summary` med indikatorer (`has_*`) samt nyckeltal (`ioc_count`, `matched_cves`).
 - Gör det enkelt för UI att rendera ett sammanhållet demoresultat från en enda request.
+- `/predict/liveflow-document` returnerar samma innehåll inbäddat i ett write-back-färdigt dokument för `ml_predictions`.
+- `/predict/liveflow-writeback` gör samma sak och skriver dessutom dokumentet direkt till `ml_predictions`.

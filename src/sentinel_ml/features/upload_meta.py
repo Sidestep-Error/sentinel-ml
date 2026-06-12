@@ -1,4 +1,4 @@
-"""Feature extraction for Spar B (upload-classifier).
+"""Feature extraction for Spår B (upload-classifier).
 
 Input: UploadRecord. Output: numpy feature vector + a parallel list of
 column names so we can interpret feature importances later.
@@ -38,6 +38,18 @@ _CONTENT_TYPE_TO_EXTENSIONS: dict[str, set[str]] = {
     "image/png": {".png"},
     "image/jpeg": {".jpg", ".jpeg"},
     "application/pdf": {".pdf"},
+    # Microsoft Office (modern OpenXML)
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {".docx"},
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {".xlsx"},
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": {".pptx"},
+    # Microsoft Office (legacy)
+    "application/msword": {".doc"},
+    "application/vnd.ms-excel": {".xls"},
+    "application/vnd.ms-powerpoint": {".ppt"},
+    # OpenDocument (LibreOffice)
+    "application/vnd.oasis.opendocument.text": {".odt"},
+    "application/vnd.oasis.opendocument.spreadsheet": {".ods"},
+    "application/vnd.oasis.opendocument.presentation": {".odp"},
 }
 
 

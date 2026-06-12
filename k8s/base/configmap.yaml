@@ -13,3 +13,8 @@ data:
   MODELS_DIR: "/app/models_store"
   # Reproducerbarhet vid eventuell on-demand training.
   SENTINEL_ML_SEED: "42"
+  # Hash-bryggan: källor till known-malicious-setet. Filerna ligger på
+  # models-PVC:n (se runbooks/sentinel-ml-load-models.md steg 7). Saknas en
+  # fil loggas det och källan hoppas över — bryggan degraderar, kraschar inte.
+  KNOWN_MALICIOUS_HASHES_PATH: "/app/models_store/known_malicious_reports.jsonl"
+  MALWARE_SAMPLES_PATH: "/app/models_store/malware_samples.jsonl"

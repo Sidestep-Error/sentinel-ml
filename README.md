@@ -102,6 +102,10 @@ på Hetzner k3s. Ingen publik URL — bara upload-api:s pods får ringa
 servicen via `sentinel-ml.sentinel.svc.cluster.local`.
 
 CI/CD vid push till `main`: tester → Docker Hub-push → `kubectl rollout restart`.
+**CI applicerar inte manifest-ändringar** — ändringar under `k8s/base/` (PVC,
+volymer, ConfigMap, NetworkPolicy) måste appliceras manuellt på klustret med
+`kubectl apply`. Modellerna (`.joblib`) ligger på en PVC, inte i imagen, och
+populeras en gång via [runbooks/sentinel-ml-load-models.md](runbooks/sentinel-ml-load-models.md).
 
 Manifest i [k8s/base/](k8s/base/). Setup-procedurer i
 [runbooks/sentinel-ml-deploy.md](runbooks/sentinel-ml-deploy.md).
@@ -110,7 +114,7 @@ Hot-modell och RBAC-resonemang i [docs/security-analysis-deployment.md](docs/sec
 ## Struktur
 
 Se [docs/architecture.md](docs/architecture.md) för fullständig översikt
-och [docs/integration-with-sentinel-upload-api.md](docs/integration-with-sentinel-upload-api.md)
+och [docs/sentinel-ml-upload-api-integration-architecture.md](docs/sentinel-ml-upload-api-integration-architecture.md)
 för hur modulen kopplas till det befintliga API:t.
 
 ## Säkerhet
