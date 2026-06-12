@@ -490,6 +490,46 @@ def test_predict_liveflow_uses_loaded_models(app_with_models):
     assert payload["upload_text_result"]["model_version"] != "none"
 
 
+def test_predict_liveflow_rejects_raw_content_in_upload_text_contract():
+    response = client.post(
+        "/predict/liveflow",
+        json={
+            "upload_text": {
+                "upload_id": "upload-201",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "raw_content": "should not be accepted in liveflow",
+                "source": "upload_text",
+            },
+        },
+    )
+    assert response.status_code == 422
+    assert "extra_forbidden" in response.text or "Field required" in response.text
+
+
+def test_predict_liveflow_rejects_wrong_upload_source():
+    response = client.post(
+        "/predict/liveflow",
+        json={
+            "upload": {
+                "upload_id": "upload-202",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "size_bytes": 58213,
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "risk_score": 78,
+                "source": "upload_text",
+            }
+        },
+    )
+    assert response.status_code == 422
+
+
 def test_predict_liveflow_document_wraps_response_for_ml_predictions():
     response = client.post(
         "/predict/liveflow-document",

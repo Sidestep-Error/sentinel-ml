@@ -27,10 +27,10 @@ from datetime import UTC, datetime
 from email import policy
 from email.parser import Parser
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from sentinel_ml import __version__
 from sentinel_ml.config import get_settings
@@ -96,6 +96,8 @@ class UploadResponse(BaseModel):
 
 
 class UploadIngestRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     upload_id: str
     filename: str
     content_type: str
@@ -105,7 +107,7 @@ class UploadIngestRequest(BaseModel):
     scan_engine: str = "unknown"
     scan_detail: str = ""
     risk_score: int = 0
-    source: str = "upload"
+    source: Literal["upload"] = "upload"
     # Static VBA analysis from upstream (None for non-Office files or when
     # the caller predates macro extraction).
     macro: MacroAnalysis | None = None
@@ -126,6 +128,8 @@ class UploadIngestResponse(BaseModel):
 
 
 class UploadTextIngestRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     upload_id: str
     filename: str
     content_type: str
@@ -134,7 +138,20 @@ class UploadTextIngestRequest(BaseModel):
     scan_detail: str = ""
     extracted_text: str | None = None
     raw_content: str | None = None
-    source: str = "upload_text"
+    source: Literal["upload_text"] = "upload_text"
+
+
+class LiveFlowUploadTextRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    upload_id: str
+    filename: str
+    content_type: str
+    scan_status: str = "clean"
+    scan_engine: str = "unknown"
+    scan_detail: str = ""
+    extracted_text: str
+    source: Literal["upload_text"] = "upload_text"
 
 
 class UploadTextIngestResponse(BaseModel):
@@ -148,6 +165,8 @@ class UploadTextIngestResponse(BaseModel):
 
 
 class SBOMComponent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     name: str
     version: str
     ecosystem: str | None = None
@@ -156,12 +175,16 @@ class SBOMComponent(BaseModel):
 
 
 class CVEAffectedPackage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     name: str
     ecosystem: str | None = None
     fixed_version: str | None = None
 
 
 class CVEItem(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     cve_id: str
     summary: str
     cvss_score: float
@@ -170,11 +193,15 @@ class CVEItem(BaseModel):
 
 
 class CVERelevanceRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     sbom_components: list[SBOMComponent]
     cves: list[CVEItem]
 
 
 class CVEMatchedComponent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     name: str
     version: str
     ecosystem: str | None = None
@@ -182,6 +209,8 @@ class CVEMatchedComponent(BaseModel):
 
 
 class CVERelevanceItem(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     cve_id: str
     severity: str
     cvss_score: float
@@ -192,24 +221,32 @@ class CVERelevanceItem(BaseModel):
 
 
 class CVERelevanceSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     total_cves: int
     matched_cves: int
     matched_high_or_critical: int
 
 
 class CVERelevanceResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     results: list[CVERelevanceItem]
     summary: CVERelevanceSummary
 
 
 class TrivyCVERelevanceRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     sbom_document: dict[str, Any]
     vulnerability_document: dict[str, Any]
 
 
 class LiveFlowRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     upload: UploadIngestRequest | None = None
-    upload_text: UploadTextIngestRequest | None = None
+    upload_text: LiveFlowUploadTextRequest | None = None
     cve_relevance: CVERelevanceRequest | None = None
 
 
@@ -608,12 +645,13 @@ def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> Upload
 
 
 def _predict_upload_text_ingest(
-    req: UploadTextIngestRequest, request: Request
+    req: UploadTextIngestRequest | LiveFlowUploadTextRequest, request: Request
 ) -> UploadTextIngestResponse:
     text_source = req.extracted_text
-    if not text_source and req.raw_content:
+    raw_content = getattr(req, "raw_content", None)
+    if not text_source and raw_content:
         try:
-            text_source = _extract_text(req.raw_content, req.content_type, req.filename)
+            text_source = _extract_text(raw_content, req.content_type, req.filename)
         except Exception:  # noqa: BLE001
             logger.exception("Text extraction failed for upload_id=%s", req.upload_id)
             text_source = ""
