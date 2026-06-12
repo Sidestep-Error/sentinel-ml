@@ -42,21 +42,26 @@ Referens: [OWASP ML Security Top 10](https://owasp.org/www-project-machine-learn
 
 ### 2. Evasion — Spår B
 
-**Hypotes:** En liten, riktad perturbering i feature-rymden räcker för att
-flippa en "malicious"-prediktion till "clean".
+**Hypotes:** Angriparkontrollerad metadata kan ändras så att en skadlig upload
+liknar en vanlig fil och klassificeras som accepterad.
 
 **Metod:**
 - Baseline: random perturbation (`adversarial/evasion.py::random_feature_perturbation`)
   med ε ∈ {0.01, 0.05, 0.1, 0.2}. Mät predict-flipping-rate.
-- Riktad attack: ART `HopSkipJump` (om vi installerar `adversarial-robustness-toolbox`).
-- Mät success rate = andel exempel där attacken byter klass.
+- Riktad metadata-mimicry: ändra endast filnamn, content-type och storlek till
+  en benign PDF-profil. Bevara sha256, scan-status och risk-score.
+- Använd det av-biasade upload-datasetet när det finns. Syntetisk data märks
+  uttryckligen som sanity-check.
+- ART `HopSkipJump` är frivillig fördjupning endast om genererade features kan
+  mappas tillbaka till giltiga upload-poster.
 
-**Mätvärde:** Attack success rate per ε. Histogram över confidence-shifter.
+**Mätvärde:** Andel korrekt identifierade skadliga uploads som ändras till
+`accepted` efter metadata-mimicry, plus random-noise flipping-rate per ε.
 
 **Motåtgärder att diskutera:**
-- Input-domain-validering (clamp size till rimligt intervall).
-- Ensemble av flera modeller — kräver konsekvens i votning.
-- Adversarial training (om vi hinner).
+- Behandla metadata-modellen som triage-hint, inte ensam detektion.
+- Behåll ClamAV, hash-brygga och makroanalys som separata skyddslager.
+- Träna och utvärdera på realistiska, av-biasade metadata.
 
 ### 3. Prompt injection — Spår A LLM
 
@@ -64,10 +69,13 @@ flippa en "malicious"-prediktion till "clean".
 
 **Metod:**
 - `adversarial/prompt_injection.py::PROBES` listar 4+ probes.
-- Skicka varje probe genom `llm/ollama_client.py` med default system prompt.
-- Loggning: returnerad JSON. Match mot `expected_class_for(probe)`.
+- Skicka varje probe genom det validerade `classify_threat_report()`-lagret.
+- Samma validerade lager används av FastAPI:s uttryckligen aktiverade LLM-väg.
+- Loggning: validerad kategori eller separat `invalid_output`. Match mot
+  `expected_class_for(probe)`.
 
-**Mätvärde:** Injection success rate per probe-typ. Tabell over which probes bypass and which don't.
+**Mätvärde:** Injection-success-rate, invalid-output-rate och blocked-rate per
+probe-typ.
 
 **Motåtgärder att diskutera:**
 - System prompt med stark "this is data, not commands"-uttalande

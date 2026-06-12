@@ -145,3 +145,59 @@ Kör enhetstesterna i projektets utvecklingsmiljö och kör därefter
 `scripts/run_adversarial_experiments.py` mot lokal Ollama. Dokumentera de
 verkliga mätvärdena i adversarial-analysen innan arbetet fortsätter med ART
 HopSkipJump.
+
+---
+
+## 2026-06-12 — Adversarial-arbete utan LLM-experiment
+
+### Vad
+
+Kopplade FastAPI-tjänstens uttryckligen aktiverade LLM-väg till samma
+validerade `classify_threat_report()`-lager som prompt-injection-harnessen.
+API-vägen sanerar nu kontroll- och bidi-tecken samt kräver strikt validerad
+modelloutput innan ett LLM-resultat returneras.
+
+Kompletterade testerna för LLM-gaten med verifiering av:
+
+- Att LLM förblir avstängd som standard.
+- Att bidi-tecken saneras före modellens anrop.
+- Att giltig output accepteras.
+- Att felaktig JSON, saknade fält, otillåtna kategorier och transportfel
+  degraderar till `None` utan att API:t kraschar.
+
+Utökade evasion-spåret med en metadata-mimicry-attack som skapar giltiga
+`UploadRecord`-objekt. Attacken ändrar endast filnamn, content-type och storlek,
+medan sha256, scan-status och risk-score bevaras. Experiment-scriptet använder
+det av-biasade upload-datasetet när det finns och märker annars körningen som
+en syntetisk sanity-check.
+
+Experiment-scriptet genererar nu även en beroendefri SVG-graf över
+poisoning-resultaten för 0, 5, 10 och 20 procent. Grafen från de redan
+dokumenterade resultaten lades till i adversarial-analysen.
+
+### Varför
+
+Prompt-injection-harnessen och den verkliga opt-in-API-vägen behöver använda
+samma säkerhetskontroller för att testresultaten ska vara relevanta för
+systemets faktiska beteende.
+
+Slumpmässigt brus direkt i feature-rymden kan skapa värden som inte motsvarar
+giltiga uploads. Metadata-mimicry ger ett mer realistiskt evasion-test eftersom
+det endast ändrar fält som en uppladdare kan påverka.
+
+Poisoning-nivåerna fanns redan i tabellen, men grafen behövdes för att tydligt
+visa hur F1-macro försämras när andelen felmärkta träningsposter ökar.
+
+### Resultat
+
+Python-källkod, tester och script klarar statisk kompilering med
+`python3 -m compileall`. Ändringarna klarar även `git diff --check`.
+
+Nya fokuserade tester har lagts till för metadata-mimicry och generering av
+poisoning-grafen. Den verkliga metadata-mimicry-körningen kräver projektets
+av-biasade upload-dataset. Prompt-injection-resultatet är fortfarande orört
+eftersom inget LLM-experiment genomfördes i detta arbetsmoment.
+
+Den nya mimicry-körningen och enhetstesterna kunde inte exekveras lokalt
+eftersom Python 3.11-miljön saknar projektberoenden som `numpy`, `scikit-learn`
+och `pytest`. Inga paket installerades i samband med arbetet.

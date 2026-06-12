@@ -52,7 +52,6 @@ from sentinel_ml.features.hash_match import (
 from sentinel_ml.features.ioc_extract import extract_iocs
 from sentinel_ml.features.macro_risk import assess_macro_risk
 from sentinel_ml.features.upload_meta import build_feature_matrix
-from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM
 from sentinel_ml.log_anomaly import tfidf_detector
 from sentinel_ml.models import threat_classifier, upload_classifier
 
@@ -353,7 +352,7 @@ def _get_malicious_hashes(request: Request) -> set[str]:
 
 
 def _call_ollama(text: str) -> LLMAnalysis | None:
-    """Call Ollama for LLM-based threat classification. Returns None on any failure.
+    """Run validated Ollama threat classification. Returns None on any failure.
 
     Gated behind ``settings.llm_enabled`` (default False): the deployed path
     runs the classical models and never touches Ollama unless explicitly opted
@@ -366,16 +365,18 @@ def _call_ollama(text: str) -> LLMAnalysis | None:
     if not settings.llm_enabled:
         return None
     try:
+        from sentinel_ml.llm.classifier import try_classify_threat_report
         from sentinel_ml.llm.ollama_client import OllamaClient
 
         client = OllamaClient(timeout=settings.ollama_timeout_seconds)
-        response = client.generate(prompt=text, system=CLASSIFY_THREAT_REPORT_SYSTEM)
-        data = json.loads(response.text)
+        result = try_classify_threat_report(text, client=client)
+        if result is None:
+            return None
         return LLMAnalysis(
-            category=str(data.get("category", "unknown")),
-            confidence=float(data.get("confidence", 0.0)),
-            rationale=str(data.get("rationale", "")),
-            model=response.model,
+            category=result.category,
+            confidence=result.confidence,
+            rationale=result.rationale,
+            model=client.model,
         )
     except Exception:
         logger.debug("Ollama unavailable or returned unexpected format — skipping LLM analysis", exc_info=True)

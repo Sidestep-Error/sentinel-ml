@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420">
+<rect width="100%" height="100%" fill="white"/>
+<text x="360" y="24" text-anchor="middle" font-size="18">Data poisoning: F1-macro</text>
+<line x1="80" y1="40" x2="80" y2="350" stroke="black"/>
+<line x1="80" y1="350" x2="680" y2="350" stroke="black"/>
+<text x="20" y="210" transform="rotate(-90 20 210)" text-anchor="middle">F1-macro</text>
+<text x="360" y="412" text-anchor="middle">Poison-ratio</text>
+<polyline points="80.0,87.2 230.0,129.3 380.0,210.9 680.0,286.2"
+  fill="none" stroke="#b91c1c" stroke-width="3"/>
+<circle cx="80.0" cy="87.2" r="5" fill="#b91c1c"/>
+<text x="80.0" y="75.2" text-anchor="middle" font-size="13">0.963</text>
+<circle cx="230.0" cy="129.3" r="5" fill="#b91c1c"/>
+<text x="230.0" y="117.3" text-anchor="middle" font-size="13">0.930</text>
+<circle cx="380.0" cy="210.9" r="5" fill="#b91c1c"/>
+<text x="380.0" y="198.9" text-anchor="middle" font-size="13">0.866</text>
+<circle cx="680.0" cy="286.2" r="5" fill="#b91c1c"/>
+<text x="680.0" y="274.2" text-anchor="middle" font-size="13">0.807</text>
+<text x="80.0" y="385" text-anchor="middle" font-size="13">0%</text>
+<text x="230.0" y="385" text-anchor="middle" font-size="13">5%</text>
+<text x="380.0" y="385" text-anchor="middle" font-size="13">10%</text>
+<text x="680.0" y="385" text-anchor="middle" font-size="13">20%</text>
+</svg>

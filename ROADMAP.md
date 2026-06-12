@@ -184,7 +184,7 @@ Detta är den operativa stopp-listan inför intern deadline på fredag.
 - [ ] **Spår A:** CVE-relevansgradering — matcha CVE-ID:n mot SBOM från sentinel-upload-api (Trivy/Syft artefakt) + ranka per CVSS.
 - [ ] **Spår B:** Hyperparameter-sökning (GridSearch eller Optuna) på Random Forest + Gradient Boosting. Välj bästa.
 - [ ] **Spår C (kritisk för VG):**
-  - [ ] **Data poisoning:** lägg in 5/10/20 % felmärkta threat reports i träningsdata. Mät F1-degradering. Plot i `docs/adversarial-analysis.md`.
+  - [x] **Data poisoning:** lägg in 5/10/20 % felmärkta threat reports i träningsdata. Mät F1-degradering. Plot i `docs/adversarial-analysis.md`.
   - [ ] **Evasion:** ART `HopSkipJump` på Spår B-modellen. Skapa adversarial-exempel som ligger nära beslutsgränsen.
   - [ ] **Prompt injection:** kuraterad lista av prompts som försöker styra LLM-output. Mät success rate.
 - [ ] **Rapport:** Påbörja teknisk rapport (`docs/technical-report.md`).
