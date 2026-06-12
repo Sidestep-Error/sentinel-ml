@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from sentinel_ml.config import get_settings
-from sentinel_ml.data.schemas import ThreatReport, UploadRecord
+from sentinel_ml.data.schemas import MalwareSample, ThreatReport, UploadRecord
 
 if TYPE_CHECKING:
     from pymongo.collection import Collection
@@ -65,3 +65,23 @@ def load_threat_reports_jsonl(path: str | Path) -> Iterator[ThreatReport]:
             if not line:
                 continue
             yield ThreatReport.model_validate(json.loads(line))
+
+
+def load_malware_samples_jsonl(path: str | Path) -> Iterator[MalwareSample]:
+    """Stream malware-sample metadata from a JSONL file.
+
+    Format: one JSON object per line, conforming to `MalwareSample` schema —
+    the shape written by `scripts/download_malwarebazaar.py`. Skips malformed
+    lines so one bad row doesn't take down the whole hash set.
+    """
+    path = Path(path)
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                yield MalwareSample.model_validate(json.loads(line))
+            except Exception:  # noqa: BLE001 - skip malformed rows, keep the rest
+                logger.debug("Skipping malformed malware-sample line", exc_info=True)
+                continue

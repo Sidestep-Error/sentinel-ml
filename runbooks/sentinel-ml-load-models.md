@@ -95,18 +95,35 @@ Förväntat (= modellerna laddade):
 kubectl delete pod sentinel-ml-models-loader -n sentinel
 ```
 
-## 7. (Valfritt) Hash-bryggan live
+## 7. Hash-bryggan live (krävs för "Threat intel: MATCH")
 
-För att kunna visa "MATCH – känd skadlig hash":
+Bryggan unionerar **två källor** vid startup (båda valfria — saknad fil loggas
+och hoppas över):
 
-1. `scp` upp en threat-reports-JSONL till servern och `kubectl cp` in den i
-   loader-podden (samma flöde som steg 2–3), t.ex.
-   `/models/known_malicious_reports.jsonl` — seedad med `sha256` på den fil du
-   tänker ladda upp i demon.
-2. Sätt i `k8s/base/configmap.yaml`:
-   `KNOWN_MALICIOUS_HASHES_PATH: "/app/models_store/known_malicious_reports.jsonl"`
-   och **applicera manuellt**: `kubectl apply -f k8s/base/configmap.yaml`.
-3. `kubectl rollout restart deployment/sentinel-ml -n sentinel`.
+| Env-var (satt i configmap)     | Fil på PVC:n                              | Innehåll                                            |
+|--------------------------------|-------------------------------------------|------------------------------------------------------|
+| `KNOWN_MALICIOUS_HASHES_PATH`  | `/models/known_malicious_reports.jsonl`   | Threat-reports-JSONL; hash-IOC:er extraheras ur text |
+| `MALWARE_SAMPLES_PATH`         | `/models/malware_samples.jsonl`            | MalwareBazaar-metadata; `sha256` per rad tas direkt  |
+
+`malware_samples.jsonl` är samma fil som `fetch-malware-data.yml`-workflowen
+producerar som CI-artifact (eller kör `scripts/download_malwarebazaar.py`
+lokalt). Eftersom våra demo-filer kommer från MalwareBazaar fångar den källan
+i praktiken allt vi testar med.
+
+1. Applicera configmappen (paths är incheckade sedan PR:en som la till
+   `MALWARE_SAMPLES_PATH`): `kubectl apply -f k8s/base/configmap.yaml`.
+2. Hämta `malware_samples.jsonl` (ladda ner CI-artifacten från senaste
+   `fetch-malware-data`-körningen, eller generera lokalt) och `scp` + `kubectl cp`
+   in den i loader-podden, samma flöde som steg 2–3:
+   `kubectl cp ~/malware_samples.jsonl sentinel/sentinel-ml-models-loader:/models/malware_samples.jsonl`
+3. (Valfritt) Samma sak med en threat-reports-JSONL till
+   `/models/known_malicious_reports.jsonl`.
+4. `kubectl rollout restart deployment/sentinel-ml -n sentinel`.
+5. Verifiera i loggen: `kubectl logs -n sentinel deploy/sentinel-ml | grep -i hash-bridge`
+   ska visa `loaded N hashes from malware-samples`.
+6. **Uppdatering inför demo:** kör om `fetch-malware-data`-workflowen så
+   artifacten innehåller färska sampel, och upprepa steg 2 + 4 — annars finns
+   inte nyss publicerade MalwareBazaar-filer i setet.
 
 ## Noter
 

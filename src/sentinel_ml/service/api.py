@@ -35,7 +35,7 @@ from pydantic import BaseModel
 from sentinel_ml import __version__
 from sentinel_ml.config import get_settings
 from sentinel_ml.data.predictions import upsert_ml_prediction_document
-from sentinel_ml.data.schemas import IOC, Prediction, UploadRecord
+from sentinel_ml.data.schemas import IOC, MacroAnalysis, Prediction, UploadRecord
 from sentinel_ml.features.cve_relevance import (
     CVERelevancePrediction,
     build_cve_relevance_prediction,
@@ -44,8 +44,13 @@ from sentinel_ml.features.cve_relevance import (
     sbom_components_from_normalized,
     sbom_components_from_trivy,
 )
-from sentinel_ml.features.hash_match import collect_hashes_from_reports, match_upload_hash
+from sentinel_ml.features.hash_match import (
+    collect_hashes_from_malware_samples,
+    collect_hashes_from_reports,
+    match_upload_hash,
+)
 from sentinel_ml.features.ioc_extract import extract_iocs
+from sentinel_ml.features.macro_risk import assess_macro_risk
 from sentinel_ml.features.upload_meta import build_feature_matrix
 from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM
 from sentinel_ml.log_anomaly import tfidf_detector
@@ -101,6 +106,9 @@ class UploadIngestRequest(BaseModel):
     scan_detail: str = ""
     risk_score: int = 0
     source: str = "upload"
+    # Static VBA analysis from upstream (None for non-Office files or when
+    # the caller predates macro extraction).
+    macro: MacroAnalysis | None = None
 
 
 class UploadIngestResponse(BaseModel):
@@ -113,6 +121,8 @@ class UploadIngestResponse(BaseModel):
     scan_detail: str
     risk_score: int
     known_malicious: bool = False
+    macro_risk: bool = False
+    macro_reason: str = ""
 
 
 class UploadTextIngestRequest(BaseModel):
@@ -210,6 +220,7 @@ class LiveFlowSummary(BaseModel):
     ioc_count: int = 0
     matched_cves: int = 0
     known_malicious_hash: bool = False
+    macro_risk: bool = False
 
 
 class LiveFlowResponse(BaseModel):
@@ -270,23 +281,46 @@ def _try_load(path: Path, loader: Callable[[Path], Any]) -> LoadedModel | None:
     return LoadedModel(artifact=artifact, version=_artifact_version(path))
 
 
-def _load_malicious_hashes(path: Path | None) -> set[str]:
-    """Build the known-malicious hash set at startup. Empty set on any problem."""
+def _load_hash_source(path: Path | None, label: str, collect: Callable[[Path], set[str]]) -> set[str]:
+    """Load one known-malicious hash source. Empty set on any problem."""
     if path is None:
         return set()
     p = Path(path)
     if not p.exists():
-        logger.info("Known-malicious hash source missing at %s — hash-bridge inactive", p)
+        logger.info("Hash-bridge: %s source missing at %s — skipped", label, p)
         return set()
     try:
-        from sentinel_ml.data.loaders import load_threat_reports_jsonl
-
-        hashes = collect_hashes_from_reports(load_threat_reports_jsonl(p))
-        logger.info("Hash-bridge: loaded %d known-malicious hashes", len(hashes))
+        hashes = collect(p)
+        logger.info("Hash-bridge: loaded %d hashes from %s (%s)", len(hashes), label, p)
         return hashes
     except Exception:  # noqa: BLE001 — degrade rather than crash startup
-        logger.exception("Failed to load known-malicious hashes from %s", p)
+        logger.exception("Hash-bridge: failed to load %s from %s", label, p)
         return set()
+
+
+def _load_malicious_hashes(reports_path: Path | None, samples_path: Path | None) -> set[str]:
+    """Union the known-malicious hash set from both sources at startup.
+
+    - threat reports JSONL: hash IOCs extracted from report text/iocs
+    - malware samples JSONL: sha256 per row (MalwareBazaar metadata)
+    """
+    from sentinel_ml.data.loaders import load_malware_samples_jsonl, load_threat_reports_jsonl
+
+    hashes = _load_hash_source(
+        reports_path,
+        "threat-reports",
+        lambda p: collect_hashes_from_reports(load_threat_reports_jsonl(p)),
+    )
+    hashes |= _load_hash_source(
+        samples_path,
+        "malware-samples",
+        lambda p: collect_hashes_from_malware_samples(load_malware_samples_jsonl(p)),
+    )
+    if hashes:
+        logger.info("Hash-bridge: %d known-malicious hashes total", len(hashes))
+    else:
+        logger.info("Hash-bridge: no hash sources loaded — bridge reports no matches")
+    return hashes
 
 
 @asynccontextmanager
@@ -302,7 +336,9 @@ async def lifespan(app: FastAPI):
     app.state.log_anomaly_model = _try_load(
         models_dir / LOG_ANOMALY_ARTIFACT_NAME, tfidf_detector.load
     )
-    app.state.malicious_hashes = _load_malicious_hashes(settings.known_malicious_hashes_path)
+    app.state.malicious_hashes = _load_malicious_hashes(
+        settings.known_malicious_hashes_path, settings.malware_samples_path
+    )
     yield
 
 
@@ -555,6 +591,7 @@ def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> Upload
         scan_detail=req.scan_detail,
     )
     result = _predict_upload_record(record, request)
+    macro_risk, macro_reason = assess_macro_risk(req.macro)
     return UploadIngestResponse(
         upload_id=req.upload_id,
         source=req.source,
@@ -565,6 +602,8 @@ def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> Upload
         scan_detail=req.scan_detail,
         risk_score=req.risk_score,
         known_malicious=match_upload_hash(req.sha256, _get_malicious_hashes(request)),
+        macro_risk=macro_risk,
+        macro_reason=macro_reason,
     )
 
 
@@ -618,6 +657,7 @@ def _predict_liveflow(req: LiveFlowRequest, request: Request) -> LiveFlowRespons
             ioc_count=ioc_count,
             matched_cves=matched_cves,
             known_malicious_hash=upload_result.known_malicious if upload_result else False,
+            macro_risk=upload_result.macro_risk if upload_result else False,
         ),
     )
 
@@ -643,8 +683,25 @@ def _build_ml_prediction_document(
     )
 
 
+def _configure_logging() -> None:
+    """Make sentinel_ml INFO logs visible in the service process.
+
+    Uvicorn only configures its own loggers; module loggers propagate to the
+    root logger, which drops INFO without a handler — so startup lines like
+    the hash-bridge counts never reached `kubectl logs`. basicConfig is a
+    no-op when the root logger already has handlers (e.g. under pytest), so
+    test log capture is unaffected.
+    """
+    level = logging.getLevelNamesMapping().get(get_settings().log_level.upper(), logging.INFO)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+
+
 def create_app() -> FastAPI:
     """Build a FastAPI app. Use this in tests to get a fresh lifespan."""
+    _configure_logging()
     app = FastAPI(
         title="Sentinel ML",
         version=__version__,

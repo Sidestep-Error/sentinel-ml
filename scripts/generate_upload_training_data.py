@@ -32,6 +32,20 @@ _CLEAN_PROFILES = [
     (".csv",  "text/csv",          ["data", "export", "results", "log", "metrics", "stats"]),
     (".txt",  "text/plain",        ["notes", "readme", "config", "changelog", "todo", "log"]),
     (".md",   "text/markdown",     ["README", "CHANGELOG", "docs", "notes", "spec"]),
+    # Microsoft Office (modern OpenXML)
+    (".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+     ["report", "letter", "memo", "proposal", "minutes", "policy", "handbook"]),
+    (".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+     ["budget", "forecast", "expenses", "inventory", "schedule", "tracker", "timesheet"]),
+    (".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+     ["presentation", "deck", "slides", "pitch", "overview", "review", "quarterly"]),
+    # Microsoft Office (legacy)
+    (".doc",  "application/msword",
+     ["report", "letter", "memo", "draft", "notes", "agenda"]),
+    (".xls",  "application/vnd.ms-excel",
+     ["budget", "data", "expenses", "log", "tracker", "sales"]),
+    (".ppt",  "application/vnd.ms-powerpoint",
+     ["presentation", "slides", "deck", "demo", "training", "kickoff"]),
 ]
 
 _MALICIOUS_MIME = {
@@ -67,10 +81,25 @@ def _clean_record(rng: random.Random, idx: int) -> dict:
     }
 
 
-def _malicious_record(raw: dict) -> dict:
+# Vardagliga filnamns-prefix (samma stil som clean-klassen). Används med
+# --realistic-malware-names för att NEUTRALISERA filnamns-artefakten: MalwareBazaar
+# döper om sina prover med AV-prefix (t.ex. "SecuriteInfo.com.W97M...") som annars
+# läcker klasstillhörigheten, så att modellen "fuskar" på filnamnet i stället för
+# att lära sig något generaliserbart. Med riktiga namn simuleras dessutom en
+# angripare som döper malware som en vanlig fil (det realistiska hotet).
+_NEUTRAL_PREFIXES = [
+    "report", "invoice", "budget", "summary", "data", "notes",
+    "document", "file", "scan", "export", "minutes", "draft",
+]
+
+
+def _malicious_record(raw: dict, realistic_name: bool = False, rng: random.Random | None = None) -> dict:
     """Map a MalwareSample record to upload-classifier training format."""
     file_type = (raw.get("file_type") or "exe").lower()
-    filename = raw.get("file_name") or f"malware.{file_type}"
+    if realistic_name and rng is not None:
+        filename = f"{rng.choice(_NEUTRAL_PREFIXES)}_{rng.randint(1, 9999)}.{file_type}"
+    else:
+        filename = raw.get("file_name") or f"malware.{file_type}"
     ctype = raw.get("file_type_mime") or _MALICIOUS_MIME.get(file_type, "application/octet-stream")
     size = raw.get("file_size") or 0
     signature = raw.get("signature") or ""
@@ -94,6 +123,13 @@ def main(
     n_clean: int = typer.Option(1000, help="Number of synthetic clean records to generate"),
     out: Path = typer.Option(Path("data/upload_training_data.jsonl"), help="Output JSONL"),
     seed: int = typer.Option(42),
+    realistic_malware_names: bool = typer.Option(
+        False,
+        help="Ge malware vardagliga filnamn + riktig ändelse. Neutraliserar "
+        "MalwareBazaar:s filnamns-artefakt så modellen inte fuskar på namnet — "
+        "ger ärligare (lägre) resultat och speglar en angripare som döper malware "
+        "som en vanlig fil.",
+    ),
 ) -> None:
     rng = random.Random(seed)
 
@@ -105,7 +141,9 @@ def main(
             for line in f:
                 line = line.strip()
                 if line:
-                    records.append(_malicious_record(json.loads(line)))
+                    records.append(
+                        _malicious_record(json.loads(line), realistic_name=realistic_malware_names, rng=rng)
+                    )
         n_malicious = sum(1 for r in records if r["label"] == "rejected")
         typer.echo(f"Malicious (MalwareBazaar): {n_malicious} poster")
     else:
