@@ -628,55 +628,70 @@ def _risk_level_from_prediction(prediction: Prediction) -> str:
     confidence = prediction.confidence
     if label in {"phishing", "ransomware", "malware", "intrusion", "ddos"}:
         if confidence >= 0.8:
-            return "hög"
+            return "high"
         if confidence >= 0.5:
-            return "förhöjd"
-        return "möjlig"
+            return "elevated"
+        return "weak"
     if label in {"clean", "accepted"}:
-        return "låg"
+        return "low"
     if label in {"rejected", "malicious"}:
-        return "hög"
-    return "oklar"
+        return "high"
+    return "unclear"
 
 
 def _label_display_name(label: str) -> str:
     mapping = {
-        "unknown": "okänd",
-        "clean": "ren",
-        "accepted": "godkänd",
-        "malicious": "skadlig",
-        "rejected": "avvisad",
+        "unknown": "unknown",
+        "clean": "clean",
+        "accepted": "accepted",
+        "malicious": "malicious",
+        "rejected": "rejected",
         "phishing": "phishing",
         "ransomware": "ransomware",
         "malware": "malware",
-        "intrusion": "intrång",
+        "intrusion": "intrusion",
         "ddos": "DDoS",
     }
-    return mapping.get((label or "unknown").lower(), label or "okänd")
+    return mapping.get((label or "unknown").lower(), label or "unknown")
 
 
 def _ioc_type_display_name(ioc_type: str, count: int) -> str:
     singular = {
-        "url": "webblänk",
-        "domain": "domän",
-        "ip": "IP-adress",
-        "email": "e-postadress",
-        "cve": "CVE-referens",
-        "md5": "MD5-hash",
-        "sha1": "SHA1-hash",
-        "sha256": "SHA256-hash",
+        "url": "URL",
+        "domain": "domain",
+        "ip": "IP address",
+        "email": "email address",
+        "cve": "CVE reference",
+        "md5": "MD5 hash",
+        "sha1": "SHA1 hash",
+        "sha256": "SHA256 hash",
     }
     plural = {
-        "url": "webblänkar",
-        "domain": "domäner",
-        "ip": "IP-adresser",
-        "email": "e-postadresser",
-        "cve": "CVE-referenser",
-        "md5": "MD5-hashar",
-        "sha1": "SHA1-hashar",
-        "sha256": "SHA256-hashar",
+        "url": "URLs",
+        "domain": "domains",
+        "ip": "IP addresses",
+        "email": "email addresses",
+        "cve": "CVE references",
+        "md5": "MD5 hashes",
+        "sha1": "SHA1 hashes",
+        "sha256": "SHA256 hashes",
     }
     return singular.get(ioc_type, ioc_type) if count == 1 else plural.get(ioc_type, ioc_type)
+
+
+def _signal_phrase(prediction: Prediction) -> str:
+    label = _label_display_name(prediction.label or "unknown")
+    confidence_pct = round(prediction.confidence * 100)
+    risk_level = _risk_level_from_prediction(prediction)
+    if risk_level == "high":
+        return f"Strong signal for {label} ({confidence_pct}%)."
+    if risk_level == "elevated":
+        return f"Moderate signal for {label} ({confidence_pct}%)."
+    if risk_level == "weak":
+        return f"Weak signal for {label} ({confidence_pct}%)."
+    if risk_level == "low":
+        return f"Low-risk text signal ({confidence_pct}%)."
+    return f"Inconclusive text signal ({confidence_pct}%)."
 
 
 def _build_upload_text_summary(
@@ -684,17 +699,12 @@ def _build_upload_text_summary(
     iocs: list[IOC],
     text_truncated: bool,
 ) -> str:
-    label = prediction.label or "unknown"
-    confidence_pct = round(prediction.confidence * 100)
-    risk_level = _risk_level_from_prediction(prediction)
-    display_label = _label_display_name(label)
     ioc_count = len(iocs)
     summary_parts = [
-        f"Textanalysen bedömer risken som {risk_level}.",
-        f"Klassificering: {display_label} ({confidence_pct} %).",
+        _signal_phrase(prediction),
     ]
     if ioc_count == 0:
-        summary_parts.append("Inga indikatorer hittades.")
+        summary_parts.append("No indicators were found.")
     else:
         breakdown = _summarize_iocs(iocs)
         parts = [
@@ -702,10 +712,10 @@ def _build_upload_text_summary(
             for ioc_type, count in sorted(breakdown.items())
         ]
         summary_parts.append(
-            f"Hittade {ioc_count} indikatorer: {', '.join(parts)}."
+            f"Found {ioc_count} indicators: {', '.join(parts)}."
         )
     if text_truncated:
-        summary_parts.append("Texten trunkerades före analys.")
+        summary_parts.append("The text was truncated before analysis.")
     return " ".join(summary_parts)
 
 

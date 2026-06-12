@@ -333,9 +333,8 @@ def test_predict_upload_text_ingest_fallback_with_extracted_text():
     assert payload["prediction"]["label"] == "unknown"
     assert payload["model_version"] == "none"
     assert payload["text_truncated"] is False
-    assert "risken som oklar" in payload["summary"]
-    assert "Klassificering: okänd" in payload["summary"]
-    assert "1 webblänk" in payload["summary"]
+    assert "Inconclusive text signal" in payload["summary"]
+    assert "1 URL" in payload["summary"]
     assert "http://evil.example" not in payload["summary"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "http://evil.example" in ioc_values
@@ -366,6 +365,7 @@ def test_predict_upload_text_ingest_extracts_eml_and_uses_model(app_with_models)
     payload = response.json()
     assert payload["model_version"] != "none"
     assert payload["prediction"]["label"] in {"ransomware", "phishing"}
+    assert "signal for" in payload["summary"]
     assert "attacker@example.com" not in payload["summary"]
     assert "Subject: Payroll update" in payload["extracted_text"]
     ioc_values = {i["value"] for i in payload["iocs"]}
@@ -388,7 +388,7 @@ def test_predict_upload_text_ingest_extracts_json_raw_content():
     payload = response.json()
     assert payload["extracted_text"].startswith('{"message"')
     assert "1.2.3.4" not in payload["summary"]
-    assert "1 IP-adress" in payload["summary"]
+    assert "1 IP address" in payload["summary"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "1.2.3.4" in ioc_values
 
@@ -406,7 +406,7 @@ def test_predict_upload_text_ingest_summary_without_indicators():
     )
     assert response.status_code == 200
     payload = response.json()
-    assert payload["summary"].endswith("Inga indikatorer hittades.")
+    assert payload["summary"].endswith("No indicators were found.")
 
 
 def test_predict_liveflow_fallback_combines_all_parts():
