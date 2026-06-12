@@ -62,6 +62,19 @@ class MalwareSample(BaseModel):
     family: str | None = None
 
 
+class MacroAnalysis(BaseModel):
+    """Static VBA-macro analysis of an Office upload.
+
+    Produced upstream by sentinel-upload-api at upload time (olevba) — file
+    content never reaches sentinel-ml, only these aggregated counts do.
+    """
+
+    has_macros: bool = False
+    autoexec_keywords: int = Field(default=0, ge=0)
+    suspicious_keywords: int = Field(default=0, ge=0)
+    ioc_count: int = Field(default=0, ge=0)
+
+
 class UploadRecord(BaseModel):
     """Projection of sentinel-upload-api's `uploads` collection.
 
