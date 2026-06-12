@@ -53,6 +53,12 @@ class Settings(BaseSettings):
     known_malicious_hashes_path: Path | None = Field(
         default=None, alias="KNOWN_MALICIOUS_HASHES_PATH"
     )
+    # Optional malware-samples JSONL (MalwareBazaar metadata, the shape written
+    # by scripts/download_malwarebazaar.py) whose sha256 values are unioned into
+    # the same known-malicious set. Unset/missing => degrades the same way.
+    malware_samples_path: Path | None = Field(
+        default=None, alias="MALWARE_SAMPLES_PATH"
+    )
 
 
 def get_settings() -> Settings:

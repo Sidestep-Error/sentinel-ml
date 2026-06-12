@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from sentinel_ml.data.schemas import IOCType, ThreatReport
+from sentinel_ml.data.schemas import IOCType, MalwareSample, ThreatReport
 from sentinel_ml.features.ioc_extract import extract_iocs
 
 # md5 / sha1 / sha256 hex lengths.
@@ -49,6 +49,15 @@ def collect_hashes_from_reports(reports: Iterable[ThreatReport]) -> set[str]:
         raw.extend(ioc.value for ioc in report.iocs if ioc.type in _HASH_IOC_TYPES)
         raw.extend(ioc.value for ioc in extract_iocs(report.text) if ioc.type in _HASH_IOC_TYPES)
     return build_hash_set(raw)
+
+
+def collect_hashes_from_malware_samples(samples: Iterable[MalwareSample]) -> set[str]:
+    """Build a known-malicious hash set from malware-sample metadata.
+
+    Every sample row (e.g. MalwareBazaar JSONL) carries the sha256 of a file
+    that is malicious by definition — no IOC extraction needed.
+    """
+    return build_hash_set(s.sha256 for s in samples)
 
 
 def match_upload_hash(sha256: str | None, known: set[str]) -> bool:
