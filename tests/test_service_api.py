@@ -333,6 +333,8 @@ def test_predict_upload_text_ingest_fallback_with_extracted_text():
     assert payload["prediction"]["label"] == "unknown"
     assert payload["model_version"] == "none"
     assert payload["text_truncated"] is False
+    assert "indikatorer" in payload["summary"]
+    assert "http://evil.example" not in payload["summary"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "http://evil.example" in ioc_values
 
@@ -362,6 +364,7 @@ def test_predict_upload_text_ingest_extracts_eml_and_uses_model(app_with_models)
     payload = response.json()
     assert payload["model_version"] != "none"
     assert payload["prediction"]["label"] in {"ransomware", "phishing"}
+    assert "attacker@example.com" not in payload["summary"]
     assert "Subject: Payroll update" in payload["extracted_text"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "CVE-2024-99999" in ioc_values
@@ -382,6 +385,7 @@ def test_predict_upload_text_ingest_extracts_json_raw_content():
     assert response.status_code == 200
     payload = response.json()
     assert payload["extracted_text"].startswith('{"message"')
+    assert "1.2.3.4" not in payload["summary"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "1.2.3.4" in ioc_values
 
@@ -450,6 +454,7 @@ def test_predict_liveflow_fallback_combines_all_parts():
     assert payload["upload_text_result"]["model_version"] == "none" or len(
         payload["upload_text_result"]["model_version"]
     ) == 12
+    assert payload["upload_text_result"]["summary"]
     assert payload["summary"]["ioc_count"] >= 1
     assert payload["summary"]["matched_cves"] == 1
 
@@ -488,6 +493,7 @@ def test_predict_liveflow_uses_loaded_models(app_with_models):
     assert payload["upload_result"]["model_version"] != "none"
     assert payload["upload_text_result"]["prediction"]["label"] in {"ransomware", "phishing"}
     assert payload["upload_text_result"]["model_version"] != "none"
+    assert payload["upload_text_result"]["summary"]
 
 
 def test_predict_liveflow_rejects_raw_content_in_upload_text_contract():

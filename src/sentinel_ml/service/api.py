@@ -160,6 +160,7 @@ class UploadTextIngestResponse(BaseModel):
     prediction: Prediction
     model_version: str
     iocs: list[IOC]
+    summary: str
     extracted_text: str
     text_truncated: bool
 
@@ -614,6 +615,36 @@ def _predict_upload_record(record: UploadRecord, request: Request) -> UploadResp
     return UploadResponse(prediction=prediction, model_version=loaded.version)
 
 
+def _summarize_iocs(iocs: list[IOC]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for ioc in iocs:
+        key = str(ioc.type)
+        counts[key] = counts.get(key, 0) + 1
+    return counts
+
+
+def _build_upload_text_summary(
+    prediction: Prediction,
+    iocs: list[IOC],
+    text_truncated: bool,
+) -> str:
+    label = prediction.label or "unknown"
+    confidence_pct = round(prediction.confidence * 100)
+    ioc_count = len(iocs)
+    if ioc_count == 0:
+        summary = f"Textanalysen klassade innehållet som {label} ({confidence_pct} %) utan indikatorträffar."
+    else:
+        breakdown = _summarize_iocs(iocs)
+        parts = [f"{count} {ioc_type}" for ioc_type, count in sorted(breakdown.items())]
+        summary = (
+            f"Textanalysen klassade innehållet som {label} ({confidence_pct} %) "
+            f"och hittade {ioc_count} indikatorer: {', '.join(parts)}."
+        )
+    if text_truncated:
+        summary += " Texten trunkerades före analys."
+    return summary
+
+
 def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> UploadIngestResponse:
     record = UploadRecord(
         filename=req.filename,
@@ -662,6 +693,7 @@ def _predict_upload_text_ingest(
 
     prediction, model_version = _threat_predict_text(final_text, request)
     iocs = extract_iocs(final_text)
+    summary = _build_upload_text_summary(prediction, iocs, truncated)
 
     return UploadTextIngestResponse(
         upload_id=req.upload_id,
@@ -669,6 +701,7 @@ def _predict_upload_text_ingest(
         prediction=prediction,
         model_version=model_version,
         iocs=iocs,
+        summary=summary,
         extracted_text=final_text,
         text_truncated=truncated,
     )
