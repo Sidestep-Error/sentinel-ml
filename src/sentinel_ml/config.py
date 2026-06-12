@@ -43,6 +43,12 @@ class Settings(BaseSettings):
     # --- Reproducibility ---
     seed: int = Field(default=42, alias="SENTINEL_ML_SEED")
 
+    # --- Logging ---
+    # Root log level for the service process. Uvicorn only configures its own
+    # loggers, so the app must configure the root logger itself (service/api.py)
+    # for sentinel_ml INFO lines to reach stdout/stderr.
+    log_level: str = Field(default="INFO", alias="LOG_LEVEL")
+
     # --- Paths ---
     data_dir: Path = Field(default=Path("./data"), alias="DATA_DIR")
     models_dir: Path = Field(default=Path("./models_store"), alias="MODELS_DIR")
