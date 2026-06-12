@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
+import json
+
 from fastapi.testclient import TestClient
 
-from sentinel_ml.data.schemas import IOC, IOCType, ThreatReport
+from sentinel_ml.data.loaders import load_malware_samples_jsonl
+from sentinel_ml.data.schemas import IOC, IOCType, MalwareSample, ThreatReport
 from sentinel_ml.features.hash_match import (
     build_hash_set,
+    collect_hashes_from_malware_samples,
     collect_hashes_from_reports,
     match_upload_hash,
     normalize_hash,
 )
-from sentinel_ml.service.api import create_app
+from sentinel_ml.service.api import _load_malicious_hashes, create_app
 
 SHA = "a" * 64
 MD5 = "b" * 32
@@ -41,6 +45,47 @@ def test_collect_hashes_from_reports_uses_iocs_and_text():
     s = collect_hashes_from_reports(reports)
     assert SHA in s  # extracted from free text
     assert MD5 in s  # from structured iocs, normalized to lowercase
+
+
+def test_collect_hashes_from_malware_samples_normalizes():
+    samples = [
+        MalwareSample(sha256=SHA.upper()),
+        MalwareSample(sha256="not-a-hash"),
+    ]
+    s = collect_hashes_from_malware_samples(samples)
+    assert s == {SHA}
+
+
+def test_load_malware_samples_jsonl_skips_malformed(tmp_path):
+    p = tmp_path / "samples.jsonl"
+    rows = [
+        json.dumps({"sha256": SHA, "family": "Emotet"}),
+        "{broken json",
+        "",
+        json.dumps({"sha256": "d" * 64}),
+    ]
+    p.write_text("\n".join(rows), encoding="utf-8")
+    samples = list(load_malware_samples_jsonl(p))
+    assert [s.sha256 for s in samples] == [SHA, "d" * 64]
+
+
+def test_load_malicious_hashes_unions_both_sources(tmp_path):
+    reports = tmp_path / "reports.jsonl"
+    reports.write_text(
+        json.dumps({"report_id": "r1", "text": f"dropper hash {'c' * 64} seen"}) + "\n",
+        encoding="utf-8",
+    )
+    samples = tmp_path / "samples.jsonl"
+    samples.write_text(json.dumps({"sha256": SHA}) + "\n", encoding="utf-8")
+
+    hashes = _load_malicious_hashes(reports, samples)
+    assert SHA in hashes  # from malware samples
+    assert "c" * 64 in hashes  # from threat reports
+
+
+def test_load_malicious_hashes_missing_sources_degrade(tmp_path):
+    assert _load_malicious_hashes(None, None) == set()
+    assert _load_malicious_hashes(tmp_path / "nope.jsonl", tmp_path / "nada.jsonl") == set()
 
 
 def test_match_upload_hash():

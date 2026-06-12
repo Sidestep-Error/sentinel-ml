@@ -44,7 +44,11 @@ from sentinel_ml.features.cve_relevance import (
     sbom_components_from_normalized,
     sbom_components_from_trivy,
 )
-from sentinel_ml.features.hash_match import collect_hashes_from_reports, match_upload_hash
+from sentinel_ml.features.hash_match import (
+    collect_hashes_from_malware_samples,
+    collect_hashes_from_reports,
+    match_upload_hash,
+)
 from sentinel_ml.features.ioc_extract import extract_iocs
 from sentinel_ml.features.upload_meta import build_feature_matrix
 from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM
@@ -270,23 +274,46 @@ def _try_load(path: Path, loader: Callable[[Path], Any]) -> LoadedModel | None:
     return LoadedModel(artifact=artifact, version=_artifact_version(path))
 
 
-def _load_malicious_hashes(path: Path | None) -> set[str]:
-    """Build the known-malicious hash set at startup. Empty set on any problem."""
+def _load_hash_source(path: Path | None, label: str, collect: Callable[[Path], set[str]]) -> set[str]:
+    """Load one known-malicious hash source. Empty set on any problem."""
     if path is None:
         return set()
     p = Path(path)
     if not p.exists():
-        logger.info("Known-malicious hash source missing at %s — hash-bridge inactive", p)
+        logger.info("Hash-bridge: %s source missing at %s — skipped", label, p)
         return set()
     try:
-        from sentinel_ml.data.loaders import load_threat_reports_jsonl
-
-        hashes = collect_hashes_from_reports(load_threat_reports_jsonl(p))
-        logger.info("Hash-bridge: loaded %d known-malicious hashes", len(hashes))
+        hashes = collect(p)
+        logger.info("Hash-bridge: loaded %d hashes from %s (%s)", len(hashes), label, p)
         return hashes
     except Exception:  # noqa: BLE001 — degrade rather than crash startup
-        logger.exception("Failed to load known-malicious hashes from %s", p)
+        logger.exception("Hash-bridge: failed to load %s from %s", label, p)
         return set()
+
+
+def _load_malicious_hashes(reports_path: Path | None, samples_path: Path | None) -> set[str]:
+    """Union the known-malicious hash set from both sources at startup.
+
+    - threat reports JSONL: hash IOCs extracted from report text/iocs
+    - malware samples JSONL: sha256 per row (MalwareBazaar metadata)
+    """
+    from sentinel_ml.data.loaders import load_malware_samples_jsonl, load_threat_reports_jsonl
+
+    hashes = _load_hash_source(
+        reports_path,
+        "threat-reports",
+        lambda p: collect_hashes_from_reports(load_threat_reports_jsonl(p)),
+    )
+    hashes |= _load_hash_source(
+        samples_path,
+        "malware-samples",
+        lambda p: collect_hashes_from_malware_samples(load_malware_samples_jsonl(p)),
+    )
+    if hashes:
+        logger.info("Hash-bridge: %d known-malicious hashes total", len(hashes))
+    else:
+        logger.info("Hash-bridge: no hash sources loaded — bridge reports no matches")
+    return hashes
 
 
 @asynccontextmanager
@@ -302,7 +329,9 @@ async def lifespan(app: FastAPI):
     app.state.log_anomaly_model = _try_load(
         models_dir / LOG_ANOMALY_ARTIFACT_NAME, tfidf_detector.load
     )
-    app.state.malicious_hashes = _load_malicious_hashes(settings.known_malicious_hashes_path)
+    app.state.malicious_hashes = _load_malicious_hashes(
+        settings.known_malicious_hashes_path, settings.malware_samples_path
+    )
     yield
 
 
