@@ -95,13 +95,6 @@ class UploadResponse(BaseModel):
     model_version: str
 
 
-class MacroAnalysis(BaseModel):
-    has_macros: bool = False
-    autoexec_keywords: int = 0
-    suspicious_keywords: int = 0
-    ioc_count: int = 0
-
-
 class UploadIngestRequest(BaseModel):
     upload_id: str
     filename: str
