@@ -592,6 +592,7 @@ def test_predict_liveflow_document_uses_loaded_models(app_with_models):
     assert payload["ml_provider"] == "sentinel-ml"
     assert payload["ml_liveflow"]["upload_result"]["model_version"] != "none"
     assert payload["ml_liveflow"]["upload_text_result"]["model_version"] != "none"
+    assert payload["ml_liveflow"]["upload_text_result"]["extracted_text"] == ""
     assert payload["ml_liveflow"]["summary"]["has_upload"] is True
     assert payload["ml_liveflow"]["summary"]["has_upload_text"] is True
 
@@ -631,6 +632,16 @@ def test_predict_liveflow_writeback_persists_document(monkeypatch):
                 "scan_detail": "Phishing.Email.Generic",
                 "risk_score": 78,
                 "source": "upload",
+            },
+            "upload_text": {
+                "upload_id": "upload-400",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "extracted_text": "secret link http://evil.example",
+                "source": "upload_text",
             }
         },
     )
@@ -640,6 +651,12 @@ def test_predict_liveflow_writeback_persists_document(monkeypatch):
     assert payload["collection"] == "ml_predictions"
     assert payload["document"]["upload_id"] == "upload-400"
     assert stored["document"]["upload_id"] == "upload-400"
+    assert (
+        payload["document"]["ml_liveflow"]["upload_text_result"]["extracted_text"] == ""
+    )
+    assert (
+        stored["document"]["ml_liveflow"]["upload_text_result"]["extracted_text"] == ""
+    )
 
 
 def test_predict_liveflow_writeback_returns_503_on_persist_failure(monkeypatch):

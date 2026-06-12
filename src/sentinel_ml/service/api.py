@@ -700,6 +700,16 @@ def _predict_liveflow(req: LiveFlowRequest, request: Request) -> LiveFlowRespons
     )
 
 
+def _storage_safe_liveflow_response(response: LiveFlowResponse) -> LiveFlowResponse:
+    upload_text_result = response.upload_text_result
+    if upload_text_result is None:
+        return response
+    redacted_upload_text_result = upload_text_result.model_copy(
+        update={"extracted_text": ""}
+    )
+    return response.model_copy(update={"upload_text_result": redacted_upload_text_result})
+
+
 def _resolve_upload_id(req: LiveFlowRequest) -> str:
     if req.upload is not None:
         return req.upload.upload_id
@@ -716,7 +726,7 @@ def _build_ml_prediction_document(
 ) -> MLPredictionDocument:
     return MLPredictionDocument(
         upload_id=_resolve_upload_id(req),
-        ml_liveflow=response,
+        ml_liveflow=_storage_safe_liveflow_response(response),
         created_at=datetime.now(UTC),
     )
 
