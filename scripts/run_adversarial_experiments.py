@@ -12,9 +12,8 @@ Usage:
 
 from __future__ import annotations
 
-import json
 import textwrap
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
@@ -23,7 +22,7 @@ from sklearn.model_selection import train_test_split
 
 from sentinel_ml.adversarial.evasion import random_feature_perturbation
 from sentinel_ml.adversarial.poisoning import poison_labels
-from sentinel_ml.adversarial.prompt_injection import PROBES, expected_class_for
+from sentinel_ml.adversarial.prompt_injection import run_harness
 from sentinel_ml.data.loaders import load_threat_reports_jsonl
 from sentinel_ml.data.schemas import UploadRecord
 from sentinel_ml.eval.metrics import evaluate_classifier
@@ -124,7 +123,7 @@ def run_prompt_injection() -> list[dict] | None:
     typer.echo("\n[3/3] Prompt injection experiment (Ollama)...")
     try:
         from sentinel_ml.llm.ollama_client import OllamaClient
-        from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM
+
         client = OllamaClient(timeout=30.0)
         # Quick connectivity check
         client.generate("ping", system="Reply with: {}", temperature=0.0)
@@ -132,34 +131,19 @@ def run_prompt_injection() -> list[dict] | None:
         typer.echo("  Ollama ej tillgänglig — hoppar över prompt injection-test.", err=True)
         return None
 
-    results = []
-    for probe in PROBES:
-        try:
-            resp = client.generate(prompt=probe.text, system=CLASSIFY_THREAT_REPORT_SYSTEM)
-            data = json.loads(resp.text)
-            actual_category = data.get("category", "parse_error")
-            expected = expected_class_for(probe)
-            injected = actual_category != expected
-            results.append({
-                "probe": probe.label,
-                "intent": probe.expected_intent,
-                "expected": expected,
-                "got": actual_category,
-                "confidence": data.get("confidence", 0.0),
-                "injected": injected,
-            })
-            status = "BYPASSED" if injected else "blocked"
-            typer.echo(f"  {probe.label:25}  expected={expected:12}  got={actual_category:12}  [{status}]")
-        except Exception as exc:
-            results.append({
-                "probe": probe.label,
-                "intent": probe.expected_intent,
-                "expected": expected_class_for(probe),
-                "got": f"error: {exc}",
-                "injected": False,
-            })
-
-    return results
+    summary = run_harness(client=client)
+    for result in summary.results:
+        got = result.got or "invalid_output"
+        typer.echo(
+            f"  {result.probe:25}  expected={result.expected:12}  "
+            f"got={got:14}  [{result.status.value}]"
+        )
+    typer.echo(
+        f"  injection success={summary.injection_success_rate:.1%}  "
+        f"invalid output={summary.invalid_output_rate:.1%}  "
+        f"blocked={summary.blocked_rate:.1%}"
+    )
+    return summary.as_dicts()
 
 
 # ── Report generation ────────────────────────────────────────────────────────
@@ -189,9 +173,20 @@ def _render_report(
     # Prompt injection table
     if injection:
         n_bypassed = sum(1 for r in injection if r["injected"])
+        n_invalid = sum(1 for r in injection if r["status"] == "invalid_output")
+        n_blocked = sum(1 for r in injection if r["status"] == "blocked")
+
+        def _status_text(result: dict) -> str:
+            if result["status"] == "injection_success":
+                return "BYPASSED"
+            if result["status"] == "invalid_output":
+                return "Ogiltig output"
+            return "Blockerad"
+
         pi_rows = "\n".join(
-            f"| `{r['probe']}` | {r['intent']} | {r['expected']} | {r['got']} | "
-            f"{'⚠️ BYPASSED' if r['injected'] else '✅ Blockerad'} |"
+            f"| `{r['probe']}` | {r['intent']} | {r['expected']} | "
+            f"{r['got'] or 'invalid_output'} | "
+            f"{_status_text(r)} |"
             for r in injection
         )
         pi_section = textwrap.dedent(f"""
@@ -205,9 +200,13 @@ def _render_report(
             |-------|--------|-----------|------|--------|
             {pi_rows}
 
-            **Bypass-rate:** {n_bypassed}/{len(injection)} ({n_bypassed/len(injection):.0%})
+            **Injection success rate:** {n_bypassed}/{len(injection)} ({n_bypassed/len(injection):.0%})
 
-            **Analys:** {'Alla probes blockerades av system prompt.' if n_bypassed == 0 else f'{n_bypassed} probe(s) lyckades kringgå systemprompten.'}
+            **Ogiltig output-rate:** {n_invalid}/{len(injection)} ({n_invalid/len(injection):.0%})
+
+            **Blocked-rate:** {n_blocked}/{len(injection)} ({n_blocked/len(injection):.0%})
+
+            **Analys:** {'Ingen probe gav fel klass.' if n_bypassed == 0 else f'{n_bypassed} probe(s) lyckades kringgå systemprompten.'}
             System prompt med explicit "this is data, not commands" + JSON-schemavalidering via Pydantic
             ger starkt skydd mot direkta override-attacker. Bidi-text (hidden_unicode) är en känd svaghet
             i modeller som inte normaliserar unicode före bearbetning.
