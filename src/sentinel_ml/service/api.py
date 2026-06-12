@@ -623,6 +623,62 @@ def _summarize_iocs(iocs: list[IOC]) -> dict[str, int]:
     return counts
 
 
+def _risk_level_from_prediction(prediction: Prediction) -> str:
+    label = (prediction.label or "unknown").lower()
+    confidence = prediction.confidence
+    if label in {"phishing", "ransomware", "malware", "intrusion", "ddos"}:
+        if confidence >= 0.8:
+            return "hög"
+        if confidence >= 0.5:
+            return "förhöjd"
+        return "möjlig"
+    if label in {"clean", "accepted"}:
+        return "låg"
+    if label in {"rejected", "malicious"}:
+        return "hög"
+    return "oklar"
+
+
+def _label_display_name(label: str) -> str:
+    mapping = {
+        "unknown": "okänd",
+        "clean": "ren",
+        "accepted": "godkänd",
+        "malicious": "skadlig",
+        "rejected": "avvisad",
+        "phishing": "phishing",
+        "ransomware": "ransomware",
+        "malware": "malware",
+        "intrusion": "intrång",
+        "ddos": "DDoS",
+    }
+    return mapping.get((label or "unknown").lower(), label or "okänd")
+
+
+def _ioc_type_display_name(ioc_type: str, count: int) -> str:
+    singular = {
+        "url": "webblänk",
+        "domain": "domän",
+        "ip": "IP-adress",
+        "email": "e-postadress",
+        "cve": "CVE-referens",
+        "md5": "MD5-hash",
+        "sha1": "SHA1-hash",
+        "sha256": "SHA256-hash",
+    }
+    plural = {
+        "url": "webblänkar",
+        "domain": "domäner",
+        "ip": "IP-adresser",
+        "email": "e-postadresser",
+        "cve": "CVE-referenser",
+        "md5": "MD5-hashar",
+        "sha1": "SHA1-hashar",
+        "sha256": "SHA256-hashar",
+    }
+    return singular.get(ioc_type, ioc_type) if count == 1 else plural.get(ioc_type, ioc_type)
+
+
 def _build_upload_text_summary(
     prediction: Prediction,
     iocs: list[IOC],
@@ -630,19 +686,27 @@ def _build_upload_text_summary(
 ) -> str:
     label = prediction.label or "unknown"
     confidence_pct = round(prediction.confidence * 100)
+    risk_level = _risk_level_from_prediction(prediction)
+    display_label = _label_display_name(label)
     ioc_count = len(iocs)
+    summary_parts = [
+        f"Textanalysen bedömer risken som {risk_level}.",
+        f"Klassificering: {display_label} ({confidence_pct} %).",
+    ]
     if ioc_count == 0:
-        summary = f"Textanalysen klassade innehållet som {label} ({confidence_pct} %) utan indikatorträffar."
+        summary_parts.append("Inga indikatorer hittades.")
     else:
         breakdown = _summarize_iocs(iocs)
-        parts = [f"{count} {ioc_type}" for ioc_type, count in sorted(breakdown.items())]
-        summary = (
-            f"Textanalysen klassade innehållet som {label} ({confidence_pct} %) "
-            f"och hittade {ioc_count} indikatorer: {', '.join(parts)}."
+        parts = [
+            f"{count} {_ioc_type_display_name(ioc_type, count)}"
+            for ioc_type, count in sorted(breakdown.items())
+        ]
+        summary_parts.append(
+            f"Hittade {ioc_count} indikatorer: {', '.join(parts)}."
         )
     if text_truncated:
-        summary += " Texten trunkerades före analys."
-    return summary
+        summary_parts.append("Texten trunkerades före analys.")
+    return " ".join(summary_parts)
 
 
 def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> UploadIngestResponse:

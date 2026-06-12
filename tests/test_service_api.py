@@ -333,7 +333,9 @@ def test_predict_upload_text_ingest_fallback_with_extracted_text():
     assert payload["prediction"]["label"] == "unknown"
     assert payload["model_version"] == "none"
     assert payload["text_truncated"] is False
-    assert "indikatorer" in payload["summary"]
+    assert "risken som oklar" in payload["summary"]
+    assert "Klassificering: okänd" in payload["summary"]
+    assert "1 webblänk" in payload["summary"]
     assert "http://evil.example" not in payload["summary"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "http://evil.example" in ioc_values
@@ -386,8 +388,25 @@ def test_predict_upload_text_ingest_extracts_json_raw_content():
     payload = response.json()
     assert payload["extracted_text"].startswith('{"message"')
     assert "1.2.3.4" not in payload["summary"]
+    assert "1 IP-adress" in payload["summary"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "1.2.3.4" in ioc_values
+
+
+def test_predict_upload_text_ingest_summary_without_indicators():
+    response = client.post(
+        "/predict/upload-text-ingest",
+        json={
+            "upload_id": "upload-126",
+            "filename": "note.txt",
+            "content_type": "text/plain",
+            "extracted_text": "Just a harmless note without any indicator.",
+            "source": "upload_text",
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["summary"].endswith("Inga indikatorer hittades.")
 
 
 def test_predict_liveflow_fallback_combines_all_parts():
