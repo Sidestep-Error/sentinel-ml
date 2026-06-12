@@ -90,6 +90,13 @@ class UploadResponse(BaseModel):
     model_version: str
 
 
+class MacroAnalysis(BaseModel):
+    has_macros: bool = False
+    autoexec_keywords: int = 0
+    suspicious_keywords: int = 0
+    ioc_count: int = 0
+
+
 class UploadIngestRequest(BaseModel):
     upload_id: str
     filename: str
@@ -101,6 +108,7 @@ class UploadIngestRequest(BaseModel):
     scan_detail: str = ""
     risk_score: int = 0
     source: str = "upload"
+    macro: MacroAnalysis | None = None
 
 
 class UploadIngestResponse(BaseModel):
@@ -113,6 +121,7 @@ class UploadIngestResponse(BaseModel):
     scan_detail: str
     risk_score: int
     known_malicious: bool = False
+    macro_risk: str | None = None
 
 
 class UploadTextIngestRequest(BaseModel):
@@ -210,6 +219,7 @@ class LiveFlowSummary(BaseModel):
     ioc_count: int = 0
     matched_cves: int = 0
     known_malicious_hash: bool = False
+    macro_risk: str | None = None
 
 
 class LiveFlowResponse(BaseModel):
@@ -541,6 +551,19 @@ def _predict_upload_record(record: UploadRecord, request: Request) -> UploadResp
     return UploadResponse(prediction=prediction, model_version=loaded.version)
 
 
+def _macro_risk_label(macro: MacroAnalysis | None) -> str | None:
+    if macro is None or not macro.has_macros:
+        return None
+    if macro.autoexec_keywords > 0 and macro.suspicious_keywords > 0:
+        return (
+            f"VBA-makro med autoexec-trigger och {macro.suspicious_keywords} "
+            "misstänkta nyckelord (Shell/CreateObject/URLDownload) — hög risk"
+        )
+    if macro.suspicious_keywords >= 3:
+        return f"VBA-makro med {macro.suspicious_keywords} misstänkta nyckelord — förhöjd risk"
+    return "VBA-makro påträffat — potentiell makro-malware"
+
+
 def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> UploadIngestResponse:
     record = UploadRecord(
         filename=req.filename,
@@ -565,6 +588,7 @@ def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> Upload
         scan_detail=req.scan_detail,
         risk_score=req.risk_score,
         known_malicious=match_upload_hash(req.sha256, _get_malicious_hashes(request)),
+        macro_risk=_macro_risk_label(req.macro),
     )
 
 
@@ -618,6 +642,7 @@ def _predict_liveflow(req: LiveFlowRequest, request: Request) -> LiveFlowRespons
             ioc_count=ioc_count,
             matched_cves=matched_cves,
             known_malicious_hash=upload_result.known_malicious if upload_result else False,
+            macro_risk=upload_result.macro_risk if upload_result else None,
         ),
     )
 
