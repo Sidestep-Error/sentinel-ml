@@ -35,7 +35,7 @@ from pydantic import BaseModel
 from sentinel_ml import __version__
 from sentinel_ml.config import get_settings
 from sentinel_ml.data.predictions import upsert_ml_prediction_document
-from sentinel_ml.data.schemas import IOC, Prediction, UploadRecord
+from sentinel_ml.data.schemas import IOC, MacroAnalysis, Prediction, UploadRecord
 from sentinel_ml.features.cve_relevance import (
     CVERelevancePrediction,
     build_cve_relevance_prediction,
@@ -50,6 +50,7 @@ from sentinel_ml.features.hash_match import (
     match_upload_hash,
 )
 from sentinel_ml.features.ioc_extract import extract_iocs
+from sentinel_ml.features.macro_risk import assess_macro_risk
 from sentinel_ml.features.upload_meta import build_feature_matrix
 from sentinel_ml.llm.prompts import CLASSIFY_THREAT_REPORT_SYSTEM
 from sentinel_ml.log_anomaly import tfidf_detector
@@ -105,6 +106,9 @@ class UploadIngestRequest(BaseModel):
     scan_detail: str = ""
     risk_score: int = 0
     source: str = "upload"
+    # Static VBA analysis from upstream (None for non-Office files or when
+    # the caller predates macro extraction).
+    macro: MacroAnalysis | None = None
 
 
 class UploadIngestResponse(BaseModel):
@@ -117,6 +121,8 @@ class UploadIngestResponse(BaseModel):
     scan_detail: str
     risk_score: int
     known_malicious: bool = False
+    macro_risk: bool = False
+    macro_reason: str = ""
 
 
 class UploadTextIngestRequest(BaseModel):
@@ -214,6 +220,7 @@ class LiveFlowSummary(BaseModel):
     ioc_count: int = 0
     matched_cves: int = 0
     known_malicious_hash: bool = False
+    macro_risk: bool = False
 
 
 class LiveFlowResponse(BaseModel):
@@ -584,6 +591,7 @@ def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> Upload
         scan_detail=req.scan_detail,
     )
     result = _predict_upload_record(record, request)
+    macro_risk, macro_reason = assess_macro_risk(req.macro)
     return UploadIngestResponse(
         upload_id=req.upload_id,
         source=req.source,
@@ -594,6 +602,8 @@ def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> Upload
         scan_detail=req.scan_detail,
         risk_score=req.risk_score,
         known_malicious=match_upload_hash(req.sha256, _get_malicious_hashes(request)),
+        macro_risk=macro_risk,
+        macro_reason=macro_reason,
     )
 
 
@@ -647,6 +657,7 @@ def _predict_liveflow(req: LiveFlowRequest, request: Request) -> LiveFlowRespons
             ioc_count=ioc_count,
             matched_cves=matched_cves,
             known_malicious_hash=upload_result.known_malicious if upload_result else False,
+            macro_risk=upload_result.macro_risk if upload_result else False,
         ),
     )
 
