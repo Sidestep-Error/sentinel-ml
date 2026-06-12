@@ -29,6 +29,7 @@ Spåret täcker två områden:
 - `LLM` körs lokalt via `Ollama`
 - `LLM` är inte primär live-klassificering
 - första liveflödet är `metadata + ClamAV + klassisk modell`
+- första textflödet är `metadata + ClamAV + säkert extraherad text`
 - `LLM` används främst offline för benchmark, analys och rapport
 - normaliserat JSON är låst som upstream-format
 - `Trivy` stöds som adapterväg i CVE-spåret
@@ -57,6 +58,7 @@ Byggt just nu:
 - upload-metadata + `ClamAV`
 - klassisk upload-modell
 - write-back till `ml_predictions`
+- `upload_text` skickas bara med låst JSON-shape via `liveflow`
 - deterministisk CVE-relevans via API
 
 ### Offline nu

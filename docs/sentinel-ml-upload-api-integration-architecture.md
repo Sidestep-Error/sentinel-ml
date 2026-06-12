@@ -26,7 +26,8 @@ collection läses.
 ### 2. HTTP-service (för live-demo i vecka 11)
 
 `sentinel-ml` deployas som en FastAPI-service (port 8100). `sentinel-upload-api`
-ringer `/predict/threat` och `/predict/upload` synkront eller asynkront.
+ringer i första hand `POST /predict/liveflow` med kort timeout och persisterar
+svaret lokalt i `ml_predictions`.
 
 **Endpoints exponerade av `sentinel-ml`:**
 
@@ -106,7 +107,7 @@ Final decision: accepted
 | Threat-intel insamling | ✓ | – |
 | ML-träning + lagring av modeller | – | ✓ |
 | ML-inferens vid request | – | ✓ |
-| `ml_predictions`-collection skrivning | – | ✓ |
+| `ml_predictions`-collection skrivning | ✓ | – |
 | `ml_predictions`-collection läsning | ✓ | – |
 | UI som visar ML-output | ✓ | – |
 | Adversarial test-data | – | ✓ |
@@ -231,3 +232,4 @@ Implementerat API-stöd för steg 4 (backend-aggregator):
 - Gör det enkelt för UI att rendera ett sammanhållet demoresultat från en enda request.
 - `/predict/liveflow-document` returnerar samma innehåll inbäddat i ett write-back-färdigt dokument för `ml_predictions`.
 - `/predict/liveflow-writeback` gör samma sak och skriver dessutom dokumentet direkt till `ml_predictions`.
+- I den nuvarande upload-integrationen används dock `POST /predict/liveflow`, och write-back görs av `sentinel-upload-api`.
