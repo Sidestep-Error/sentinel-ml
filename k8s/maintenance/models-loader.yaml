@@ -11,7 +11,11 @@ metadata:
   name: sentinel-ml-models-loader
   namespace: sentinel
   labels:
-    app.kubernetes.io/name: sentinel-ml
+    # Must NOT match the sentinel-ml Deployment/Service selector
+    # (app.kubernetes.io/name: sentinel-ml): a matching label makes the
+    # Service route traffic here and makes `kubectl logs/port-forward
+    # deploy/sentinel-ml` resolve to this pod instead of the app pod.
+    app.kubernetes.io/name: sentinel-ml-models-loader
 spec:
   restartPolicy: Never
   securityContext:

@@ -100,7 +100,8 @@ trigga ny deploy.
 | `/health` svarar 503 | Service uppe men kan inte nå Mongo | Kontrollera `MONGODB_URI` i secret; verifiera att NetworkPolicy tillåter egress till port 27017 |
 | `forbidden: cannot patch deployments` i CI | SA-token rotated eller saknas | Regenera `KUBECONFIG_HETZNER_B64`-secret enligt sentinel-upload-api runbook |
 | OPA-policyn blockerar apply | Manifest bryter mot constraint (latest-tag, missing labels, no resource limits, root user, rw-rootfs) | Läs error-meddelandet — alla policies dokumenterade i `sentinel-upload-api/k8s/gatekeeper/` |
-| Pod startar men `models_store` är tomt | Förväntat i Fas 1 | Service returnerar fallback-svar (`label="unknown"`, `model_version="none"`). Fas 2 bakar in `.joblib` i image. |
+| Pod startar men `model_version="none"` / `label="unknown"` | `models_store`-PVC:n inte populerad (eller PVC/volym-ändring inte applicerad på klustret) | Modellerna ligger på PVC:n `sentinel-ml-models`, inte i imagen. Följ [sentinel-ml-load-models.md](sentinel-ml-load-models.md): applicera `pvc.yaml`+`deployment.yaml`, populera via loader-pod, `rollout restart`. |
+| `FailedScheduling: persistentvolumeclaim ... not found` | PVC-manifestet inte applicerat (CI applicerar inte manifest) | På Hetzner: `cd /srv/sentinel-ml && git pull && kubectl apply -f k8s/base/pvc.yaml -f k8s/base/deployment.yaml`. |
 | `connection refused` från upload-api trots att sentinel-ml-pod är Running | upload-api:s egress-policy tillåter inte port 8100 till sentinel-ml; eller manifest-ändring inte applicerad på klustret | (1) Säkerställ att `sentinel-upload-api/k8s/base/networkpolicy.yaml` har egress-regel för sentinel-ml. (2) På Hetzner: `cd /srv/sentinel-upload-api && git pull && kubectl apply -k k8s/base/`. Se docs/security-analysis-deployment.md (Operationella lärdomar) för fullständig analys. |
 
 ## Manifest-ändringar kräver manuell apply
