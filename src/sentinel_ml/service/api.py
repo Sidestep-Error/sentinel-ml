@@ -672,8 +672,25 @@ def _build_ml_prediction_document(
     )
 
 
+def _configure_logging() -> None:
+    """Make sentinel_ml INFO logs visible in the service process.
+
+    Uvicorn only configures its own loggers; module loggers propagate to the
+    root logger, which drops INFO without a handler — so startup lines like
+    the hash-bridge counts never reached `kubectl logs`. basicConfig is a
+    no-op when the root logger already has handlers (e.g. under pytest), so
+    test log capture is unaffected.
+    """
+    level = logging.getLevelNamesMapping().get(get_settings().log_level.upper(), logging.INFO)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+
+
 def create_app() -> FastAPI:
     """Build a FastAPI app. Use this in tests to get a fresh lifespan."""
+    _configure_logging()
     app = FastAPI(
         title="Sentinel ML",
         version=__version__,
