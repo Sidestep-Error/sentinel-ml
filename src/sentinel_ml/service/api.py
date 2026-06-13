@@ -27,10 +27,10 @@ from datetime import UTC, datetime
 from email import policy
 from email.parser import Parser
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from sentinel_ml import __version__
 from sentinel_ml.config import get_settings
@@ -95,6 +95,8 @@ class UploadResponse(BaseModel):
 
 
 class UploadIngestRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     upload_id: str
     filename: str
     content_type: str
@@ -104,7 +106,7 @@ class UploadIngestRequest(BaseModel):
     scan_engine: str = "unknown"
     scan_detail: str = ""
     risk_score: int = 0
-    source: str = "upload"
+    source: Literal["upload"] = "upload"
     # Static VBA analysis from upstream (None for non-Office files or when
     # the caller predates macro extraction).
     macro: MacroAnalysis | None = None
@@ -125,6 +127,8 @@ class UploadIngestResponse(BaseModel):
 
 
 class UploadTextIngestRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     upload_id: str
     filename: str
     content_type: str
@@ -133,7 +137,20 @@ class UploadTextIngestRequest(BaseModel):
     scan_detail: str = ""
     extracted_text: str | None = None
     raw_content: str | None = None
-    source: str = "upload_text"
+    source: Literal["upload_text"] = "upload_text"
+
+
+class LiveFlowUploadTextRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    upload_id: str
+    filename: str
+    content_type: str
+    scan_status: str = "clean"
+    scan_engine: str = "unknown"
+    scan_detail: str = ""
+    extracted_text: str
+    source: Literal["upload_text"] = "upload_text"
 
 
 class UploadTextIngestResponse(BaseModel):
@@ -142,11 +159,14 @@ class UploadTextIngestResponse(BaseModel):
     prediction: Prediction
     model_version: str
     iocs: list[IOC]
+    summary: str
     extracted_text: str
     text_truncated: bool
 
 
 class SBOMComponent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     name: str
     version: str
     ecosystem: str | None = None
@@ -155,12 +175,16 @@ class SBOMComponent(BaseModel):
 
 
 class CVEAffectedPackage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     name: str
     ecosystem: str | None = None
     fixed_version: str | None = None
 
 
 class CVEItem(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     cve_id: str
     summary: str
     cvss_score: float
@@ -169,11 +193,15 @@ class CVEItem(BaseModel):
 
 
 class CVERelevanceRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     sbom_components: list[SBOMComponent]
     cves: list[CVEItem]
 
 
 class CVEMatchedComponent(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     name: str
     version: str
     ecosystem: str | None = None
@@ -181,6 +209,8 @@ class CVEMatchedComponent(BaseModel):
 
 
 class CVERelevanceItem(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     cve_id: str
     severity: str
     cvss_score: float
@@ -191,24 +221,32 @@ class CVERelevanceItem(BaseModel):
 
 
 class CVERelevanceSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     total_cves: int
     matched_cves: int
     matched_high_or_critical: int
 
 
 class CVERelevanceResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     results: list[CVERelevanceItem]
     summary: CVERelevanceSummary
 
 
 class TrivyCVERelevanceRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     sbom_document: dict[str, Any]
     vulnerability_document: dict[str, Any]
 
 
 class LiveFlowRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     upload: UploadIngestRequest | None = None
-    upload_text: UploadTextIngestRequest | None = None
+    upload_text: LiveFlowUploadTextRequest | None = None
     cve_relevance: CVERelevanceRequest | None = None
 
 
@@ -578,6 +616,110 @@ def _predict_upload_record(record: UploadRecord, request: Request) -> UploadResp
     return UploadResponse(prediction=prediction, model_version=loaded.version)
 
 
+def _summarize_iocs(iocs: list[IOC]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for ioc in iocs:
+        key = str(ioc.type)
+        counts[key] = counts.get(key, 0) + 1
+    return counts
+
+
+def _risk_level_from_prediction(prediction: Prediction) -> str:
+    label = (prediction.label or "unknown").lower()
+    confidence = prediction.confidence
+    if label in {"phishing", "ransomware", "malware", "intrusion", "ddos"}:
+        if confidence >= 0.8:
+            return "high"
+        if confidence >= 0.5:
+            return "elevated"
+        return "weak"
+    if label in {"clean", "accepted"}:
+        return "low"
+    if label in {"rejected", "malicious"}:
+        return "high"
+    return "unclear"
+
+
+def _label_display_name(label: str) -> str:
+    mapping = {
+        "unknown": "unknown",
+        "clean": "clean",
+        "accepted": "accepted",
+        "malicious": "malicious",
+        "rejected": "rejected",
+        "phishing": "phishing",
+        "ransomware": "ransomware",
+        "malware": "malware",
+        "intrusion": "intrusion",
+        "ddos": "DDoS",
+    }
+    return mapping.get((label or "unknown").lower(), label or "unknown")
+
+
+def _ioc_type_display_name(ioc_type: str, count: int) -> str:
+    singular = {
+        "url": "URL",
+        "domain": "domain",
+        "ip": "IP address",
+        "email": "email address",
+        "cve": "CVE reference",
+        "md5": "MD5 hash",
+        "sha1": "SHA1 hash",
+        "sha256": "SHA256 hash",
+    }
+    plural = {
+        "url": "URLs",
+        "domain": "domains",
+        "ip": "IP addresses",
+        "email": "email addresses",
+        "cve": "CVE references",
+        "md5": "MD5 hashes",
+        "sha1": "SHA1 hashes",
+        "sha256": "SHA256 hashes",
+    }
+    return singular.get(ioc_type, ioc_type) if count == 1 else plural.get(ioc_type, ioc_type)
+
+
+def _signal_phrase(prediction: Prediction) -> str:
+    label = _label_display_name(prediction.label or "unknown")
+    confidence_pct = round(prediction.confidence * 100)
+    risk_level = _risk_level_from_prediction(prediction)
+    if risk_level == "high":
+        return f"Strong signal for {label} ({confidence_pct}%)."
+    if risk_level == "elevated":
+        return f"Moderate signal for {label} ({confidence_pct}%)."
+    if risk_level == "weak":
+        return f"Weak signal for {label} ({confidence_pct}%)."
+    if risk_level == "low":
+        return f"Low-risk text signal ({confidence_pct}%)."
+    return f"Inconclusive text signal ({confidence_pct}%)."
+
+
+def _build_upload_text_summary(
+    prediction: Prediction,
+    iocs: list[IOC],
+    text_truncated: bool,
+) -> str:
+    ioc_count = len(iocs)
+    summary_parts = [
+        _signal_phrase(prediction),
+    ]
+    if ioc_count == 0:
+        summary_parts.append("No indicators were found.")
+    else:
+        breakdown = _summarize_iocs(iocs)
+        parts = [
+            f"{count} {_ioc_type_display_name(ioc_type, count)}"
+            for ioc_type, count in sorted(breakdown.items())
+        ]
+        summary_parts.append(
+            f"Found {ioc_count} indicators: {', '.join(parts)}."
+        )
+    if text_truncated:
+        summary_parts.append("The text was truncated before analysis.")
+    return " ".join(summary_parts)
+
+
 def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> UploadIngestResponse:
     record = UploadRecord(
         filename=req.filename,
@@ -609,12 +751,13 @@ def _predict_upload_ingest(req: UploadIngestRequest, request: Request) -> Upload
 
 
 def _predict_upload_text_ingest(
-    req: UploadTextIngestRequest, request: Request
+    req: UploadTextIngestRequest | LiveFlowUploadTextRequest, request: Request
 ) -> UploadTextIngestResponse:
     text_source = req.extracted_text
-    if not text_source and req.raw_content:
+    raw_content = getattr(req, "raw_content", None)
+    if not text_source and raw_content:
         try:
-            text_source = _extract_text(req.raw_content, req.content_type, req.filename)
+            text_source = _extract_text(raw_content, req.content_type, req.filename)
         except Exception:  # noqa: BLE001
             logger.exception("Text extraction failed for upload_id=%s", req.upload_id)
             text_source = ""
@@ -625,6 +768,7 @@ def _predict_upload_text_ingest(
 
     prediction, model_version = _threat_predict_text(final_text, request)
     iocs = extract_iocs(final_text)
+    summary = _build_upload_text_summary(prediction, iocs, truncated)
 
     return UploadTextIngestResponse(
         upload_id=req.upload_id,
@@ -632,6 +776,7 @@ def _predict_upload_text_ingest(
         prediction=prediction,
         model_version=model_version,
         iocs=iocs,
+        summary=summary,
         extracted_text=final_text,
         text_truncated=truncated,
     )
@@ -663,6 +808,16 @@ def _predict_liveflow(req: LiveFlowRequest, request: Request) -> LiveFlowRespons
     )
 
 
+def _storage_safe_liveflow_response(response: LiveFlowResponse) -> LiveFlowResponse:
+    upload_text_result = response.upload_text_result
+    if upload_text_result is None:
+        return response
+    redacted_upload_text_result = upload_text_result.model_copy(
+        update={"extracted_text": ""}
+    )
+    return response.model_copy(update={"upload_text_result": redacted_upload_text_result})
+
+
 def _resolve_upload_id(req: LiveFlowRequest) -> str:
     if req.upload is not None:
         return req.upload.upload_id
@@ -679,7 +834,7 @@ def _build_ml_prediction_document(
 ) -> MLPredictionDocument:
     return MLPredictionDocument(
         upload_id=_resolve_upload_id(req),
-        ml_liveflow=response,
+        ml_liveflow=_storage_safe_liveflow_response(response),
         created_at=datetime.now(UTC),
     )
 

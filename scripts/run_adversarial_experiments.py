@@ -13,7 +13,6 @@ Usage:
 
 from __future__ import annotations
 
-import json
 import textwrap
 from datetime import UTC, datetime
 from pathlib import Path

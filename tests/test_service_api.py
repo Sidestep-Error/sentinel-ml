@@ -333,6 +333,9 @@ def test_predict_upload_text_ingest_fallback_with_extracted_text():
     assert payload["prediction"]["label"] == "unknown"
     assert payload["model_version"] == "none"
     assert payload["text_truncated"] is False
+    assert "Inconclusive text signal" in payload["summary"]
+    assert "1 URL" in payload["summary"]
+    assert "http://evil.example" not in payload["summary"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "http://evil.example" in ioc_values
 
@@ -362,6 +365,8 @@ def test_predict_upload_text_ingest_extracts_eml_and_uses_model(app_with_models)
     payload = response.json()
     assert payload["model_version"] != "none"
     assert payload["prediction"]["label"] in {"ransomware", "phishing"}
+    assert "signal for" in payload["summary"]
+    assert "attacker@example.com" not in payload["summary"]
     assert "Subject: Payroll update" in payload["extracted_text"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "CVE-2024-99999" in ioc_values
@@ -382,8 +387,26 @@ def test_predict_upload_text_ingest_extracts_json_raw_content():
     assert response.status_code == 200
     payload = response.json()
     assert payload["extracted_text"].startswith('{"message"')
+    assert "1.2.3.4" not in payload["summary"]
+    assert "1 IP address" in payload["summary"]
     ioc_values = {i["value"] for i in payload["iocs"]}
     assert "1.2.3.4" in ioc_values
+
+
+def test_predict_upload_text_ingest_summary_without_indicators():
+    response = client.post(
+        "/predict/upload-text-ingest",
+        json={
+            "upload_id": "upload-126",
+            "filename": "note.txt",
+            "content_type": "text/plain",
+            "extracted_text": "Just a harmless note without any indicator.",
+            "source": "upload_text",
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["summary"].endswith("No indicators were found.")
 
 
 def test_predict_liveflow_fallback_combines_all_parts():
@@ -450,6 +473,7 @@ def test_predict_liveflow_fallback_combines_all_parts():
     assert payload["upload_text_result"]["model_version"] == "none" or len(
         payload["upload_text_result"]["model_version"]
     ) == 12
+    assert payload["upload_text_result"]["summary"]
     assert payload["summary"]["ioc_count"] >= 1
     assert payload["summary"]["matched_cves"] == 1
 
@@ -488,6 +512,47 @@ def test_predict_liveflow_uses_loaded_models(app_with_models):
     assert payload["upload_result"]["model_version"] != "none"
     assert payload["upload_text_result"]["prediction"]["label"] in {"ransomware", "phishing"}
     assert payload["upload_text_result"]["model_version"] != "none"
+    assert payload["upload_text_result"]["summary"]
+
+
+def test_predict_liveflow_rejects_raw_content_in_upload_text_contract():
+    response = client.post(
+        "/predict/liveflow",
+        json={
+            "upload_text": {
+                "upload_id": "upload-201",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "raw_content": "should not be accepted in liveflow",
+                "source": "upload_text",
+            },
+        },
+    )
+    assert response.status_code == 422
+    assert "extra_forbidden" in response.text or "Field required" in response.text
+
+
+def test_predict_liveflow_rejects_wrong_upload_source():
+    response = client.post(
+        "/predict/liveflow",
+        json={
+            "upload": {
+                "upload_id": "upload-202",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "size_bytes": 58213,
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "risk_score": 78,
+                "source": "upload_text",
+            }
+        },
+    )
+    assert response.status_code == 422
 
 
 def test_predict_liveflow_document_wraps_response_for_ml_predictions():
@@ -552,6 +617,7 @@ def test_predict_liveflow_document_uses_loaded_models(app_with_models):
     assert payload["ml_provider"] == "sentinel-ml"
     assert payload["ml_liveflow"]["upload_result"]["model_version"] != "none"
     assert payload["ml_liveflow"]["upload_text_result"]["model_version"] != "none"
+    assert payload["ml_liveflow"]["upload_text_result"]["extracted_text"] == ""
     assert payload["ml_liveflow"]["summary"]["has_upload"] is True
     assert payload["ml_liveflow"]["summary"]["has_upload_text"] is True
 
@@ -591,6 +657,16 @@ def test_predict_liveflow_writeback_persists_document(monkeypatch):
                 "scan_detail": "Phishing.Email.Generic",
                 "risk_score": 78,
                 "source": "upload",
+            },
+            "upload_text": {
+                "upload_id": "upload-400",
+                "filename": "invoice.eml",
+                "content_type": "message/rfc822",
+                "scan_status": "malicious",
+                "scan_engine": "clamav",
+                "scan_detail": "Phishing.Email.Generic",
+                "extracted_text": "secret link http://evil.example",
+                "source": "upload_text",
             }
         },
     )
@@ -600,6 +676,12 @@ def test_predict_liveflow_writeback_persists_document(monkeypatch):
     assert payload["collection"] == "ml_predictions"
     assert payload["document"]["upload_id"] == "upload-400"
     assert stored["document"]["upload_id"] == "upload-400"
+    assert (
+        payload["document"]["ml_liveflow"]["upload_text_result"]["extracted_text"] == ""
+    )
+    assert (
+        stored["document"]["ml_liveflow"]["upload_text_result"]["extracted_text"] == ""
+    )
 
 
 def test_predict_liveflow_writeback_returns_503_on_persist_failure(monkeypatch):
