@@ -1,13 +1,16 @@
-"""Evasion attacks against Spar B (upload classifier).
+"""Evasion attacks against Spår B (upload classifier).
 
-Stub for Fas 2: real implementation uses ART (adversarial-robustness-toolbox)
-to generate feature-space adversarial examples. Kept minimal here so the
-package imports cleanly even when ART isn't installed (it's an optional dep).
+Includes both a numeric random-noise baseline and a metadata mimicry attack
+that stays inside the valid UploadRecord domain.
 """
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 import numpy as np
+
+from sentinel_ml.data.schemas import UploadRecord
 
 
 def random_feature_perturbation(
@@ -21,3 +24,29 @@ def random_feature_perturbation(
     rng = np.random.default_rng(seed)
     noise = rng.uniform(-epsilon, epsilon, size=features.shape).astype(features.dtype)
     return features + noise
+
+
+def mimic_upload_metadata(
+    record: UploadRecord,
+    *,
+    filename: str = "quarterly_report.pdf",
+    content_type: str = "application/pdf",
+    size_bytes: int = 500_000,
+) -> UploadRecord:
+    """Make attacker-controlled metadata look like a common benign upload.
+
+    Security-derived fields such as sha256, scan_status and risk_score are
+    deliberately preserved because an uploader cannot directly rewrite them.
+    """
+    return record.model_copy(
+        update={
+            "filename": filename,
+            "content_type": content_type,
+            "size_bytes": size_bytes,
+        }
+    )
+
+
+def mimic_uploads(records: Iterable[UploadRecord]) -> list[UploadRecord]:
+    """Apply the same reproducible benign-looking profile to many uploads."""
+    return [mimic_upload_metadata(record) for record in records]

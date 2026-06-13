@@ -2,12 +2,13 @@
 
 Experiment:
   1. Data poisoning  — label-flipping på threat-classifier
-  2. Evasion         — random feature perturbation på upload-classifier
+  2. Evasion         — random feature noise + giltig metadata-mimicry
   3. Prompt injection — PROBES mot Ollama (hoppas över om Ollama ej är igång)
 
 Usage:
   python scripts/run_adversarial_experiments.py
   python scripts/run_adversarial_experiments.py --dataset data/real_threat_reports.jsonl
+  python scripts/run_adversarial_experiments.py --upload-dataset data/upload_training_data.jsonl
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ import numpy as np
 import typer
 from sklearn.model_selection import train_test_split
 
-from sentinel_ml.adversarial.evasion import random_feature_perturbation
+from sentinel_ml.adversarial.evasion import mimic_uploads, random_feature_perturbation
 from sentinel_ml.adversarial.poisoning import poison_labels
 from sentinel_ml.adversarial.prompt_injection import run_harness
 from sentinel_ml.data.loaders import load_threat_reports_jsonl
@@ -35,26 +36,41 @@ EVASION_EPSILONS = [0.01, 0.05, 0.10, 0.20]
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
-def _synthetic_uploads(n: int = 200, seed: int = 42) -> tuple[np.ndarray, list[str]]:
-    """Generate synthetic UploadRecord feature matrix for evasion testing."""
+def _synthetic_uploads(n: int = 200, seed: int = 42) -> tuple[list[UploadRecord], list[str]]:
+    """Generate records for a reproducible metadata-evasion sanity check."""
     rng = np.random.default_rng(seed)
     records = []
     labels = []
     for i in range(n):
         is_malicious = i % 2 == 0
+        label = "rejected" if is_malicious else "accepted"
         record = UploadRecord(
-            filename=f"{'evil' if is_malicious else 'report'}{i}.{'exe' if is_malicious else 'pdf'}",
-            content_type="application/octet-stream" if is_malicious else "application/pdf",
+            filename=f"{'payload' if is_malicious else 'report'}_{i}.{'exe' if is_malicious else 'pdf'}",
+            content_type="application/x-dosexec" if is_malicious else "application/pdf",
             sha256="a" * 64,
             size_bytes=int(rng.integers(1000, 10_000_000)),
-            scan_status="malicious" if is_malicious else "clean",
-            decision="rejected" if is_malicious else "accepted",
-            risk_score=int(rng.integers(70, 100)) if is_malicious else int(rng.integers(0, 30)),
+            # Both classes simulate files ClamAV did not flag. The metadata
+            # model must not receive the answer through security-derived fields.
+            scan_status="clean",
+            decision=label,
+            risk_score=0,
         )
         records.append(record)
-        labels.append("malicious" if is_malicious else "clean")
-    features, _ = build_feature_matrix(records)
-    return features, labels
+        labels.append(label)
+    return records, labels
+
+
+def _load_upload_dataset(path: Path) -> tuple[list[UploadRecord], list[str]]:
+    """Load the av-bias:ed upload training JSONL used by the honest pipeline."""
+    records: list[UploadRecord] = []
+    labels: list[str] = []
+    with path.open(encoding="utf-8") as file:
+        for line in file:
+            raw = json.loads(line)
+            label = str(raw.pop("label"))
+            records.append(UploadRecord.model_validate(raw))
+            labels.append(label)
+    return records, labels
 
 
 # ── Experiment 1: Data Poisoning ─────────────────────────────────────────────
@@ -91,12 +107,21 @@ def run_poisoning(dataset_path: Path) -> list[dict]:
 
 # ── Experiment 2: Evasion ─────────────────────────────────────────────────────
 
-def run_evasion() -> list[dict]:
+def run_evasion(dataset_path: Path | None = None) -> list[dict]:
     typer.echo("\n[2/3] Evasion experiment (upload classifier)...")
-    features, labels = _synthetic_uploads(n=300)
-    X_train, X_test, y_train, y_test = train_test_split(
-        features, labels, test_size=0.2, random_state=42
+    if dataset_path is not None and dataset_path.exists():
+        records, labels = _load_upload_dataset(dataset_path)
+        dataset_source = str(dataset_path)
+    else:
+        records, labels = _synthetic_uploads(n=300)
+        dataset_source = "syntetisk sanity-check"
+    typer.echo(f"  dataset={dataset_source}  records={len(records)}")
+
+    train_records, test_records, y_train, y_test = train_test_split(
+        records, labels, test_size=0.2, random_state=42, stratify=labels
     )
+    X_train, _ = build_feature_matrix(train_records)
+    X_test, _ = build_feature_matrix(test_records)
     clf = upload_classifier.train(X_train, y_train)
     baseline_pred = clf.predict(X_test)
 
@@ -107,14 +132,86 @@ def run_evasion() -> list[dict]:
         flipped = int((baseline_pred != adv_pred).sum())
         flip_rate = flipped / len(y_test)
         results.append({
-            "epsilon": eps,
-            "flipped": flipped,
+            "attack": "random_noise",
+            "parameter": f"ε={eps}",
+            "successful": flipped,
             "total": len(y_test),
-            "flip_rate": round(flip_rate, 3),
+            "success_rate": round(flip_rate, 3),
+            "dataset": dataset_source,
         })
         typer.echo(f"  ε={eps}  flipped={flipped}/{len(y_test)}  rate={flip_rate:.1%}")
 
+    target_indices = [
+        idx
+        for idx, (label, prediction) in enumerate(zip(y_test, baseline_pred, strict=True))
+        if label == "rejected" and prediction == "rejected"
+    ]
+    target_records = [test_records[idx] for idx in target_indices]
+    mimicked_features, _ = build_feature_matrix(mimic_uploads(target_records))
+    mimicked_pred = clf.predict(mimicked_features) if target_records else []
+    successful = int(sum(prediction == "accepted" for prediction in mimicked_pred))
+    total = len(target_records)
+    success_rate = successful / total if total else 0.0
+    results.append({
+        "attack": "metadata_mimicry",
+        "parameter": "benign PDF profile",
+        "successful": successful,
+        "total": total,
+        "success_rate": round(success_rate, 3),
+        "dataset": dataset_source,
+    })
+    typer.echo(
+        f"  metadata mimicry  evaded={successful}/{total}  rate={success_rate:.1%}"
+    )
+
     return results
+
+
+def _write_poisoning_svg(results: list[dict], path: Path) -> None:
+    """Write a dependency-free line plot of poison ratio against F1-macro."""
+    width, height = 720, 420
+    left, right, top, bottom = 80, 40, 40, 70
+    chart_w = width - left - right
+    chart_h = height - top - bottom
+    max_ratio = max((result["ratio"] for result in results), default=1.0) or 1.0
+    f1_values = [result["f1_macro"] for result in results]
+    min_f1 = max(0.0, min(f1_values, default=0.0) - 0.05)
+    max_f1 = min(1.0, max(f1_values, default=1.0) + 0.05)
+    f1_span = max_f1 - min_f1 or 1.0
+
+    def point(result: dict) -> tuple[float, float]:
+        x = left + (result["ratio"] / max_ratio) * chart_w
+        y = top + (max_f1 - result["f1_macro"]) / f1_span * chart_h
+        return x, y
+
+    points = [point(result) for result in results]
+    polyline = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+    markers = "\n".join(
+        (
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="5" fill="#b91c1c"/>'
+            f'<text x="{x:.1f}" y="{y - 12:.1f}" text-anchor="middle" '
+            f'font-size="13">{result["f1_macro"]:.3f}</text>'
+        )
+        for result, (x, y) in zip(results, points, strict=True)
+    )
+    x_labels = "\n".join(
+        f'<text x="{x:.1f}" y="{height - 35}" text-anchor="middle" font-size="13">'
+        f'{result["ratio"]:.0%}</text>'
+        for result, (x, _) in zip(results, points, strict=True)
+    )
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">
+<rect width="100%" height="100%" fill="white"/>
+<text x="{width / 2}" y="24" text-anchor="middle" font-size="18">Data poisoning: F1-macro</text>
+<line x1="{left}" y1="{top}" x2="{left}" y2="{height - bottom}" stroke="black"/>
+<line x1="{left}" y1="{height - bottom}" x2="{width - right}" y2="{height - bottom}" stroke="black"/>
+<text x="20" y="{height / 2}" transform="rotate(-90 20 {height / 2})" text-anchor="middle">F1-macro</text>
+<text x="{width / 2}" y="{height - 8}" text-anchor="middle">Poison-ratio</text>
+<polyline points="{polyline}" fill="none" stroke="#b91c1c" stroke-width="3"/>
+{markers}
+{x_labels}
+</svg>
+"""
+    path.write_text(svg, encoding="utf-8")
 
 
 # ── Experiment 3: Prompt Injection ────────────────────────────────────────────
@@ -153,6 +250,7 @@ def _render_report(
     evasion: list[dict],
     injection: list[dict] | None,
     dataset_path: Path,
+    poisoning_plot_name: str = "adversarial-poisoning.svg",
 ) -> str:
     baseline_f1 = poisoning[0]["f1_macro"]
     ts = datetime.now(UTC).strftime("%Y-%m-%d")
@@ -166,9 +264,11 @@ def _render_report(
 
     # Evasion table
     e_rows = "\n".join(
-        f"| {r['epsilon']} | {r['flipped']} / {r['total']} | {r['flip_rate']:.1%} |"
+        f"| `{r['attack']}` | {r['parameter']} | "
+        f"{r['successful']} / {r['total']} | {r['success_rate']:.1%} |"
         for r in evasion
     )
+    mimicry = next(result for result in evasion if result["attack"] == "metadata_mimicry")
 
     # Prompt injection table
     if injection:
@@ -229,7 +329,7 @@ def _render_report(
         | Experiment | Resultat |
         |------------|---------|
         | Data poisoning (20 %) | ΔF1 = {poisoning[-1]['f1_macro'] - baseline_f1:+.3f} |
-        | Evasion (ε=0.2) | Flip rate = {evasion[-1]['flip_rate']:.1%} |
+        | Metadata-mimicry | Success rate = {mimicry['success_rate']:.1%} |
         | Prompt injection | {"Ej testat (Ollama ej tillgänglig)" if injection is None else f"{sum(1 for r in injection if r['injected'])}/{len(injection)} bypassed"} |
 
         ## Hotmodell
@@ -254,6 +354,8 @@ def _render_report(
         |-------------|-------------------|----------|----------|-----|
         {p_rows}
 
+        ![F1-macro per poison-ratio]({poisoning_plot_name})
+
         **Analys:**
         Vid 20 % förgiftning sjunker F1 från {baseline_f1:.3f} till {poisoning[-1]['f1_macro']:.3f}
         (ΔF1={poisoning[-1]['f1_macro'] - baseline_f1:+.3f}). TF-IDF + LR visar sig
@@ -268,22 +370,29 @@ def _render_report(
 
         ### 2. Evasion — Upload-classifier (Random Forest)
 
-        **Hypotes:** Bounded uniform noise i feature-rymden räcker för att flippa prediktioner.
+        **Hypotes:** Angriparkontrollerad metadata kan ändras så att en skadlig
+        upload liknar en vanlig PDF och klassificeras som accepterad.
 
-        **Metod:** `adversarial/evasion.py::random_feature_perturbation` lägger till
-        uniform brus ∈ [-ε, ε] på alla features. Mäter andel flippade prediktioner.
+        **Metod:** Random feature noise behålls som sanity-check. Den riktade
+        metadata-mimicry-attacken ändrar endast filnamn, content-type och storlek
+        till en benign PDF-profil. Hash, scan-status och risk-score bevaras.
+        Dataset: `{mimicry['dataset']}`.
 
-        | ε | Flippade | Flip-rate |
-        |---|----------|-----------|
+        | Attack | Parameter | Lyckade / möjliga | Success rate |
+        |--------|-----------|-------------------|--------------|
         {e_rows}
 
         **Analys:**
-        {"Random Forest är robust mot random feature noise — låg flip-rate även vid ε=0.2. En riktad ART-attack (HopSkipJump) skulle sannolikt prestera bättre." if evasion[-1]['flip_rate'] < 0.15 else "Hög flip-rate indikerar att modellen är känslig för perturbationer — adversarial training rekommenderas."}
+        Metadata-mimicry lyckades för {mimicry['successful']} av {mimicry['total']}
+        korrekt identifierade skadliga testposter ({mimicry['success_rate']:.1%}).
+        Resultatet visar metadata-modellens gameability utan att skapa ogiltiga
+        feature-vektorer. Hash-bryggan och makroregeln är separata skyddslager
+        som inte mäts av klassificerarattacken.
 
         **Motåtgärder:**
-        - Input-domain-validering (clampa size_bytes, risk_score till rimliga intervall)
-        - Ensemble-votning med flera modeller
-        - Adversarial training med ART
+        - Behandla metadata-modellen som triage-hint, inte ensam detektion
+        - Behåll ClamAV, hash-brygga och makroanalys som separata skyddslager
+        - Träna och utvärdera med realistiska, av-biasade filnamn
 
         ---
 
@@ -297,9 +406,9 @@ def _render_report(
         inte anses produktionsklart utan ytterligare härdning:
 
         1. **Datavalidering** bör implementeras i `data/loaders.py` vid MongoDB-intag
-        2. **Input-range-validering** bör läggas till i upload-feature-pipeline
+        2. **Metadata-modellen** måste kombineras med innehålls- och hashbaserade skydd
         3. **Prompt injection** kräver fortsatt testning mot en körande Ollama-instans
-        4. **ART-baserade riktade attacker** (HopSkipJump, C&W) är nästa steg för VG
+        4. **ART-baserade attacker** är frivillig fördjupning om resultaten kan mappas till giltiga uploads
 
         Referens: [OWASP ML Security Top 10](https://owasp.org/www-project-machine-learning-security-top-10/),
         [MITRE ATLAS](https://atlas.mitre.org/), NIST AI 100-2.
@@ -310,15 +419,25 @@ def _render_report(
 
 def main(
     dataset: Path = typer.Argument(Path("data/real_threat_reports.jsonl")),
+    upload_dataset: Path = typer.Option(Path("data/upload_training_data.jsonl")),
     out: Path = typer.Option(Path("docs/adversarial-analysis.md")),
 ) -> None:
     poisoning_results = run_poisoning(dataset)
-    evasion_results = run_evasion()
+    evasion_results = run_evasion(upload_dataset)
     injection_results = run_prompt_injection()
 
-    report = _render_report(poisoning_results, evasion_results, injection_results, dataset)
     out.parent.mkdir(parents=True, exist_ok=True)
+    poisoning_plot = out.with_name("adversarial-poisoning.svg")
+    _write_poisoning_svg(poisoning_results, poisoning_plot)
+    report = _render_report(
+        poisoning_results,
+        evasion_results,
+        injection_results,
+        dataset,
+        poisoning_plot.name,
+    )
     out.write_text(report, encoding="utf-8")
+    typer.echo(f"Poisoning-graf sparad till {poisoning_plot}")
     typer.echo(f"\nRapport sparad till {out}")
 
 

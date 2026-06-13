@@ -35,6 +35,8 @@
 | 10% | 126 | 0.934 | 0.866 | -0.097 |
 | 20% | 253 | 0.886 | 0.807 | -0.156 |
 
+        ![F1-macro per poison-ratio](adversarial-poisoning.svg)
+
         **Analys:**
         Vid 20 % förgiftning sjunker F1 från 0.963 till 0.807
         (ΔF1=-0.156). TF-IDF + LR visar sig
@@ -75,7 +77,6 @@
 
 **Status:** Ej genomfört — Ollama var inte tillgängligt vid testkörningen.
 Kör `ollama serve` och kör scriptet igen för att genomföra testet.
-Ägare: kollega som ansvarar för LLM/Ollama-spåret.
 
         ---
 
